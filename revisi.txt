@@ -3,7 +3,7 @@ bisa terkoneksi dengan server dan database, Perbaiki authentikaasi, oathorisasi,
 pendaftaran sebagai murid/guru, profil, logo, animasi in/out, konten, SEO, dan layout grid atau card data sesuai dengan data yang 
 didapat dari json response.
 
-base url localhost = http://localhost:5000
+base url server = http://localhost:5000
 
 Buat koneksi api sesuai deengan dokumentasi api requset/response di file API_DOCUMENTATION.md Analisis dokumentasi
 karena api tersebut memberikan ke 2 website landing page (projek ini) & dashboard maka cari api yang dibutuhkan untuk projek ini, untuk membantu menentukan api mana yang digunakan, maka baca dan analisis file workflow.pdf. File ini adalah alur
