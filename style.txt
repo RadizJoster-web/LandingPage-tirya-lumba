@@ -1,0 +1,37 @@
+======================================================
+UI/UX DESIGN SYSTEM: PT TIRYA LUMBA
+Tema Utama: Aquatic, Moderen, Bersih, Profesional
+======================================================
+
+1. PALET WARNA (Aquatic Vibe)
+- Primary Blue   : #0077B6 (Warna laut dalam - untuk Header, Primary Text, Navbar aktif)
+- Cyan/Aqua      : #00B4D8 (Warna air segar - untuk tombol CTA, Aksen, Hover states)
+- Light Azure    : #E0FBFC (Warna air dangkal - untuk Background section Landing Page, highlight ringan)
+- Accent Coral   : #FF6F59 (Warna kontras pelampung - untuk Notifikasi, Error, tombol Destructive)
+- Neutral Light  : #F8F9FA (Putih Mutiara - Background utama Landing Page)
+- Dashboard Base : #F3F4F6 (Abu-abu sangat terang - Background utama Dashboard Admin)
+- Text Dark      : #1D3557 (Navy gelap pekat - Pengganti warna hitam murni untuk teks agar lebih menyatu dengan tema)
+
+2. TIPOGRAFI
+- Font Heading   : 'Plus Jakarta Sans', sans-serif (Memberikan kesan moderen, bersih, dan ramah).
+- Font Body      : 'Inter', sans-serif (Tingkat keterbacaan tinggi, sangat cocok untuk tabel data di Dashboard dan paragraf panjang).
+- Hierarki       :
+  * H1: 48px/56px (Bold) - Hero section Landing Page
+  * H2: 32px/40px (Semi-Bold) - Judul section
+  * Body Text: 16px/24px (Regular) - Konten utama
+  * Data/Table: 14px/20px (Medium) - Khusus Dashboard
+
+3. UI STYLING & BENTUK (Fluid & Water-like)
+- Border Radius  : 
+  * 16px (rounded-2xl) untuk Card di Landing Page (kesan cairan/fluid).
+  * 8px (rounded-lg) untuk Card, Input, dan Tabel di Dashboard (kesan lebih struktural/data-heavy).
+- Efek Visual (Landing Page) : 
+  * Glassmorphism (bg-white/70 backdrop-blur-md) pada Navbar dan floating card untuk meniru efek melihat dari balik kaca akuarium/permukaan air.
+  * Soft Shadow (shadow-lg shadow-blue-900/5) untuk memberikan kedalaman tanpa terlihat berat.
+- Efek Visual (Dashboard Admin) : 
+  * Flat & Clean. Hindari shadow berlebihan. Gunakan border tipis (border-gray-200) antar elemen untuk memisahkan data dengan jelas.
+
+4. KONSISTENSI ANTARMUKA
+- Input Form     : Background putih, border gray-300, focus ring Cyan (#00B4D8).
+- Button Primary : Solid background #00B4D8, teks putih, hover #0077B6, rounded-full untuk Landing Page, rounded-lg untuk Dashboard.
+- Animasi        : Transisi CSS yang halus (ease-in-out 300ms) untuk hover tombol dan buka-tutup modal, layaknya pergerakan air yang mengalir.
