@@ -1,11 +1,11 @@
 import React from 'react';
 import Link from 'next/link';
-import { UserSession } from '@/types';
+import { AuthUser } from '@/types';
 import { Button } from '@/components/ui/Button';
 
 interface MobileMenuProps {
   isOpen: boolean;
-  user: UserSession | null;
+  user: AuthUser | null;
   onClose: () => void;
   onLogout: () => void;
 }
@@ -54,7 +54,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
           <>
             <Link href="/profile" onClick={onClose}>
               <Button variant="secondary" size="md" className="w-full">
-                👤 Profil Saya ({user.name || user.email})
+                👤 Profil Saya ({user.email.split('@')[0]})
               </Button>
             </Link>
             <Link href="/daftar" onClick={onClose}>

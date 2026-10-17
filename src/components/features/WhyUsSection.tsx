@@ -2,13 +2,23 @@ import React from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import { PlatformStats } from '@/services/api';
 
 interface WhyUsSectionProps {
-  stats: PlatformStats;
+  /** Angka nyata dari API: jumlah kolam mitra, wilayah, dan jenis kelas yang tersedia. */
+  stats: {
+    totalPartnerPools: number;
+    totalAreas: number;
+    totalClassTypes: number;
+  };
 }
 
 export const WhyUsSection: React.FC<WhyUsSectionProps> = ({ stats }) => {
+  const statItems = [
+    { value: stats.totalPartnerPools, label: 'Kolam Renang Mitra', color: 'text-[#00B4D8]' },
+    { value: stats.totalAreas, label: 'Wilayah Layanan', color: 'text-[#0077B6]' },
+    { value: stats.totalClassTypes, label: 'Jenis Kelas Tersedia', color: 'text-[#00B4D8]' },
+  ];
+
   return (
     <section id="kenapa-pilih-kami" className="py-24 bg-[#E0FBFC]/40 scroll-mt-16">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -23,17 +33,16 @@ export const WhyUsSection: React.FC<WhyUsSectionProps> = ({ stats }) => {
           Kami memberikan bimbingan renang berstandar tinggi dengan ekosistem belajar yang aman, ramah anak, dan terstruktur.
         </p>
 
-        {/* 3 Key Pillars */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-14 text-left">
           <Card variant="landing" className="flex flex-col gap-3">
             <div className="w-12 h-12 rounded-2xl bg-[#E0FBFC] text-[#0077B6] flex items-center justify-center text-2xl font-bold">
               🎓
             </div>
             <h3 className="font-heading font-bold text-xl text-[#0077B6]">
-              Guru Berkualitas & Berlisensi
+              Guru Berkualitas &amp; Berlisensi
             </h3>
             <p className="text-sm text-slate-600 leading-relaxed">
-              Seluruh pelatih telah tersertifikasi oleh PRSI dan dibekali sertifikasi keselamatan air (Water Safety & First Aid). Ramah, sabar, dan komunikatif.
+              Setiap pelatih yang tampil di sistem sudah terverifikasi admin: lisensi pelatih, pengalaman mengajar, dan jadwal ketersediaannya tercatat resmi.
             </p>
           </Card>
 
@@ -42,10 +51,10 @@ export const WhyUsSection: React.FC<WhyUsSectionProps> = ({ stats }) => {
               🕒
             </div>
             <h3 className="font-heading font-bold text-xl text-[#0077B6]">
-              Jadwal & Lokasi Fleksibel
+              Jadwal &amp; Lokasi Fleksibel
             </h3>
             <p className="text-sm text-slate-600 leading-relaxed">
-              Bebas tentukan hari, jam (pagi, siang, atau sore), serta pilihan kolam renang mitra terdekat dari domisili Anda di Tangerang Raya.
+              Pilih kolam terdekat, hari, dan sesi jam les langsung dari jadwal asli pada sistem. Pelatih yang muncul sudah otomatis tersaring sesuai pilihanmu.
             </p>
           </Card>
 
@@ -54,37 +63,30 @@ export const WhyUsSection: React.FC<WhyUsSectionProps> = ({ stats }) => {
               🛡️
             </div>
             <h3 className="font-heading font-bold text-xl text-[#0077B6]">
-              Kurikulum Aman & Terarah
+              Kurikulum Aman &amp; Terarah
             </h3>
             <p className="text-sm text-slate-600 leading-relaxed">
-              Metode pengajaran bertahap dari pemula sampai gaya kompetisi. Progres murid terpantau rapi dalam sistem digital tanpa khawatir jadwal bentrok.
+              Metode pengajaran bertahap dari pemula sampai gaya kompetisi. Status pendaftaran dan verifikasi tercatat digital tanpa jadwal bentrok.
             </p>
           </Card>
         </div>
 
-        {/* Real Dynamic / Parallel Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto py-8 px-6 bg-white rounded-3xl shadow-lg shadow-blue-900/5 border border-blue-50 mb-12">
-          <div className="space-y-1">
-            <div className="font-heading font-extrabold text-4xl sm:text-5xl text-[#00B4D8]">
-              {stats.totalStudents.toLocaleString('id-ID')}+
+          {statItems.map((item, index) => (
+            <div
+              key={item.label}
+              className={`space-y-1 ${
+                index > 0 ? 'border-t sm:border-t-0 sm:border-x border-slate-100 pt-4 sm:pt-0' : ''
+              }`}
+            >
+              <div className={`font-heading font-extrabold text-4xl sm:text-5xl ${item.color}`}>
+                {item.value}
+              </div>
+              <p className="text-sm font-semibold text-slate-600">{item.label}</p>
             </div>
-            <p className="text-sm font-semibold text-slate-600">Total Murid Dilatih</p>
-          </div>
-          <div className="space-y-1 border-t sm:border-t-0 sm:border-x border-slate-100 pt-4 sm:pt-0">
-            <div className="font-heading font-extrabold text-4xl sm:text-5xl text-[#0077B6]">
-              {stats.totalCoaches}
-            </div>
-            <p className="text-sm font-semibold text-slate-600">Pelatih Berpengalaman</p>
-          </div>
-          <div className="space-y-1 border-t sm:border-t-0 border-slate-100 pt-4 sm:pt-0">
-            <div className="font-heading font-extrabold text-4xl sm:text-5xl text-[#00B4D8]">
-              {stats.totalPartnerPools}
-            </div>
-            <p className="text-sm font-semibold text-slate-600">Kolam Renang Mitra</p>
-          </div>
+          ))}
         </div>
 
-        {/* CTA Button */}
         <Link href="/daftar/murid">
           <Button variant="primary" size="lg" isFullRounded={true} className="shadow-lg hover:scale-105">
             Daftar Sebagai Murid

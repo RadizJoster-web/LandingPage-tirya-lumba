@@ -73,8 +73,8 @@ export const StepBiodata: React.FC<MuridStep1Props> = ({
               <input
                 type="radio"
                 name="gender"
-                checked={gender === 'Laki-laki'}
-                onChange={() => setGender('Laki-laki')}
+                checked={gender === 'Laki-Laki'}
+                onChange={() => setGender('Laki-Laki')}
                 className="text-[#00B4D8] focus:ring-[#00B4D8]"
               />
               <span>Laki-laki</span>

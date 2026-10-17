@@ -1,4 +1,13 @@
-import { ClassType, ShirtSize, PaymentMethod, Instructor, Pool } from '@/types';
+import {
+  Area,
+  AvailableInstructor,
+  Gender,
+  LessonPackage,
+  Location,
+  PaymentMethod,
+  SessionSlot,
+  ShirtSize,
+} from '@/types';
 
 export interface MuridStep1Props {
   name: string;
@@ -8,12 +17,13 @@ export interface MuridStep1Props {
   birthDate: string;
   setBirthDate: (v: string) => void;
   currentAge: number;
-  gender: 'Laki-laki' | 'Perempuan';
-  setGender: (v: 'Laki-laki' | 'Perempuan') => void;
+  gender: Gender;
+  setGender: (v: Gender) => void;
   address: string;
   setAddress: (v: string) => void;
   phone: string;
   setPhone: (v: string) => void;
+  /** Email akun yang sedang login; dipakai sebagai contact person & data pendaftaran. */
   email: string;
   schoolOrOffice: string;
   setSchoolOrOffice: (v: string) => void;
@@ -23,36 +33,47 @@ export interface MuridStep1Props {
 }
 
 export interface MuridStep2Props {
-  poolId: number;
-  setPoolId: (v: number) => void;
-  classType: ClassType;
-  setClassType: (v: ClassType) => void;
-  startDate: string;
-  setStartDate: (v: string) => void;
-  startTime: string;
-  setStartTime: (v: string) => void;
-  coachName: string;
-  setCoachName: (v: string) => void;
-  availableCoaches: Instructor[];
-  photoFiles: File[];
-  handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  areas: Area[];
+  areaId: string;
+  setAreaId: (v: string) => void;
+  areaLocations: Location[];
+  locationId: string;
+  onSelectLocation: (v: string) => void;
+  locationPackages: LessonPackage[];
+  packageId: string;
+  setPackageId: (v: string) => void;
+  firstMeetDate: string;
+  setFirstMeetDate: (v: string) => void;
+  sessions: SessionSlot[];
+  sessionLoading: boolean;
+  sessionName: string;
+  setSessionName: (v: string) => void;
+  instructors: AvailableInstructor[];
+  instructorLoading: boolean;
+  instructorId: string;
+  setInstructorId: (v: string) => void;
+  photoFileName: string;
+  onPhotoChange: (file: File | null) => void;
+  isLoadingData: boolean;
+  errorMsg: string;
   onSubmit: (e: React.FormEvent) => void;
   onBack: () => void;
 }
 
 export interface MuridStep3Props {
   name: string;
-  selectedPool: Pool;
-  coachName: string;
-  classType: ClassType;
-  coursePrice: number;
-  adminFee: number;
-  grandTotal: number;
+  locationName: string;
+  packageType: string;
+  instructorName: string;
+  firstMeetDate: string;
+  sessionName: string;
+  packagePrice: number;
   paymentMethod: PaymentMethod;
   setPaymentMethod: (v: PaymentMethod) => void;
-  paymentProofFile: File | null;
-  setPaymentProofFile: (v: File | null) => void;
+  paymentProofName: string;
+  onPaymentProofChange: (file: File | null) => void;
   isSubmitting: boolean;
+  errorMsg: string;
   onSubmit: (e: React.FormEvent) => void;
   onBack: () => void;
 }

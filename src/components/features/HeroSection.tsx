@@ -2,7 +2,12 @@ import React from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 
-export const HeroSection: React.FC = () => {
+interface HeroSectionProps {
+  /** Jumlah kolam mitra dari API; dipakai sebagai bukti skala, bukan angka karangan. */
+  totalPartnerPools: number;
+}
+
+export const HeroSection: React.FC<HeroSectionProps> = ({ totalPartnerPools }) => {
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-[#E0FBFC] via-white to-[#F8F9FA] pt-16 pb-24 md:pt-24 md:pb-32">
       {/* Background aquatic ambient glow circles */}
@@ -28,7 +33,9 @@ export const HeroSection: React.FC = () => {
             </h1>
 
             <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-xl mx-auto lg:mx-0">
-              Belajar berenang dengan aman, menyenangkan, dan berjenjang bersama 37+ pelatih bersertifikat PRSI di kolam mitra terbaik dekat rumah Anda.
+              Belajar berenang dengan aman, menyenangkan, dan berjenjang bersama pelatih
+              berlisensi di {totalPartnerPools > 0 ? `${totalPartnerPools} ` : ''}kolam mitra
+              terbaik dekat rumah Anda.
             </p>
 
             {/* CTAs */}
@@ -127,7 +134,9 @@ export const HeroSection: React.FC = () => {
                 </div>
                 <div>
                   <div className="flex text-amber-400 text-xs">★★★★★</div>
-                  <p className="text-xs font-bold text-[#1D3557]">2.500+ Murid Lulus</p>
+                  <p className="text-xs font-bold text-[#1D3557]">
+                    Pendaftaran 100% Online
+                  </p>
                 </div>
               </div>
             </div>

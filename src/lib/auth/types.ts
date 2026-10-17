@@ -1,19 +1,18 @@
-import { UserSession, StudentRegistration, CoachRegistration } from '@/types';
+import { AuthUser, RegistrationSnapshot } from '@/types';
 
 export interface AuthContextType {
-  user: UserSession | null;
+  /** Profil akun hasil login (userId, email, role) atau null bila belum masuk. */
+  user: AuthUser | null;
+  /** Snapshot pendaftaran murid/guru terakhir yang sukses dikirim ke server. */
+  registration: RegistrationSnapshot | null;
   isLoading: boolean;
-  login: (email: string) => Promise<boolean>;
+  /** POST /api/auth/register — kirim OTP. Mengembalikan email tujuan OTP. */
+  register: (input: { fullName: string; email: string; password: string }) => Promise<string>;
+  /** POST /api/auth/verify-otp */
+  verifyOtp: (email: string, otpCode: string) => Promise<void>;
+  /** POST /api/auth/login */
+  login: (email: string, password: string) => Promise<AuthUser>;
   logout: () => void;
-  saveStudentRegistration: (data: StudentRegistration) => void;
-  saveCoachRegistration: (data: CoachRegistration) => void;
-  updateStudentCompletedSessions: (count: number) => void;
-  updateRegistrationStatus: (status: 'approved' | 'rejected') => void;
-  cancelRescheduleSlot: (slotKey: string) => void;
-  requestRescheduleSlot: (
-    fromDay: number,
-    fromSession: number,
-    toDay: number,
-    toSession: number
-  ) => { success: boolean; message: string };
+  /** Simpan hasil pendaftaran agar /profile bisa menampilkannya setelah redirect. */
+  persistRegistration: (snapshot: RegistrationSnapshot) => void;
 }

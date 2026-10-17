@@ -65,7 +65,7 @@ export default function DaftarPortalParent() {
                   <span className="text-[#00B4D8]">✓</span> Pembayaran QRIS / Transfer / Tunai
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-[#00B4D8]">✓</span> Pantau 8 pertemuan langsung di profil
+                  <span className="text-[#00B4D8]">✓</span> Status pendaftaran &amp; verifikasi tampil di profil
                 </li>
               </ul>
             </div>
@@ -106,7 +106,7 @@ export default function DaftarPortalParent() {
                   <span className="text-[#0077B6]">✓</span> Tentukan sesi ketersediaan mengajar
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-[#0077B6]">✓</span> Pengajuan reschedule otomatis & transparan
+                  <span className="text-[#0077B6]">✓</span> Pengajuan reschedule jadwal langsung ke admin
                 </li>
               </ul>
             </div>

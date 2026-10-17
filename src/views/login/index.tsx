@@ -2,14 +2,16 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
+import { toErrorMessage } from '@/services/api';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
 
 export default function LoginParent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { login } = useAuth();
 
   const [email, setEmail] = useState('');
@@ -18,25 +20,27 @@ export default function LoginParent() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  const justVerified = searchParams.get('terverifikasi') === '1';
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+    if (!/^\S+@\S+\.\S+$/.test(email)) {
       setError('Masukkan alamat email yang valid.');
       return;
     }
-    if (!password || password.length < 6) {
+    if (password.length < 6) {
       setError('Password harus memiliki minimal 6 karakter.');
       return;
     }
 
     setIsLoading(true);
     try {
-      await login(email);
+      await login(email, password);
       router.push('/profile');
-    } catch {
-      setError('Gagal masuk. Silakan periksa kembali data Anda.');
+    } catch (err) {
+      setError(toErrorMessage(err));
     } finally {
       setIsLoading(false);
     }
@@ -58,6 +62,12 @@ export default function LoginParent() {
             </p>
           </div>
 
+          {justVerified && (
+            <div className="mb-4 p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-700">
+              Verifikasi akun berhasil. Silakan masuk dengan email dan password Anda.
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input
               label="Alamat Email"
@@ -65,6 +75,7 @@ export default function LoginParent() {
               placeholder="nama@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
               required
             />
 
@@ -75,6 +86,7 @@ export default function LoginParent() {
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
                 required
               />
               <button

@@ -18,7 +18,7 @@ export const AboutSection: React.FC = () => {
             PT Tirya Lumba adalah lembaga pelatihan dan kursus renang terkemuka di Tangerang Raya yang berfokus pada keselamatan, pembentukan karakter, dan pengembangan potensi olahraga renang. Kami telah mendampingi ribuan murid, mulai dari usia balita, anak-anak, remaja, hingga dewasa pemula.
           </p>
           <p>
-            Dengan didukung oleh lebih dari 37 pelatih bersertifikasi resmi PRSI (Persatuan Renang Seluruh Indonesia) dan kurikulum bertahap berbasis kenyamanan air (*water comfort*), kami memastikan setiap peserta tidak hanya bisa berenang, namun memiliki teknik bernafas yang benar, daya tahan, bahkan dipersiapkan menjadi atlet renang berprestasi.
+            Dengan didukung oleh pelatih bersertifikasi resmi PRSI (Persatuan Renang Seluruh Indonesia) dan kurikulum bertahap berbasis kenyamanan air (*water comfort*), kami memastikan setiap peserta tidak hanya bisa berenang, namun memiliki teknik bernafas yang benar, daya tahan, bahkan dipersiapkan menjadi atlet renang berprestasi.
           </p>
         </div>
 

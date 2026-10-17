@@ -1,10 +1,10 @@
 import React from 'react';
 import Link from 'next/link';
-import { UserSession } from '@/types';
+import { AuthUser } from '@/types';
 import { Button } from '@/components/ui/Button';
 
 interface NavAuthButtonsProps {
-  user: UserSession | null;
+  user: AuthUser | null;
   isLoading: boolean;
   onLogout: () => void;
 }
@@ -24,7 +24,7 @@ export const NavAuthButtons: React.FC<NavAuthButtonsProps> = ({
         <Link href="/profile">
           <Button variant="secondary" size="sm" isFullRounded={true} className="gap-1.5">
             <span>👤</span>
-            <span className="max-w-[130px] truncate">{user.name || user.email.split('@')[0]}</span>
+            <span className="max-w-[130px] truncate">{user.email.split('@')[0]}</span>
           </Button>
         </Link>
         <Link href="/daftar">

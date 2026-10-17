@@ -1,127 +1,154 @@
 import React from 'react';
 import { MuridStep2Props } from './types';
-import { INITIAL_POOLS, POOL_CATEGORIES, CLASS_TYPES } from '@/lib/constants';
-import { ClassType } from '@/types';
 import { Select } from '@/components/ui/Select';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { CoachSelector } from './CoachSelector';
 
 export const StepKelasJadwal: React.FC<MuridStep2Props> = ({
-  poolId,
-  setPoolId,
-  classType,
-  setClassType,
-  startDate,
-  setStartDate,
-  startTime,
-  setStartTime,
-  coachName,
-  setCoachName,
-  availableCoaches,
-  photoFiles,
-  handleFileChange,
+  areas,
+  areaId,
+  setAreaId,
+  areaLocations,
+  locationId,
+  onSelectLocation,
+  locationPackages,
+  packageId,
+  setPackageId,
+  firstMeetDate,
+  setFirstMeetDate,
+  sessions,
+  sessionLoading,
+  sessionName,
+  setSessionName,
+  instructors,
+  instructorLoading,
+  instructorId,
+  setInstructorId,
+  photoFileName,
+  onPhotoChange,
+  isLoadingData,
   onSubmit,
   onBack,
 }) => {
   return (
     <form onSubmit={onSubmit} className="space-y-5">
       <Select
-        label="Pilihan Lokasi Kolam Renang *"
-        value={poolId}
-        onChange={(e) => {
-          setPoolId(Number(e.target.value));
-          setCoachName('');
-        }}
+        label="Wilayah Kolam Renang *"
+        value={areaId}
+        onChange={(e) => setAreaId(e.target.value)}
+        disabled={isLoadingData}
+        helperText="Data wilayah diambil langsung dari server."
       >
-        {Object.entries(POOL_CATEGORIES).map(([catKey, catLabel]) => (
-          <optgroup key={catKey} label={catLabel}>
-            {INITIAL_POOLS.filter((p) => p.category === catKey).map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.name} - {p.address}
-              </option>
-            ))}
-          </optgroup>
+        <option value="">-- Pilih Wilayah --</option>
+        {areas.map((area) => (
+          <option key={area.id} value={area.id}>
+            {area.name}
+          </option>
         ))}
       </Select>
 
       <Select
-        label="Pilihan Kelas Renang *"
-        value={classType}
-        onChange={(e) => setClassType(e.target.value as ClassType)}
+        label="Pilihan Lokasi Kolam Renang *"
+        value={locationId}
+        onChange={(e) => onSelectLocation(e.target.value)}
+        disabled={!areaId || areaLocations.length === 0}
       >
-        {CLASS_TYPES.map((cls) => (
-          <option key={cls} value={cls}>
-            Kelas {cls}
+        <option value="">
+          {areaId
+            ? '-- Pilih Kolam Renang --'
+            : '-- Pilih wilayah terlebih dahulu --'}
+        </option>
+        {areaLocations.map((location) => (
+          <option key={location.id} value={location.id}>
+            {location.name}
+          </option>
+        ))}
+      </Select>
+
+      <Select
+        label="Jenis Kelas / Paket Les *"
+        value={packageId}
+        onChange={(e) => setPackageId(e.target.value)}
+        disabled={!locationId}
+        helperText="Harga diambil dari paket resmi kolam yang dipilih."
+      >
+        <option value="">
+          {locationId ? '-- Pilih Paket Les --' : '-- Pilih kolam terlebih dahulu --'}
+        </option>
+        {locationPackages.map((item) => (
+          <option key={item.id} value={item.id}>
+            {item.type} — Rp {item.price.toLocaleString('id-ID')}
           </option>
         ))}
       </Select>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Input
-          label="Rencana Pertemuan ke-1 (Tanggal) *"
+          label="Rencana Pertemuan Pertama *"
           type="date"
-          value={startDate}
-          onChange={(e) => {
-            setStartDate(e.target.value);
-            setCoachName('');
-          }}
+          value={firstMeetDate}
+          onChange={(e) => setFirstMeetDate(e.target.value)}
           required
         />
-        <Input
-          label="Jam Pertemuan *"
-          type="time"
-          value={startTime}
-          onChange={(e) => {
-            setStartTime(e.target.value);
-            setCoachName('');
-          }}
-          required
-        />
+
+        <Select
+          label="Sesi Jam Latihan *"
+          value={sessionName}
+          onChange={(e) => setSessionName(e.target.value)}
+          disabled={!firstMeetDate || sessionLoading}
+          helperText={
+            !firstMeetDate
+              ? 'Pilih tanggal pertemuan terlebih dahulu.'
+              : sessionLoading
+                ? 'Memuat sesi tersedia…'
+                : sessions.length === 0
+                  ? 'Belum ada sesi terdaftar pada hari itu.'
+                  : undefined
+          }
+        >
+          <option value="">-- Pilih Sesi --</option>
+          {sessions.map((session) => (
+            <option key={session.id} value={session.sessionName}>
+              {session.sessionName} ({session.startTime} - {session.endTime})
+            </option>
+          ))}
+        </Select>
       </div>
 
       <CoachSelector
-        startDate={startDate}
-        availableCoaches={availableCoaches}
-        coachName={coachName}
-        setCoachName={setCoachName}
+        sessionReady={Boolean(locationId && firstMeetDate && sessionName)}
+        availableCoaches={instructors}
+        isLoading={instructorLoading}
+        coachId={instructorId}
+        setCoachId={setInstructorId}
       />
 
       <div>
         <label className="block text-sm font-semibold text-[#1D3557] mb-1.5">
-          Upload Foto Pribadi 4x6 cm * (Maks 5 file, didukung PDF / Gambar, maks 100MB/file)
+          Foto 4x6 Murid * (JPG/PNG maks 5 MB)
         </label>
         <input
           type="file"
-          multiple
-          accept="image/*,application/pdf"
-          onChange={handleFileChange}
-          className="w-full text-xs text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-[#E0FBFC] file:text-[#0077B6] hover:file:bg-[#00B4D8] hover:file:text-white file:cursor-pointer border border-gray-300 rounded-lg p-1.5"
+          accept="image/jpeg,image/png,image/webp"
+          onChange={(e) => onPhotoChange(e.target.files?.[0] ?? null)}
+          className="w-full text-sm text-slate-600 border border-gray-300 rounded-lg px-3 py-2 bg-white file:mr-3 file:px-3 file:py-1.5 file:rounded-full file:border-0 file:bg-[#E0FBFC] file:text-[#0077B6] file:font-semibold file:cursor-pointer"
         />
-        {photoFiles.length > 0 && (
-          <p className="text-xs text-emerald-600 mt-1.5">
-            ✓ {photoFiles.length} berkas dipilih: {photoFiles.map((f) => f.name).join(', ')}
+        {photoFileName && (
+          <p className="text-xs text-emerald-600 font-semibold mt-1.5">
+            ✓ {photoFileName}
           </p>
         )}
+        <p className="text-xs text-slate-400 mt-1">
+          Berkas langsung diunggah ke server saat Anda menekan Lanjut.
+        </p>
       </div>
 
-      <div className="pt-6 border-t border-slate-100 flex justify-between">
-        <Button
-          type="button"
-          variant="outline"
-          size="md"
-          isFullRounded={true}
-          onClick={onBack}
-        >
+      <div className="flex items-center justify-between gap-3 pt-2">
+        <Button type="button" variant="outline" size="md" onClick={onBack}>
           ← Kembali
         </Button>
-        <Button
-          type="submit"
-          variant="primary"
-          size="md"
-          isFullRounded={true}
-          className="min-w-[140px]"
-        >
+        <Button type="submit" variant="primary" size="md" className="flex-1 sm:flex-none">
           Lanjut ke Pembayaran →
         </Button>
       </div>

@@ -38,3 +38,43 @@ body {
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading), "Plus Jakarta Sans", sans-serif;
 }
+
+/* Animasi masuk/keluar ringan untuk perpindahan langkah form dan pesan status. */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.35s ease-out both;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out both;
+}
+
+/* Hormati preferensi pengguna yang menonaktifkan animasi. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in-up,
+  .animate-fade-in {
+    animation: none;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}

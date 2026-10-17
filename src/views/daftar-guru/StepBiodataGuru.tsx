@@ -37,12 +37,12 @@ export const StepBiodataGuru: React.FC<GuruStep1Props> = ({
         />
         <div>
           <label className="block text-sm font-semibold text-[#1D3557] mb-1.5">
-            Umur (Dihitung Otomatis)
+            Usia Saat Ini
           </label>
           <input
             readOnly
             value={birthDate ? `${currentAge} Tahun` : '-'}
-            className="w-full px-3.5 py-2.5 bg-slate-100 text-slate-700 text-sm sm:text-base border border-gray-300 rounded-lg cursor-not-allowed font-medium"
+            className="w-full px-3.5 py-2.5 bg-slate-100 text-slate-700 text-sm border border-gray-300 rounded-lg cursor-not-allowed font-medium"
           />
         </div>
       </div>
@@ -51,13 +51,13 @@ export const StepBiodataGuru: React.FC<GuruStep1Props> = ({
         <label className="block text-sm font-semibold text-[#1D3557] mb-1.5">
           Jenis Kelamin *
         </label>
-        <div className="flex gap-6 pt-1">
+        <div className="flex gap-4 pt-2">
           <label className="inline-flex items-center gap-2 text-sm text-[#1D3557] cursor-pointer">
             <input
               type="radio"
               name="gender"
-              checked={gender === 'Laki-laki'}
-              onChange={() => setGender('Laki-laki')}
+              checked={gender === 'Laki-Laki'}
+              onChange={() => setGender('Laki-Laki')}
               className="text-[#00B4D8] focus:ring-[#00B4D8]"
             />
             <span>Laki-laki</span>
@@ -76,7 +76,7 @@ export const StepBiodataGuru: React.FC<GuruStep1Props> = ({
       </div>
 
       <Input
-        label="Nomor WhatsApp Aktif *"
+        label="No. Telp / WhatsApp *"
         type="tel"
         placeholder="081234567890"
         value={phone}
@@ -85,15 +85,15 @@ export const StepBiodataGuru: React.FC<GuruStep1Props> = ({
       />
 
       <Input
-        label="Alamat Domisili *"
-        placeholder="Kota / Kecamatan tempat tinggal"
+        label="Domisili Tempat Tinggal *"
+        placeholder="Contoh: Bintaro, Tangerang Selatan"
         value={domicile}
         onChange={(e) => setDomicile(e.target.value)}
         required
       />
 
       <div className="pt-6 border-t border-slate-100 flex justify-end">
-        <Button type="submit" variant="primary" size="md" isFullRounded={true} className="min-w-[140px]">
+        <Button type="submit" variant="primary" size="md" className="min-w-[140px]">
           Selanjutnya →
         </Button>
       </div>

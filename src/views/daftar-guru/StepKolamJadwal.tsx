@@ -1,13 +1,27 @@
 import React from 'react';
 import { GuruStep3Props } from './types';
-import { INITIAL_POOLS, DAYS_ID, SESSIONS_ID } from '@/lib/constants';
+import { DAYS_ID } from '@/lib/constants';
 import { Button } from '@/components/ui/Button';
+import { Select } from '@/components/ui/Select';
 
 export const StepKolamJadwal: React.FC<GuruStep3Props> = ({
-  selectedPoolIds,
-  togglePoolSelection,
-  availableSlots,
-  toggleSlot,
+  areas,
+  areaId,
+  setAreaId,
+  areaLocations,
+  locationId,
+  setLocationId,
+  dayOfWeek,
+  setDayOfWeek,
+  sessions,
+  sessionLoading,
+  sessionName,
+  setSessionName,
+  schedules,
+  onAddSchedule,
+  onRemoveSchedule,
+  scheduleLabels,
+  errorMsg,
   isSubmitting,
   onSubmit,
   onBack,
@@ -17,107 +31,143 @@ export const StepKolamJadwal: React.FC<GuruStep3Props> = ({
       <div>
         <div className="flex items-center justify-between mb-2">
           <label className="block text-sm font-semibold text-[#1D3557]">
-            Pilih Kolam Tempat Mengajar *
+            Deklarasi Jadwal Mengajar *
           </label>
           <span className="text-xs text-[#0077B6] font-medium">
-            (Semakin banyak, semakin besar kesempatan Anda mengajar)
+            Semakin banyak jadwal, semakin besar kesempatan mengajar
           </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-56 overflow-y-auto p-1 border border-slate-200 rounded-xl">
-          {INITIAL_POOLS.map((p) => {
-            const isChecked = selectedPoolIds.includes(p.id);
-            return (
-              <label
-                key={p.id}
-                onClick={() => togglePoolSelection(p.id)}
-                className={`flex items-start gap-2.5 p-2.5 rounded-lg border text-xs cursor-pointer transition-all ${
-                  isChecked
-                    ? 'bg-[#E0FBFC]/60 border-[#00B4D8] text-[#0077B6] font-bold'
-                    : 'bg-white border-slate-200 text-slate-700 hover:border-[#00B4D8]'
-                }`}
-              >
-                <input
-                  type="checkbox"
-                  checked={isChecked}
-                  onChange={() => {}}
-                  className="mt-0.5 rounded text-[#00B4D8] focus:ring-[#00B4D8]"
-                />
-                <span>{p.name}</span>
-              </label>
-            );
-          })}
-        </div>
-        <p className="text-xs text-slate-500 mt-1.5">
-          {selectedPoolIds.length} kolam terpilih
-        </p>
-      </div>
+        <div className="space-y-3 p-4 bg-slate-50 border border-slate-200 rounded-xl">
+          <Select
+            label="Wilayah Kolam"
+            value={areaId}
+            onChange={(e) => setAreaId(e.target.value)}
+          >
+            <option value="">-- Pilih Wilayah --</option>
+            {areas.map((area) => (
+              <option key={area.id} value={area.id}>
+                {area.name}
+              </option>
+            ))}
+          </Select>
 
-      {/* Day & Session Availability Matrix */}
-      <div>
-        <label className="block text-sm font-semibold text-[#1D3557] mb-2">
-          Matriks Hari & Sesi Ketersediaan Mengajar *
-        </label>
-        <div className="overflow-x-auto border border-gray-200 rounded-xl">
-          <table className="w-full text-left text-xs">
-            <thead className="bg-[#E0FBFC]/70 text-[#0077B6] font-bold border-b border-gray-200">
-              <tr>
-                <th className="p-3">Hari</th>
-                {SESSIONS_ID.map((s) => (
-                  <th key={s} className="p-3 text-center">
-                    {s.split(' ')[0]}
-                    <span className="block font-normal text-[10px] text-slate-500">
-                      {s.match(/\((.*?)\)/)?.[1]}
-                    </span>
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {DAYS_ID.map((dayName, dayIdx) => (
-                <tr key={dayName} className="hover:bg-slate-50">
-                  <td className="p-3 font-semibold text-slate-700">{dayName}</td>
-                  {[0, 1, 2].map((sessionIdx) => {
-                    const isChecked = availableSlots.includes(`${dayIdx}|${sessionIdx}`);
-                    return (
-                      <td key={sessionIdx} className="p-3 text-center">
-                        <input
-                          type="checkbox"
-                          checked={isChecked}
-                          onChange={() => toggleSlot(dayIdx, sessionIdx)}
-                          className="w-4 h-4 rounded text-[#00B4D8] focus:ring-[#00B4D8] cursor-pointer"
-                        />
-                      </td>
-                    );
-                  })}
-                </tr>
+          <Select
+            label="Kolam Renang"
+            value={locationId}
+            onChange={(e) => {
+              setLocationId(e.target.value);
+              setSessionName('');
+            }}
+            disabled={!areaId}
+          >
+            <option value="">-- Pilih Kolam --</option>
+            {areaLocations.map((location) => (
+              <option key={location.id} value={location.id}>
+                {location.name}
+              </option>
+            ))}
+          </Select>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Select
+              label="Hari Mengajar"
+              value={dayOfWeek}
+              onChange={(e) => {
+                setDayOfWeek(e.target.value);
+                setSessionName('');
+              }}
+              disabled={!locationId}
+            >
+              <option value="">-- Pilih Hari --</option>
+              {DAYS_ID.map((day) => (
+                <option key={day} value={day}>
+                  {day}
+                </option>
               ))}
-            </tbody>
-          </table>
+            </Select>
+
+            <Select
+              label="Sesi Jam"
+              value={sessionName}
+              onChange={(e) => setSessionName(e.target.value)}
+              disabled={!dayOfWeek || sessionLoading}
+              helperText={
+                sessionLoading
+                  ? 'Memuat sesi…'
+                  : dayOfWeek && sessions.length === 0
+                    ? 'Belum ada sesi pada hari itu.'
+                    : undefined
+              }
+            >
+              <option value="">-- Pilih Sesi --</option>
+              {sessions.map((session) => (
+                <option key={session.id} value={session.sessionName}>
+                  {session.sessionName} ({session.startTime} - {session.endTime})
+                </option>
+              ))}
+            </Select>
+          </div>
+
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            onClick={onAddSchedule}
+            disabled={!locationId || !dayOfWeek || !sessionName}
+          >
+            + Tambahkan ke Daftar Jadwal
+          </Button>
         </div>
-        <p className="text-xs text-slate-500 mt-1.5">
-          {availableSlots.length} slot sesi dipilih
-        </p>
       </div>
 
-      <div className="pt-6 border-t border-slate-100 flex justify-between">
-        <Button
-          type="button"
-          variant="outline"
-          size="md"
-          isFullRounded={true}
-          onClick={onBack}
-          disabled={isSubmitting}
-        >
+      <div>
+        <p className="text-sm font-semibold text-[#1D3557] mb-2">
+          Jadwal yang Dideklarasikan ({schedules.length})
+        </p>
+        {schedules.length === 0 ? (
+          <p className="text-xs text-slate-500 italic bg-white p-3 rounded-lg border border-slate-200">
+            Belum ada jadwal. Tambahkan minimal satu jadwal mengajar.
+          </p>
+        ) : (
+          <ul className="space-y-2">
+            {schedules.map((schedule, index) => (
+              <li
+                key={`${schedule.locationId}-${schedule.dayOfWeek}-${schedule.sessionName}`}
+                className="flex items-center justify-between gap-3 bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm"
+              >
+                <span className="text-[#1D3557] font-medium">
+                  🗓️ {scheduleLabels[index]}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => onRemoveSchedule(index)}
+                  className="text-xs font-bold text-[#FF6F59] hover:underline"
+                >
+                  Hapus
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      {errorMsg && (
+        <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-xs font-semibold text-[#FF6F59]">
+          {errorMsg}
+        </div>
+      )}
+
+      <div className="pt-2 flex items-center justify-between gap-3">
+        <Button type="button" variant="outline" size="md" onClick={onBack} disabled={isSubmitting}>
           ← Kembali
         </Button>
         <Button
           type="submit"
           variant="primary"
           size="md"
-          isFullRounded={true}
-          className="min-w-[160px] shadow-lg"
           isLoading={isSubmitting}
+          disabled={schedules.length === 0}
         >
           Kirim Pendaftaran Pelatih
         </Button>

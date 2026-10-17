@@ -6,10 +6,14 @@ import { Button } from '@/components/ui/Button';
 export const StepKualifikasi: React.FC<GuruStep2Props> = ({
   license,
   setLicense,
-  teachingExperience,
-  setTeachingExperience,
+  experience,
+  setExperience,
+  shortBio,
+  setShortBio,
   cvFileName,
-  setCvFileName,
+  onCvChange,
+  photoFileName,
+  onPhotoChange,
   onSubmit,
   onBack,
 }) => {
@@ -17,58 +21,69 @@ export const StepKualifikasi: React.FC<GuruStep2Props> = ({
     <form onSubmit={onSubmit} className="space-y-5">
       <Input
         label="Nomor / Nama Lisensi Pelatih *"
-        placeholder="Contoh: PRSI Level 2 Nasional / FINA Certified"
+        placeholder="Contoh: Lisensi C FINA / PRSI Level 2"
         value={license}
         onChange={(e) => setLicense(e.target.value)}
         required
       />
 
+      <Input
+        label="Pengalaman Mengajar *"
+        placeholder="Contoh: 5 Tahun"
+        value={experience}
+        onChange={(e) => setExperience(e.target.value)}
+        required
+      />
+
       <div>
         <label className="block text-sm font-semibold text-[#1D3557] mb-1.5">
-          Pengalaman Mengajar Renang *
+          Ringkasan Profil Singkat *
         </label>
         <textarea
-          rows={4}
-          placeholder="Ceritakan pengalaman Anda melatih anak-anak, privat, maupun klub renang..."
-          value={teachingExperience}
-          onChange={(e) => setTeachingExperience(e.target.value)}
+          rows={3}
+          placeholder="Ceritakan singkat keahlian Anda, misalnya spesialisasi anak pemula atau atlet prestasi."
+          value={shortBio}
+          onChange={(e) => setShortBio(e.target.value)}
+          className="w-full px-3.5 py-2.5 bg-white text-[#1D3557] text-sm border border-gray-300 rounded-lg shadow-xs focus:outline-none focus:border-[#00B4D8] focus:ring-2 focus:ring-[#00B4D8]/30"
           required
-          className="w-full px-3.5 py-2.5 bg-white text-[#1D3557] text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:border-[#00B4D8] focus:ring-2 focus:ring-[#00B4D8]/20 transition-all"
         />
       </div>
 
       <div>
         <label className="block text-sm font-semibold text-[#1D3557] mb-1.5">
-          Upload Curriculum Vitae (CV) (PDF / DOC / DOCX)
+          Unggah CV / Sertifikat Pelatih * (PDF, maks 5 MB)
         </label>
         <input
           type="file"
-          accept=".pdf,.doc,.docx"
-          onChange={(e) => setCvFileName(e.target.files?.[0]?.name || '')}
-          className="w-full text-xs text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-[#E0FBFC] file:text-[#0077B6] hover:file:bg-[#00B4D8] hover:file:text-white file:cursor-pointer border border-gray-300 rounded-lg p-1.5"
+          accept="application/pdf"
+          onChange={(e) => onCvChange(e.target.files?.[0] ?? null)}
+          className="w-full text-sm text-slate-600 border border-gray-300 rounded-lg px-3 py-2 bg-white file:mr-3 file:px-3 file:py-1.5 file:rounded-full file:border-0 file:bg-[#E0FBFC] file:text-[#0077B6] file:font-semibold file:cursor-pointer"
         />
         {cvFileName && (
-          <p className="text-xs text-emerald-600 mt-1">✓ Berkas terpilih: {cvFileName}</p>
+          <p className="text-xs text-emerald-600 font-semibold mt-1.5">✓ {cvFileName}</p>
         )}
       </div>
 
-      <div className="pt-6 border-t border-slate-100 flex justify-between">
-        <Button
-          type="button"
-          variant="outline"
-          size="md"
-          isFullRounded={true}
-          onClick={onBack}
-        >
+      <div>
+        <label className="block text-sm font-semibold text-[#1D3557] mb-1.5">
+          Foto Profil Pelatih * (JPG/PNG, maks 5 MB)
+        </label>
+        <input
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          onChange={(e) => onPhotoChange(e.target.files?.[0] ?? null)}
+          className="w-full text-sm text-slate-600 border border-gray-300 rounded-lg px-3 py-2 bg-white file:mr-3 file:px-3 file:py-1.5 file:rounded-full file:border-0 file:bg-[#E0FBFC] file:text-[#0077B6] file:font-semibold file:cursor-pointer"
+        />
+        {photoFileName && (
+          <p className="text-xs text-emerald-600 font-semibold mt-1.5">✓ {photoFileName}</p>
+        )}
+      </div>
+
+      <div className="pt-6 border-t border-slate-100 flex items-center justify-between gap-3">
+        <Button type="button" variant="outline" size="md" onClick={onBack}>
           ← Kembali
         </Button>
-        <Button
-          type="submit"
-          variant="primary"
-          size="md"
-          isFullRounded={true}
-          className="min-w-[140px]"
-        >
+        <Button type="submit" variant="primary" size="md">
           Selanjutnya →
         </Button>
       </div>

@@ -1,0 +1,117 @@
+# Laporan Pengecekan Kesesuaian Revisi
+
+Tanggal cek: 17 Oktober 2026
+Proyek: Landing Page PT Tirya Lumba (Next.js 16.4.1, React 19, Tailwind 4)
+
+## Ringkasan
+
+Revisi pada `revisi.txt` SUDAH diimplementasikan di working tree, tetapi
+perubahannya BELUM di-commit (masih muncul sebagai modified/deleted/untracked
+di `git status`).
+
+Bukti teknis:
+- `npx tsc --noEmit`  -> bersih, tanpa error
+- `npx eslint .`      -> bersih, tanpa error
+- `npm run build`     -> sukses, 15 route ter-generate
+
+## Peta Revisi -> Status
+
+1. Koneksi server + database, base url http://localhost:5000
+   Status: SESUAI
+   Bukti: `src/services/api.ts:20-21` default `http://localhost:5000/api`,
+   dapat dioverride lewat env `NEXT_PUBLIC_API_URL`. Semua data master
+   (area, kolam, paket, sesi, guru) diambil dari REST API, bukan mock.
+
+2. Autentikasi, otorisasi, login/signup/register
+   Status: SESUAI
+   Bukti: `registerAccount`, `verifyOtp`, `loginAccount`
+   (`api.ts:101-120`); state auth di `AuthProvider.tsx`; guard rute di
+   `profile`, `daftar`, `daftar-murid`, `daftar-guru`; peran
+   ADMIN/POOL_MANAGER dialihkan ke pesan dasbor terpisah.
+
+3. Pendaftaran sebagai murid/guru
+   Status: SESUAI
+   Bukti: `POST /register/student` (`views/daftar-murid/index.tsx:96`),
+   `POST /register/instructor` (`views/daftar-guru/index.tsx:177`),
+   bentuk payload persis mengikuti API_DOCUMENTATION.md.
+
+4. Profil
+   Status: SEBAGIAN
+   Bukti: halaman ada (`views/profile/index.tsx`,
+   `RegistrationStatus.tsx`). Namun isi status berasal dari snapshot
+   localStorage (`RegistrationStatus.tsx:33-36`), karena API tidak
+   menyediakan endpoint baca status pendaftaran.
+
+5. Logo
+   Status: SESUAI
+   Bukti: logo SVG di `Navbar.tsx:26-36`, favicon dinamis `app/icon.tsx`,
+   kartu share `app/opengraph-image.tsx`.
+
+6. Animasi in/out
+   Status: SEBAGIAN
+   Bukti: hanya animasi masuk `animate-fade-in-up` / `animate-fade-in`
+   (`app/globals.css:43-75`). Belum ada animasi keluar; `MobileMenu`
+   muncul/hilang secara instan.
+
+7. Konten
+   Status: SESUAI
+   Bukti: seluruh section ditulis ulang (HeroSection, BrandSection,
+   ProgramSection, AboutSection, WhyUsSection, Footer).
+
+8. SEO
+   Status: SESUAI
+   Bukti: metadata + OpenGraph + Twitter (`app/layout.tsx:23-62`),
+   `app/robots.ts`, `app/sitemap.ts`, `app/opengraph-image.tsx`,
+   JSON-LD `SportsActivityLocation` (`app/page.tsx:45-66`), dan
+   `noindex` untuk rute privat.
+
+9. Layout grid/card sesuai respons JSON
+   Status: SESUAI
+   Bukti: grid dari `GET /locations/public`
+   (`components/features/ProgramSection.tsx:51`); `PoolCard` memakai
+   field `name`, `areaName`, `mapUrl`, `regularPrice`.
+
+10. Mock data dihapus
+    Status: SESUAI
+    Bukti: pencarian `mock/dummy` = 0 hasil; berkas lama seperti
+    `constants/pools.ts`, `constants/instructors.ts`,
+    `profile/StudentDashboard.tsx` sudah dihapus (status D).
+
+## Celah / Risiko yang Masih Ada
+
+1. workflow.pdf tidak dapat dibaca oleh model (input PDF tidak didukung);
+   ekstraksi manual hanya menghasilkan tabel font, bukan teks isi. Alur
+   bisnis dari PDF karena itu BELUM terverifikasi. Alur yang saat ini
+   diimplementasikan: home -> register + OTP -> login -> /daftar portal ->
+   form murid/guru -> status di profil. Perlu konfirmasi apakah ini sudah
+   sama dengan workflow.pdf.
+
+2. API live belum diuji: server http://localhost:5000 tidak berjalan
+   (permintaan timeout), jadi integrasi runtime belum terbukti, baru
+   kontrak statis yang cocok.
+
+3. URL unggahan bisa kosong dan berpotensi menolak submit: dokumentasi
+   endpoint `/upload-file/student/payment` dan `/upload-file/instructor`
+   hanya membalas `{ success, message }` tanpa URL berkas, padahal submit
+   pendaftaran mewajibkan `paymentProofUrl`/`cvUrl`/`profilePictureUrl`.
+   Kode mengirim string kosong bila URL tidak ada (`api.ts:213-216`,
+   sudah ditandai `shortcut:`). UI hanya memberi peringatan; backend bisa
+   membalas 400.
+
+4. Status pendaftaran tidak real-time: hanya tersimpan di localStorage,
+   hilang bila storage dibersihkan atau dibuka di perangkat lain.
+
+5. Reschedule tanpa endpoint: `/guru/atur-ulang-jadwal` memakai fallback
+   WhatsApp (`views/atur-ulang-jadwal/index.tsx:14-17`).
+   Bukan poin revisi eksplisit, tetapi kemungkinan ada di workflow.
+
+6. Animasi keluar belum ada: permintaan "animasi in/out" baru terpenuhi
+   separuh (hanya animasi masuk).
+
+7. Semua perubahan belum di-commit; `AGENTS.md` ikut termodifikasi.
+
+## Catatan
+
+- Tidak ada penanda TODO/FIXME/HACK di source.
+- Import lintas fitur `@/pages/daftar-murid/StepIndicator` di
+  `daftar-guru` tetap valid lewat alias tsconfig (`@/pages/*`).

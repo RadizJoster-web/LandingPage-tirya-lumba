@@ -4,20 +4,26 @@ import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 
 interface RegisterFormProps {
+  fullName: string;
+  setFullName: (v: string) => void;
   email: string;
   setEmail: (v: string) => void;
   password: string;
   setPassword: (v: string) => void;
   error: string;
+  isLoading: boolean;
   onSubmit: (e: React.FormEvent) => void;
 }
 
 export const RegisterForm: React.FC<RegisterFormProps> = ({
+  fullName,
+  setFullName,
   email,
   setEmail,
   password,
   setPassword,
   error,
+  isLoading,
   onSubmit,
 }) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -38,11 +44,21 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
       <form onSubmit={onSubmit} className="space-y-4">
         <Input
+          label="Nama Lengkap"
+          placeholder="Contoh: Budi Santoso"
+          value={fullName}
+          onChange={(e) => setFullName(e.target.value)}
+          autoComplete="name"
+          required
+        />
+
+        <Input
           label="Alamat Email Aktif"
           type="email"
           placeholder="nama@email.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          autoComplete="email"
           required
         />
 
@@ -53,6 +69,8 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
             placeholder="Minimal 6 karakter"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            autoComplete="new-password"
+            minLength={6}
             required
           />
           <button
@@ -77,6 +95,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
           size="md"
           isFullRounded={true}
           className="w-full mt-2"
+          isLoading={isLoading}
         >
           Kirim Kode OTP
         </Button>

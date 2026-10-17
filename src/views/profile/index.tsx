@@ -3,19 +3,13 @@
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
+import { Card } from '@/components/ui/Card';
 import { EmptyProfile } from './EmptyProfile';
-import { RejectedProfile } from './RejectedProfile';
-import { StudentDashboard } from './StudentDashboard';
-import { CoachDashboard } from './CoachDashboard';
+import { RegistrationStatus } from './RegistrationStatus';
 
 export default function ProfileParent() {
   const router = useRouter();
-  const {
-    user,
-    isLoading,
-    updateStudentCompletedSessions,
-    updateRegistrationStatus,
-  } = useAuth();
+  const { user, registration, isLoading } = useAuth();
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -31,47 +25,29 @@ export default function ProfileParent() {
     );
   }
 
-  // Case 1: Unregistered user
-  if (!user.role || (!user.studentReg && !user.coachReg)) {
-    return <EmptyProfile displayName={user.name || user.email} />;
-  }
-
-  const isStudent = user.role === 'murid' && !!user.studentReg;
-  const isCoach = user.role === 'guru' && !!user.coachReg;
-  const currentStatus = isStudent ? user.studentReg?.status : user.coachReg?.status;
-
-  // Case 2: Rejected
-  if (currentStatus === 'rejected') {
+  // Akun admin/pengelola kolam memakai dasbor terpisah, bukan halaman landing ini.
+  if (user.role === 'ADMIN' || user.role === 'POOL_MANAGER') {
     return (
-      <RejectedProfile
-        reason={user.studentReg?.rejectionReason || user.coachReg?.rejectionReason}
-        onApprove={() => updateRegistrationStatus('approved')}
-      />
+      <div className="min-h-[70vh] py-16 px-4 sm:px-6 lg:px-8 bg-[#F3F4F6]">
+        <div className="max-w-xl mx-auto">
+          <Card variant="dashboard" className="p-8 text-center space-y-3">
+            <div className="text-4xl">🗂️</div>
+            <h1 className="font-heading font-extrabold text-2xl text-[#1D3557]">
+              Akun Manajemen
+            </h1>
+            <p className="text-sm text-slate-600">
+              Akun <span className="font-semibold">{user.email}</span> terdaftar sebagai pengelola sistem.
+              Silakan gunakan aplikasi dasbor admin untuk mengelola data kolam, pelatih, dan pendaftaran.
+            </p>
+          </Card>
+        </div>
+      </div>
     );
   }
 
-  // Case 3: Student view
-  if (isStudent && user.studentReg) {
-    return (
-      <StudentDashboard
-        user={user}
-        reg={user.studentReg}
-        onStatusChange={updateRegistrationStatus}
-        onUpdateCompletedSessions={updateStudentCompletedSessions}
-      />
-    );
+  if (!registration) {
+    return <EmptyProfile displayName={user.email} />;
   }
 
-  // Case 4: Coach view
-  if (isCoach && user.coachReg) {
-    return (
-      <CoachDashboard
-        user={user}
-        reg={user.coachReg}
-        onStatusChange={updateRegistrationStatus}
-      />
-    );
-  }
-
-  return null;
+  return <RegistrationStatus snapshot={registration} />;
 }
