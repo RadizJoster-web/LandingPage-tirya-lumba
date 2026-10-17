@@ -1,11 +1,13 @@
 import React from 'react';
 import Link from 'next/link';
-import { ApiPagination, Location } from '@/types';
+import { ApiPagination, LessonPackage, Location } from '@/types';
 import { PoolCard } from '@/components/features/PoolCard';
 import { Button } from '@/components/ui/Button';
 
 interface ProgramSectionProps {
   locations: Location[];
+  /** Dipakai kartu kolam untuk menampilkan harga tiap jenis kelas. */
+  packages?: LessonPackage[];
   pagination?: ApiPagination;
   currentPage: number;
 }
@@ -13,6 +15,7 @@ interface ProgramSectionProps {
 /** Grid kartu kolam mitra; isi dan jumlah halaman berasal dari GET /api/locations/public. */
 export const ProgramSection: React.FC<ProgramSectionProps> = ({
   locations,
+  packages = [],
   pagination,
   currentPage,
 }) => {
@@ -50,7 +53,7 @@ export const ProgramSection: React.FC<ProgramSectionProps> = ({
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {locations.map((pool) => (
-              <PoolCard key={pool.id} pool={pool} />
+              <PoolCard key={pool.id} pool={pool} packages={packages} />
             ))}
           </div>
         )}

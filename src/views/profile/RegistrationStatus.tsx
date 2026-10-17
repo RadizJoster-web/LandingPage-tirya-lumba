@@ -42,7 +42,7 @@ export const RegistrationStatus: React.FC<RegistrationStatusProps> = ({ snapshot
   const isStudent = snapshot.kind === 'student';
 
   const waMessage = encodeURIComponent(
-    `Halo Admin PT Tirya Lumba, saya ${isStudent ? snapshot.fullName : snapshot.fullName} (ID pendaftaran: ${snapshot.registrationId}). Saya ingin menanyakan status pendaftaran saya.`,
+    `Halo Admin PT Tirya Lumba, saya ${snapshot.fullName} (ID pendaftaran: ${snapshot.registrationId}). Saya ingin menanyakan status pendaftaran saya.`,
   );
 
   return (

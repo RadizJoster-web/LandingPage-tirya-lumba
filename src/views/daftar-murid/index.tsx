@@ -180,7 +180,8 @@ export default function DaftarMuridParent() {
 
           <StepIndicator step={form.step} errorMsg={form.errorMsg} />
 
-          <div className="mt-8 animate-fade-in-up">
+          {/* key memaksa React memasang ulang div agar animasi masuk diputar tiap ganti langkah. */}
+          <div key={form.step} className="mt-8 animate-fade-in-up">
             {form.step === 1 && (
               <StepBiodata
                 name={form.name}

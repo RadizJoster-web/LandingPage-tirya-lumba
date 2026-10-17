@@ -7,8 +7,16 @@ const TOKEN_KEY = 'tirya_access_token';
 const USER_KEY = 'tirya_auth_user';
 const REGISTRATION_KEY = 'tirya_last_registration';
 const SYNC_EVENT = 'tirya_auth_sync';
+/** Penanda sesi untuk proxy.ts; bukan kredensial, token asli tetap JWT server. */
+const SESSION_COOKIE = 'tirya_session';
+const SESSION_MAX_AGE = 60 * 60 * 24 * 30;
 
 const isBrowser = () => typeof window !== 'undefined';
+
+function writeSessionCookie(maxAge: number) {
+  if (!isBrowser()) return;
+  document.cookie = `${SESSION_COOKIE}=1; path=/; max-age=${maxAge}; SameSite=Lax`;
+}
 
 function readJson<T>(key: string): T | null {
   if (!isBrowser()) return null;
@@ -33,6 +41,7 @@ export function saveSession(user: AuthUser, token: string) {
   if (!isBrowser()) return;
   localStorage.setItem(TOKEN_KEY, token);
   localStorage.setItem(USER_KEY, JSON.stringify(user));
+  writeSessionCookie(SESSION_MAX_AGE);
   window.dispatchEvent(new Event(SYNC_EVENT));
 }
 
@@ -41,6 +50,7 @@ export function clearSession() {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(USER_KEY);
   localStorage.removeItem(REGISTRATION_KEY);
+  writeSessionCookie(0);
   window.dispatchEvent(new Event(SYNC_EVENT));
 }
 

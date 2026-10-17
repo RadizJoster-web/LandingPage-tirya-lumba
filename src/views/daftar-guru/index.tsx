@@ -249,7 +249,8 @@ export default function DaftarGuruParent() {
             errorMsg={errorMsg}
           />
 
-          <div className="mt-8 animate-fade-in-up">
+          {/* key memaksa React memasang ulang div agar animasi masuk diputar tiap ganti langkah. */}
+          <div key={step} className="mt-8 animate-fade-in-up">
             {step === 1 && (
               <StepBiodataGuru
                 name={name}
