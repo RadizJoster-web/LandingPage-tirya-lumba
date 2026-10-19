@@ -225,6 +225,8 @@ export default function DaftarGuruParent() {
             : undefined,
       });
 
+      console.log(result)
+
       router.push('/profile');
     } catch (error) {
       setErrorMsg(toErrorMessage(error));
