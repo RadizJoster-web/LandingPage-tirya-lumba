@@ -68,6 +68,7 @@ export default async function HomePage({
       <BrandSection />
       <ProgramSection
         locations={locationResult.locations}
+        packages={packages}
         pagination={locationResult.pagination}
         currentPage={page}
       />

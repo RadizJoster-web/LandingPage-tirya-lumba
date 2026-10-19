@@ -1,15 +1,25 @@
 import React from 'react';
-import { Location } from '@/types';
+import { LessonPackage, Location } from '@/types';
 import { formatRupiah, mediaUrl } from '@/lib/utils';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 
 interface PoolCardProps {
   pool: Location;
+  /** Paket les kolam ini dari GET /api/packages; harga reguler & privat tampil dari sini. */
+  packages?: LessonPackage[];
 }
 
-export const PoolCard: React.FC<PoolCardProps> = ({ pool }) => {
+export const PoolCard: React.FC<PoolCardProps> = ({ pool, packages = [] }) => {
   const mapHref = mediaUrl(pool.mapUrl) ?? undefined;
+
+  const prices = packages
+    .filter((item) => item.locationId === pool.id)
+    .map((item) => ({ label: item.type, price: item.price }));
+
+  if (prices.length === 0 && typeof pool.regularPrice === 'number') {
+    prices.push({ label: 'Reguler', price: pool.regularPrice });
+  }
 
   return (
     <Card variant="landing" className="flex flex-col justify-between group">
@@ -45,14 +55,17 @@ export const PoolCard: React.FC<PoolCardProps> = ({ pool }) => {
         )}
       </div>
 
-      {typeof pool.regularPrice === 'number' && (
-        <div className="pt-2 border-t border-blue-50">
-          <div className="flex items-center justify-between text-xs sm:text-sm bg-[#E0FBFC]/70 px-3 py-2 rounded-lg">
-            <span className="text-slate-600 font-medium">Kelas Reguler</span>
-            <span className="font-bold text-[#0077B6]">
-              {formatRupiah(pool.regularPrice)}
-            </span>
-          </div>
+      {prices.length > 0 && (
+        <div className="pt-2 border-t border-blue-50 space-y-1.5">
+          {prices.map((item) => (
+            <div
+              key={item.label}
+              className="flex items-center justify-between text-xs sm:text-sm bg-[#E0FBFC]/70 px-3 py-2 rounded-lg"
+            >
+              <span className="text-slate-600 font-medium">Kelas {item.label}</span>
+              <span className="font-bold text-[#0077B6]">{formatRupiah(item.price)}</span>
+            </div>
+          ))}
         </div>
       )}
     </Card>

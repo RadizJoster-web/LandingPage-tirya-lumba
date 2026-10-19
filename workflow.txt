@@ -1,0 +1,133 @@
+WORKFLOW FRONTEND 1: LANDING PAGE PT TIRTA LUMBA
+
+
+1. HALAMAN BERANDA (/)
+
+a. Hero Section
+Di section ini menjadi First Impression bagi pengunjung, jadi buat section ini menarik, modern, dan tetap clean.
+- Berikan kalimat selamat datang yang unik.
+- Berikan gambar yang sesuai dengan tema.
+- Tambahkan CTA untuk mendaftar "Daftar Sekarang".
+- Tambahkan CTA tentang kami yang mengarah ke section tentang kami.
+
+b. Brand Section
+Section ini menampilkan brand atau product yang sudah bekerjasama dengan PT Tirta Lumba. Dengan menampilkan logo mereka.
+
+c. Tentang Kami Section (/#tentang-kami)
+Section ini menampilkan deskripsi singkat apa sebenarnya perusahaan PT Tirta Lumba ini. Dan disini akan menjelaskan pengalaman Tirta Lumba yang sudah membantu anak-anak hingga dewasa bisa berenang dengan baik dan benar bahkan menjadi Atlet.
+- Tambahkan CTA ke section selanjutnya dengan kalimat "kenal kami lebih dalam" Tapi dalam bentuk seperti link url modern dengan hover animasi dari bawah bukan button.
+
+d. Kenapa Pilih Kami (/#kenapa-pilih-kami)
+Di section ini menjelaskan kenapa kalian bisa memilih Tirta Lumba sebagai tempat menempuh orang kesayangan kalian untuk dilatih renang.
+- Tampilkan kalimat singkat yang menjelaskan kualitas guru, pemilihan kelas, guru dan waktu yang flexible.
+- Tampilkan total murid yang sudah diajar.
+- Tampilkan total guru yang mengajar.
+- Tambahkan CTA daftar sebagai murid.
+
+
+2. HALAMAN AUTENTIKASI (/register)
+
+a. Menginput Email dan Password.
+b. Submit button.
+
+
+3. HALAMAN AUTENTIKASI (/login)
+
+a. Menginput Email & Password.
+b. Jika login berhasil maka sekarang client bisa mendaftarkan anak/dirinya sendiri atau mendaftar menjadi guru/pelatih.
+
+
+4. HALAMAN DAFTAR (/daftar)
+
+Di halaman ini hanya akan menampilkan 2 card dengan design yang menarik sebagai pilihan:
+a. Daftar sebagai Murid
+b. Daftar sebagai Pelatih / Guru
+
+
+5. HALAMAN DAFTAR SEBAGAI MURID (/daftar/murid)
+
+Di halaman ini client bisa mendaftarkan anak atau dirinya sendiri sebagai murid. Form pengisian data dipisahkan menjadi 3 step dengan indikator interaktif.
+
+a. Step 1
+i. Nama Lengkap*
+ii. Tempat Tgl/Lahir*
+iii. Usia saat ini* (Auto generate tanggal lahir)
+iv. Alamat rumah*
+v. Jenis Kelamin* (Radio Box)
+   1. Laki-laki
+   2. Perempuan
+vi. No Telp / WA*
+vii. Alamat Email Aktif (Otomatis generate email client ketika login)
+viii. Nama Sekolah/kantor*
+ix. Ukuran T Shirt* (Radio box)
+   1. XS
+   2. S
+   3. M
+   4. L
+   5. XL
+   6. XXL
+x. CTA "Selanjutnya"
+
+b. Step 2
+Memilih lokasi kolam renang di berbagai daerah. Terdapat 2 section.
+
+c. Step 3
+i. Menampilkan semacam nota total pembayaran.
+ii. Metode pembayaran (Qris atau Transfer bank)
+   1. Qris: Menampilkan QR pembayaran.
+   2. Bank: Menampilkan Nama & No Rek Pembayaran.
+   3. Cash: Beri tahu kalau cash memasukan foto dokumentasi foto sedang membayar ke pengelola kolam renang dan wajib menampilkan wajah dan total uang yang sedang diberikan (Tambahkan contoh gambarnya nanti).
+iii. Upload Bukti Transfer Biaya Kursus Renang*.
+iv. CTA "Bayar Sekarang". Ketika di click maka akan mengirim semua data dalam bentuk FormData ke server dan akan di simpan di database dan di local server bagi yang gambar. Setelah itu redirect ke profil dan menampilkan pendaftaran sedang diproses.
+
+
+6. HALAMAN DAFTAR SEBAGAI GURU (/daftar/guru)
+
+a. Step 1
+i. Nama Lengkap
+ii. Tanggal Lahir
+iii. Umur (auto generate dari tanggal lahir)
+iv. Jenis Kelamin
+v. No WhatsApp Aktif
+vi. Alamat Domisili
+vii. CTA "Selanjutnya"
+
+b. Step 2
+i. Lisensi
+ii. Pengalaman mengajar
+iii. Upload file CV
+iv. CTA "Selanjutnya"
+
+c. Step 3
+i. Pilih total kolam renang tempat dia bisa mengajar (semakin banyak, semakin besar kesempatan untuk mengajar).
+ii. Memilih hari dan sesi kapan dia bisa mengajar.
+iii. CTA "Daftar". Data akan langsung kirim ke server.
+
+
+7. HALAMAN PROFILE MURID (/profile)
+
+Ketika client sudah register dan login menggunakan Email maka mereka akan mendapatkan akses ke Profile. Untuk permulaan profile tidak menampilkan apapun hanya menampilkan "Selamat datang {Email}". Jika client sudah daftar sebagai murid atau guru maka akan menampilkan ini.
+
+a. Jika pendaftaran ditolak maka akan menampilkan status pendaftaran dan alasan mengapa ditolak, lalu tambahkan button yang mengarah ke whatsapp CS/pengelola untuk menyelesaikan masalah.
+
+b. Murid
+i. Widget Jadwal Les.
+ii. Widget profil guru yang akan mengajar dia. (gambar profil, nama, CTA berupa teks link untuk melihat lisensi mengajar)
+iii. CTA Perpanjang Paket bagi siswa yang activeSessions = 0.
+iv. Riwayat Pertemuan.
+
+c. Guru
+i. Menampilkan jadwal hari, sesi, dan lokasi dia mengajar.
+ii. Total murid yang diajar per hari, sesi, dan lokasinya.
+iii. CTA form pengajuan jadwal ulang.
+
+d. Guru (/guru/atur-ulang-jadwal)
+i. Memilih hari dan sesi yang ingin di ganti.
+ii. Menginputkan hari dan sesi baru.
+
+
+8. GLOBAL LAYOUT
+
+a. Top Bar & Navigation: Berisi logo PT Tirta Lumba dengan tautan menuju ke beranda (/) dan menampilkan button login & register tapi akan menampilkan button daftar jika sudah terautentikasi.
+b. Main Content (children): Area dinamis penyajian data setiap route.
+c. Footer: Informasi kontak, sosial media, dan sitemap singkat. Bersifat statis dan digunakan ulang di seluruh halaman publik.

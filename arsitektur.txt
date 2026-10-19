@@ -1,0 +1,181 @@
+ARSITEKTUR FRONTEND 1: LANDING PAGE PT TIRTA LUMBA
+Spesifikasi teknis, pedoman arsitektur, dan instruksi implementasi sistem untuk portal publik PT Tirta Lumba.
+
+
+1. RINGKASAN SISTEM
+Frontend 1 adalah portal publik PT Tirta Lumba yang berfungsi sebagai pusat informasi layanan, profil instruktur, pintu masuk pendaftaran (sistem booking) bagi siswa baru, serta portal personal bagi Siswa dan Pelatih. Aplikasi ini dibangun dengan pendekatan Server-Side Rendering (SSR) untuk memastikan kualitas SEO yang tinggi, berlapis arsitektur berbasis komponen, dan mengandalkan sumber data dinamis dari REST API (Express.js) yang terhubung ke MySQL.
+
+
+2. TEKNOLOGI
+- Teknologi Inti Frontend 1: Next.js (App Router), React, TypeScript.
+- Styling: Tailwind CSS (memanfaatkan utilitas kelas dan arsitektur komponen UI ringan).
+- State Management & Data Fetching: React Hooks bawaan dan TanStack Query (digunakan khusus pada area interaktif klien seperti multi-step form booking untuk meminimalkan beban komputasi lokal).
+- Quality Tools: ESLint, Prettier, TypeScript Strict Mode.
+- Library Opsional: Framer Motion (hanya digunakan untuk transisi ringan pada hero section atau modal, wajib dipasang menggunakan dynamic import agar tidak membebani initial load).
+
+
+3. STRUKTUR HALAMAN & FITUR (PUBLIC PAGES)
+
+A. Halaman Beranda (/)
+- Hero Section: Kalimat selamat datang yang unik, gambar tema air, CTA "Daftar Sekarang", dan CTA "Tentang Kami".
+- Brand Section: Menampilkan logo brand/produk yang bekerjasama dengan PT Tirta Lumba.
+- Program: Menampilkan card program dengan struktur card. Terapkan pagination masing-masing 6 card. Tambahkan CTA button di header section untuk pergi mendaftar sebagai murid.
+  - Nama kolam renang
+  - Alamat kolam renang beserta jika di klik langsung redirect ke koordinat kolam renang tersebut melalui Google Maps
+  - Harga jika memilih kelas reguler dan private
+- Tentang Kami (/#tentang-kami): Deskripsi perusahaan, pengalaman melatih, CTA "Kenal kami lebih dalam" (desain link modern dengan hover animasi dari bawah, bukan tombol kaku).
+- Kenapa Pilih Kami (/#kenapa-pilih-kami): Alasan memilih Tirta Lumba, kualitas guru, kelas fleksibel, statistik total murid & guru, CTA "Daftar Sebagai Murid".
+
+C. Autentikasi (/register & /login)
+- /register: Input Email, Password, submit, dan verifikasi 4 karakter OTP (dengan countdown timer).
+- /login: Input Email & Password. Setelah berhasil, diarahkan ke profil. Terdapat fitur Show/Hide Password.
+
+D. Portal Pendaftaran (/daftar)
+Halaman transisi yang menampilkan 2 Card pilihan dengan desain menarik:
+1. Daftar sebagai Murid (mengarahkan ke /daftar/murid)
+2. Daftar sebagai Pelatih / Guru (mengarahkan ke /daftar/guru)
+Wajib login (diproteksi oleh middleware). Dilarang di-cache oleh Next.js.
+
+E. Booking Wizard Murid (/daftar/murid) - Multi-Step Form
+- Step 1 (Biodata): Nama Lengkap, Tempat Tgl/Lahir, Usia saat ini (auto-generate dari tgl lahir), Jenis Kelamin, Alamat rumah, No Telp/WA, Email (otomatis dari login), Nama Sekolah/Kantor, Ukuran T-Shirt (XS-XXL).
+- Step 2 (Pilih Kelas & Jadwal):
+  - Pilihan lokasi kolam renang (dibagi kategori Kerjasama Kota Tangerang, Tangsel, Kab. Tangerang, dan Non Kerjasama).
+  - Kelas Renang (Reguler, Privat, Prestasi, Ekstrakurikuler).
+  - Rencana pertemuan ke-1 di mulai (Hari/Tgl dan Jam).
+  - Pilih Guru terfilter (berdasarkan hari, jam, lokasi). Tampilkan pesan jika tidak ada guru tersedia.
+  - Upload Foto Pribadi ukuran 4x6 cm (maks 5 file, 100MB/file).
+- Step 3 (Pembayaran):
+  - Menampilkan nota total pembayaran.
+  - Metode Pembayaran: QRIS (tampil QR), Transfer Bank (tampil Rekening), Cash (wajib upload foto dokumentasi penyerahan uang dengan pengelola).
+  - Upload Bukti Transfer/Pembayaran.
+  - Tombol "Bayar Sekarang" (Mengirim FormData ke server dan redirect ke profil).
+
+F. Booking Wizard Guru (/daftar/guru) - Multi-Step Form
+Wajib login (diproteksi oleh middleware).
+- Step 1: Nama Lengkap, Tanggal Lahir, Umur (auto-generate), Jenis Kelamin, No WhatsApp Aktif, Alamat Domisili.
+- Step 2: Input Lisensi, Pengalaman mengajar, Upload file CV.
+- Step 3: Pilih total kolam renang tempat dia bisa mengajar, memilih hari dan sesi ketersediaan mengajar. Tombol "Daftar".
+
+G. Portal Pengguna (/profile)
+Dasbor dinamis (multi-role) berdasarkan akun yang login.
+- Jika pendaftaran ditolak: Tampilkan status pendaftaran, alasan ditolak, dan CTA link WhatsApp CS/Pengelola.
+- Jika Siswa:
+  - Widget profil guru yang akan mengajar (gambar, nama, link lisensi).
+  - Widget Jadwal Les.
+  - Riwayat pertemuan.
+  - Quick Renew: CTA "Perpanjang Paket" (Hanya muncul jika activeSessions = 0).
+- Jika Pelatih:
+  - Jadwal mengajar (hari, sesi, lokasi).
+  - Total murid yang diajar per jadwal.
+  - CTA form pengajuan jadwal ulang.
+- Atur Ulang Jadwal (/guru/atur-ulang-jadwal):
+  - Memilih hari dan sesi yang ingin diganti, lalu menginput jadwal baru.
+  - CTA "Hapus Jadwal": Menghapus ketersediaan mengajar di hari tersebut.
+  - CTA "Request Persetujuan": Mengirim permintaan reschedule ke admin. Syarat mutlak: Request hanya bisa dikirim jika guru TIDAK memiliki jadwal mengajar/murid di hari tersebut. Jika ada murid, otomatis batal terkirim.
+
+
+4. GLOBAL LAYOUT
+- Top Bar & Navigation: Berisi logo dan tombol Login/Daftar (berubah menjadi profil user jika sudah login). Komponen ini dirender sebagai Client Component jika membutuhkan deteksi state auth.
+- Main Content (children): Area dinamis penyajian data setiap route.
+- Footer: Informasi kontak, sosial media, dan sitemap singkat. Bersifat statis dan digunakan ulang di seluruh halaman publik.
+
+
+5. ARSITEKTUR PENGAMBILAN DATA & STATE
+- Server Component (Next.js): Fetching data publik (katalog guru, daftar kolam) dilakukan di Server Component dengan ISR (Cache per jam).
+- Client Component: Semua Booking Wizard dan Dasbor Profil menggunakan Client Component dengan TanStack Query untuk mutasi data form dan loading state. File upload menggunakan FormData.
+
+
+5. DATA ARCHITECTURE
+Pengambilan data dibagi menjadi dua layer utama:
+- Server Fetching (Next.js App Router): Halaman publik seperti Katalog Pelatih mengambil data langsung di level komponen server (page.tsx) menggunakan fungsi fetch() standar. Logika data ini terisolasi dari komponen presentasi.
+- Client Mutation: Proses interaktif (seperti verifikasi OTP dan submit booking) dipisahkan ke dalam Custom Hooks (misal: useBooking.ts), sehingga UI hanya fokus menampilkan state (loading, error, success) tanpa menyentuh logika HTTP request.
+
+
+6. FOLDER STRUCTURE
+Menggunakan standar Next.js App Router:
+- src/app: Entry point, routing, global layout, dan halaman (page.tsx).
+- src/components: UI components. Dibagi menjadi ui (atomic: button, input) dan features (komponen kompleks spesifik bisnis).
+- src/lib: Konfigurasi utilitas umum (axios instance, validasi Zod).
+- src/services: Layer pemanggil API eksternal/Express.js (fetcher functions).
+- src/hooks: Custom hooks untuk membungkus logika stateful.
+- src/types: Definisi interface TypeScript global.
+- src/styles: Konfigurasi global.css Tailwind.
+
+
+7. PARENT COMPONENT CONTRACT
+Parent Component bertanggung jawab penuh atas pengambilan data dari API, pengecekan state loading/error awal, penerapan pagination (melalui search params), dan pengaturan layout grid utama. Parent dilarang keras memuat logika styling spesifik item atau logika interaksi hover/klik; semua itu harus dikirim sebagai props ke Child Component.
+
+
+8. EXAMPLE PARENT RESPONSIBILITY
+
+TypeScript
+// app/pelatih/page.tsx (Parent)
+import InstructorCard from '@/components/features/InstructorCard';
+import { getInstructors } from '@services/api';
+
+export default async function PelatihPage({ searchParams }: any) {
+  const page = searchParams.page || 1;
+  const { data: instructors, error } = await getInstructors(page);
+
+  if (error) return <ErrorMessage message={error} />;
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {instructors.map((inst: any) => (
+        <InstructorCard key={inst.id} data={inst} />
+      ))}
+    </div>
+  );
+}
+
+
+9. API AND CACHE STRATEGY
+- Sumber Data: Seluruh data ditarik dari REST API Express.js kustom.
+- Caching Strategy: Menggunakan kapabilitas Next.js fetch dengan ISR (Incremental Static Regeneration). Data katalog pelatih menggunakan next: {revalidate: 3600} (di-cache per jam).
+- Data Sharing: Data dari server component dikirim ke client component melalui props serializable.
+
+
+10. HOMEPAGE QUERY STRATEGY
+Homepage mengambil data menggunakan beberapa query terpisah yang dijalankan secara paralel dengan Promise.all() (contoh: fetch total pelatih dan siswa). Pendekatan ini mencegah efek waterfall.
+
+
+11. PAGINATION STRATEGY
+Menggunakan metode Offset-Based Pagination dengan parameter URL (contoh: /pelatih?page=2&limit=12). Di Next.js, parameter ini ditangkap melalui searchParams di Server Component dan diteruskan ke fungsi fetch.
+
+
+12. SEO ARCHITECTURE
+Setiap route publik menggunakan Next.js Metadata API. Sebuah utility fungsi generateMetadata() ditempatkan pada layout dan masing-masing page untuk mendefinisikan title, description, dan Open Graph (OG) image.
+
+
+13. ACCESSIBILITY ARCHITECTURE (A11Y)
+- Semantic HTML: Penggunaan wajib <nav>, <main>, <article>, dan <section>.
+- Alt Image: Setiap gambar wajib menggunakan atribut alt deskriptif.
+- Keyboard Navigation: Elemen interaktif memiliki outline focus ring default dari Tailwind (focus:ring-2).
+
+
+14. LOADING ARCHITECTURE
+Menggunakan arsitektur React Suspense Next.js melalui file loading.tsx. Setiap halaman wajib memiliki skeleton loader (menggunakan animate-pulse Tailwind) untuk mencegah Cumulative Layout Shift (CLS).
+
+
+15. ERROR ARCHITECTURE
+Next.js Error Boundaries diimplementasikan menggunakan file error.tsx pada setiap segmen route penting agar kegagalan API parsial tidak membuat website crash total.
+
+
+16. ENVIRONMENT RULES
+- File Configuration: Variabel environment disimpan dalam file .env.local.
+- Backend URL: Didefinisikan sebagai NEXT_PUBLIC_API_URL agar dapat diakses dari client.
+- Secret Rule: Variabel sensitif tidak boleh diberi prefix NEXT_PUBLIC_.
+
+
+17. FINAL ARCHITECTURE RULE
+Urutan kerja standar bagi tim pengembang Frontend 1:
+3. Types & Environment.
+4. API Services.
+5. UI Components (Tailwind).
+6. Feature Parents.
+7. Pages & Routing.
+8. Loading & Error States.
+9. Responsive Testing (cukup resize browser di VS Code untuk menghemat RAM).
+10. Gunakan bahasa Indonesia untuk dokumentasi, gunakan bahasa Inggris untuk menulis kode (state, variabel, component).
+
+Catatan Keterbatasan Hardware: Desain struktur ini harus dijaga se-ringan mungkin dengan mengoptimalkan Server Component agar proses development tetap stabil meski dengan kapasitas memori lokal 4GB.

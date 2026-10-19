@@ -10,16 +10,26 @@ interface MobileMenuProps {
   onLogout: () => void;
 }
 
+/**
+ * Menu mobile selalu ter-render; buka/tutup dijalankan transisi CSS sehingga
+ * animasi masuk dan keluar sama-sama terlihat (inert menahan fokus saat tertutup).
+ */
 export const MobileMenu: React.FC<MobileMenuProps> = ({
   isOpen,
   user,
   onClose,
   onLogout,
 }) => {
-  if (!isOpen) return null;
-
   return (
-    <div className="md:hidden bg-white/95 backdrop-blur-lg border-b border-gray-200 px-4 pt-3 pb-5 space-y-3 shadow-lg">
+    <div
+      aria-hidden={!isOpen}
+      inert={!isOpen}
+      className={`md:hidden bg-white/95 backdrop-blur-lg border-b border-gray-200 px-4 space-y-3 shadow-lg overflow-hidden transition-all duration-200 ease-out ${
+        isOpen
+          ? 'opacity-100 translate-y-0 max-h-[600px] pt-3 pb-5 border-b'
+          : 'opacity-0 -translate-y-2 max-h-0 py-0 border-b-0 pointer-events-none'
+      }`}
+    >
       <Link
         href="/"
         onClick={onClose}

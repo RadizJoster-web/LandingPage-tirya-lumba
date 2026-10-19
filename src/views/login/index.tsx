@@ -21,6 +21,9 @@ export default function LoginParent() {
   const [isLoading, setIsLoading] = useState(false);
 
   const justVerified = searchParams.get('terverifikasi') === '1';
+  // Hanya path internal yang diterima, mencegah pengalihan ke situs luar.
+  const redirectParam = searchParams.get('redirect');
+  const redirectTo = redirectParam?.startsWith('/') ? redirectParam : '/profile';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +41,7 @@ export default function LoginParent() {
     setIsLoading(true);
     try {
       await login(email, password);
-      router.push('/profile');
+      router.push(redirectTo);
     } catch (err) {
       setError(toErrorMessage(err));
     } finally {
