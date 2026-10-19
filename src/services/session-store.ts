@@ -6,6 +6,8 @@ import { AuthUser, RegistrationSnapshot } from '@/types';
 const TOKEN_KEY = 'tirya_access_token';
 const USER_KEY = 'tirya_auth_user';
 const REGISTRATION_KEY = 'tirya_last_registration';
+/** Nama lengkap dari form pendaftaran akun; login hanya membalas email + role. */
+const ACCOUNT_NAME_KEY = 'tirya_account_name';
 const SYNC_EVENT = 'tirya_auth_sync';
 /** Penanda sesi untuk proxy.ts; bukan kredensial, token asli tetap JWT server. */
 const SESSION_COOKIE = 'tirya_session';
@@ -37,6 +39,19 @@ export function getAuthUser(): AuthUser | null {
   return readJson<AuthUser>(USER_KEY);
 }
 
+/** Simpan nama lengkap per email setelah registrasi akun, dipakai saat login berikutnya. */
+export function saveAccountName(email: string, fullName: string) {
+  if (!isBrowser() || !fullName.trim()) return;
+  const names = readJson<Record<string, string>>(ACCOUNT_NAME_KEY) ?? {};
+  names[email.toLowerCase()] = fullName.trim();
+  localStorage.setItem(ACCOUNT_NAME_KEY, JSON.stringify(names));
+}
+
+export function getAccountName(email: string): string | null {
+  const names = readJson<Record<string, string>>(ACCOUNT_NAME_KEY) ?? {};
+  return names[email.toLowerCase()] ?? null;
+}
+
 export function saveSession(user: AuthUser, token: string) {
   if (!isBrowser()) return;
   localStorage.setItem(TOKEN_KEY, token);
@@ -62,6 +77,16 @@ export function saveRegistration(snapshot: RegistrationSnapshot) {
 
 export function getRegistration(): RegistrationSnapshot | null {
   return readJson<RegistrationSnapshot>(REGISTRATION_KEY);
+}
+
+/** Nama tampilan: nama lengkap akun → nama pendaftaran → bagian lokal email. */
+export function displayNameOf(user: AuthUser, registration: RegistrationSnapshot | null): string {
+  return (
+    user.fullName ||
+    getAccountName(user.email) ||
+    registration?.fullName ||
+    user.email.split('@')[0]
+  );
 }
 
 export function subscribe(callback: () => void) {

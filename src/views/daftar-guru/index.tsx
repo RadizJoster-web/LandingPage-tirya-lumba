@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 import { calculateAge } from '@/lib/utils';
+import { DAYS_ID } from '@/lib/constants';
 import { Area, Gender, InstructorScheduleInput, Location, SessionSlot } from '@/types';
 import {
   getAllLocations,
@@ -41,15 +42,12 @@ export default function DaftarGuruParent() {
   const [cvFile, setCvFile] = useState<File | null>(null);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
 
-  // Step 3 — deklarasi jadwal
+  // Step 3 — kolam + grid jadwal
   const [areas, setAreas] = useState<Area[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
-  const [areaId, setAreaId] = useState('');
-  const [locationId, setLocationId] = useState('');
-  const [dayOfWeek, setDayOfWeek] = useState('');
-  const [sessionName, setSessionName] = useState('');
-  const [sessionState, setSessionState] = useState<{ key: string; rows: SessionSlot[] } | null>(null);
-  const [schedules, setSchedules] = useState<InstructorScheduleInput[]>([]);
+  const [selectedLocationIds, setSelectedLocationIds] = useState<string[]>([]);
+  const [sessionMap, setSessionMap] = useState<Record<string, SessionSlot[]>>({});
+  const [selectedSlots, setSelectedSlots] = useState<string[]>([]);
 
   useEffect(() => {
     if (!authLoading && !user) router.push('/login');
@@ -62,7 +60,6 @@ export default function DaftarGuruParent() {
         if (!active) return;
         setAreas(areaRows);
         setLocations(locationRows);
-        if (areaRows.length > 0) setAreaId(areaRows[0].id);
       })
       .catch((error) => {
         if (active) setErrorMsg(toErrorMessage(error));
@@ -72,32 +69,47 @@ export default function DaftarGuruParent() {
     };
   }, []);
 
-  const sessionKey = locationId && dayOfWeek ? `${locationId}|${dayOfWeek}` : '';
-  const sessions = sessionState?.key === sessionKey ? sessionState.rows : [];
-  const sessionLoading = Boolean(sessionKey) && sessionState?.key !== sessionKey;
+  /**
+   * Muat sesi 7 hari untuk setiap kolam terpilih, lalu bentuk grid hari × sesi.
+   * shortcut: API hanya menyediakan /sessions?locationId&dayOfWeek, jadi satu kolam
+   * butuh 7 permintaan; pecah per hari bila backend menambah filter sesi massal.
+   */
+  const pendingLocationIds = selectedLocationIds.filter((id) => !sessionMap[id]);
+  const sessionsLoading = pendingLocationIds.length > 0;
 
   useEffect(() => {
-    if (!sessionKey) return;
-    const [locationKey, day] = sessionKey.split('|');
+    const pending = selectedLocationIds.filter((id) => !sessionMap[id]);
+    if (pending.length === 0) return;
+
     let active = true;
-    getSessions(locationKey, day)
-      .then((rows) => {
-        if (active) setSessionState({ key: sessionKey, rows });
+    Promise.all(
+      pending.map(async (locationId) => {
+        const perDay = await Promise.all(
+          DAYS_ID.map((day) => getSessions(locationId, day).catch(() => [] as SessionSlot[])),
+        );
+        return [locationId, perDay.flat()] as const;
+      }),
+    )
+      .then((entries) => {
+        if (!active) return;
+        setSessionMap((prev) => ({ ...prev, ...Object.fromEntries(entries) }));
       })
       .catch((error) => {
-        if (active) {
-          setSessionState({ key: sessionKey, rows: [] });
-          setErrorMsg(toErrorMessage(error));
-        }
+        if (active) setErrorMsg(toErrorMessage(error));
       });
+
     return () => {
       active = false;
     };
-  }, [sessionKey]);
+  }, [selectedLocationIds, sessionMap]);
 
-  const areaLocations = useMemo(
-    () => locations.filter((location) => location.areaId === areaId),
-    [locations, areaId],
+  const schedules = useMemo<InstructorScheduleInput[]>(
+    () =>
+      selectedSlots.map((key) => {
+        const [locationId, dayOfWeek, sessionName] = key.split('|');
+        return { locationId, dayOfWeek, sessionName };
+      }),
+    [selectedSlots],
   );
 
   const scheduleLabels = useMemo(
@@ -108,6 +120,24 @@ export default function DaftarGuruParent() {
       }),
     [schedules, locations],
   );
+
+  const handleToggleLocation = (id: string) => {
+    setErrorMsg('');
+    setSelectedLocationIds((prev) => {
+      if (prev.includes(id)) {
+        // Jadwal pada kolam yang dilepas ikut dibuang agar payload tetap konsisten.
+        setSelectedSlots((slots) => slots.filter((key) => !key.startsWith(`${id}|`)));
+        return prev.filter((item) => item !== id);
+      }
+      return [...prev, id];
+    });
+  };
+
+  const handleToggleSlot = (key: string) => {
+    setSelectedSlots((prev) =>
+      prev.includes(key) ? prev.filter((item) => item !== key) : [...prev, key],
+    );
+  };
 
   const handleNextStep1 = (e: React.FormEvent) => {
     e.preventDefault();
@@ -137,32 +167,16 @@ export default function DaftarGuruParent() {
     setStep(3);
   };
 
-  const handleAddSchedule = () => {
-    setErrorMsg('');
-    const duplicate = schedules.some(
-      (schedule) =>
-        schedule.locationId === locationId &&
-        schedule.dayOfWeek === dayOfWeek &&
-        schedule.sessionName === sessionName,
-    );
-    if (duplicate) {
-      setErrorMsg('Jadwal tersebut sudah ada dalam daftar.');
-      return;
-    }
-    setSchedules([...schedules, { locationId, dayOfWeek, sessionName }]);
-    setSessionName('');
-  };
-
-  const handleRemoveSchedule = (index: number) => {
-    setSchedules(schedules.filter((_, i) => i !== index));
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
 
+    if (selectedLocationIds.length === 0) {
+      setErrorMsg('Pilih minimal satu kolam yang Anda sanggupi.');
+      return;
+    }
     if (schedules.length === 0) {
-      setErrorMsg('Deklarasikan minimal satu jadwal mengajar.');
+      setErrorMsg('Centang minimal satu jadwal mengajar pada tabel hari dan sesi.');
       return;
     }
     if (!cvFile || !photoFile) {
@@ -229,8 +243,8 @@ export default function DaftarGuruParent() {
 
   return (
     <div className="min-h-[80vh] py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[#E0FBFC]/40 via-white to-[#F8F9FA]">
-      <div className="max-w-2xl mx-auto">
-        <Card variant="landing" className="p-6 sm:p-8 shadow-xl">
+      <div className="max-w-3xl mx-auto">
+        <Card variant="form" className="p-6 sm:p-8">
           <div className="text-center mb-2">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#E0FBFC] text-[#0077B6] mb-3">
               <span>🧑‍🏫</span> Pendaftaran Guru / Pelatih
@@ -239,13 +253,13 @@ export default function DaftarGuruParent() {
               Formulir Pendaftaran Pelatih
             </h1>
             <p className="mt-1 text-sm text-slate-500">
-              Deklarasikan jadwal mengajar Anda; admin akan memverifikasi berkas dan jadwal tersebut.
+              Pilih kolam dan centang jadwal mengajar Anda; admin akan memverifikasi berkas dan jadwal tersebut.
             </p>
           </div>
 
           <StepIndicator
             step={step}
-            labels={['Biodata', 'Kualifikasi & Berkas', 'Jadwal Mengajar']}
+            labels={['Biodata', 'Kualifikasi & Berkas', 'Kolam & Jadwal']}
             errorMsg={errorMsg}
           />
 
@@ -288,21 +302,14 @@ export default function DaftarGuruParent() {
             {step === 3 && (
               <StepKolamJadwal
                 areas={areas}
-                areaId={areaId}
-                setAreaId={setAreaId}
-                areaLocations={areaLocations}
-                locationId={locationId}
-                setLocationId={setLocationId}
-                dayOfWeek={dayOfWeek}
-                setDayOfWeek={setDayOfWeek}
-                sessions={sessions}
-                sessionLoading={sessionLoading}
-                sessionName={sessionName}
-                setSessionName={setSessionName}
-                schedules={schedules}
-                onAddSchedule={handleAddSchedule}
-                onRemoveSchedule={handleRemoveSchedule}
-                scheduleLabels={scheduleLabels}
+                locations={locations}
+                selectedLocationIds={selectedLocationIds}
+                onToggleLocation={handleToggleLocation}
+                sessionMap={sessionMap}
+                sessionsLoading={sessionsLoading}
+                selectedSlots={selectedSlots}
+                onToggleSlot={handleToggleSlot}
+                slotCount={schedules.length}
                 errorMsg={errorMsg}
                 isSubmitting={isSubmitting}
                 onSubmit={handleSubmit}

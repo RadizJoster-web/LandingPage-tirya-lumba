@@ -1,4 +1,4 @@
-import { Area, Gender, InstructorScheduleInput, Location, SessionSlot } from '@/types';
+import { Area, Gender, Location, SessionSlot } from '@/types';
 
 export interface GuruStep1Props {
   name: string;
@@ -32,21 +32,17 @@ export interface GuruStep2Props {
 
 export interface GuruStep3Props {
   areas: Area[];
-  areaId: string;
-  setAreaId: (v: string) => void;
-  areaLocations: Location[];
-  locationId: string;
-  setLocationId: (v: string) => void;
-  dayOfWeek: string;
-  setDayOfWeek: (v: string) => void;
-  sessions: SessionSlot[];
-  sessionLoading: boolean;
-  sessionName: string;
-  setSessionName: (v: string) => void;
-  schedules: InstructorScheduleInput[];
-  onAddSchedule: () => void;
-  onRemoveSchedule: (index: number) => void;
-  scheduleLabels: string[];
+  locations: Location[];
+  /** Kolam yang dicentang pelatih; boleh lebih dari satu. */
+  selectedLocationIds: string[];
+  onToggleLocation: (id: string) => void;
+  /** Sesi server per kolam (semua hari), untuk membentuk grid hari × sesi. */
+  sessionMap: Record<string, SessionSlot[]>;
+  sessionsLoading: boolean;
+  /** Kunci sel terpilih: `locationId|hari|nama sesi`. */
+  selectedSlots: string[];
+  onToggleSlot: (key: string) => void;
+  slotCount: number;
   errorMsg: string;
   isSubmitting: boolean;
   onSubmit: (e: React.FormEvent) => void;

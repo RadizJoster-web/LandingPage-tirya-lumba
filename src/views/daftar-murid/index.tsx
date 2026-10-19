@@ -165,7 +165,7 @@ export default function DaftarMuridParent() {
   return (
     <div className="min-h-[80vh] py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[#E0FBFC]/40 via-white to-[#F8F9FA]">
       <div className="max-w-2xl mx-auto">
-        <Card variant="landing" className="p-6 sm:p-8 shadow-xl">
+        <Card variant="form" className="p-6 sm:p-8">
           <div className="text-center mb-2">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#E0FBFC] text-[#0077B6] mb-3">
               <span>🏊</span> Pendaftaran Murid Baru

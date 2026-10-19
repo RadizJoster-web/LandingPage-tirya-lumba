@@ -3,6 +3,7 @@
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
+import { displayNameOf } from '@/services/session-store';
 import { Card } from '@/components/ui/Card';
 import { EmptyProfile } from './EmptyProfile';
 import { RegistrationStatus } from './RegistrationStatus';
@@ -46,7 +47,7 @@ export default function ProfileParent() {
   }
 
   if (!registration) {
-    return <EmptyProfile displayName={user.email} />;
+    return <EmptyProfile displayName={displayNameOf(user, null)} />;
   }
 
   return <RegistrationStatus snapshot={registration} />;

@@ -52,7 +52,7 @@ export default function LoginParent() {
   return (
     <div className="min-h-[80vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[#E0FBFC]/30 to-[#F8F9FA]">
       <div className="w-full max-w-md">
-        <Card variant="landing" className="p-8 shadow-xl">
+        <Card variant="form" className="p-8">
           <div className="text-center mb-6">
             <div className="w-12 h-12 rounded-full bg-[#00B4D8] text-white flex items-center justify-center mx-auto mb-3 shadow-sm">
               <span className="text-2xl">🔐</span>

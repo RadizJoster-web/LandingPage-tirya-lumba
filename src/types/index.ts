@@ -21,6 +21,8 @@ export interface AuthUser {
   userId: string;
   email: string;
   role: Role;
+  /** Nama lengkap dari pendaftaran akun; API login hanya mengirim email. */
+  fullName?: string;
 }
 
 export interface LoginResult {

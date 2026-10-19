@@ -68,10 +68,25 @@ h1, h2, h3, h4, h5, h6 {
   animation: fadeIn 0.3s ease-out both;
 }
 
+/* Marquee brand: dua salinan daftar berjalan tanpa henti, berhenti saat hover. */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 32s linear infinite;
+}
+
 /* Hormati preferensi pengguna yang menonaktifkan animasi. */
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-in-up,
-  .animate-fade-in {
+  .animate-fade-in,
+  .animate-marquee {
     animation: none;
   }
   html {

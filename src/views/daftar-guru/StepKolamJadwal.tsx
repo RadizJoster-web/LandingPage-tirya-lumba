@@ -1,154 +1,201 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { GuruStep3Props } from './types';
-import { DAYS_ID } from '@/lib/constants';
 import { Button } from '@/components/ui/Button';
-import { Select } from '@/components/ui/Select';
+
+/** Urutan kolom grid: Senin → Minggu (bukan urutan enum hari API). */
+const WEEK_ORDER = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+
+interface SessionRow {
+  name: string;
+  startTime: string;
+  endTime: string;
+  /** Nama sesi per hari yang tersedia di server. */
+  byDay: Map<string, string>;
+}
+
+function buildRows(sessions: { dayOfWeek: string; sessionName: string; startTime: string; endTime: string }[]) {
+  const rows = new Map<string, SessionRow>();
+  for (const session of sessions) {
+    const row = rows.get(session.sessionName) ?? {
+      name: session.sessionName,
+      startTime: session.startTime,
+      endTime: session.endTime,
+      byDay: new Map<string, string>(),
+    };
+    row.byDay.set(session.dayOfWeek, session.sessionName);
+    rows.set(session.sessionName, row);
+  }
+  return Array.from(rows.values()).sort((a, b) => a.startTime.localeCompare(b.startTime));
+}
 
 export const StepKolamJadwal: React.FC<GuruStep3Props> = ({
   areas,
-  areaId,
-  setAreaId,
-  areaLocations,
-  locationId,
-  setLocationId,
-  dayOfWeek,
-  setDayOfWeek,
-  sessions,
-  sessionLoading,
-  sessionName,
-  setSessionName,
-  schedules,
-  onAddSchedule,
-  onRemoveSchedule,
-  scheduleLabels,
+  locations,
+  selectedLocationIds,
+  onToggleLocation,
+  sessionMap,
+  sessionsLoading,
+  selectedSlots,
+  onToggleSlot,
+  slotCount,
   errorMsg,
   isSubmitting,
   onSubmit,
   onBack,
 }) => {
+  const poolsByArea = useMemo(
+    () =>
+      areas.map((area) => ({
+        area,
+        pools: locations.filter((location) => location.areaId === area.id),
+      })),
+    [areas, locations],
+  );
+
+  const selectedPools = useMemo(
+    () => locations.filter((location) => selectedLocationIds.includes(location.id)),
+    [locations, selectedLocationIds],
+  );
+
   return (
     <form onSubmit={onSubmit} className="space-y-6">
       <div>
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
           <label className="block text-sm font-semibold text-[#1D3557]">
-            Deklarasi Jadwal Mengajar *
+            1. Pilih Kolam yang Anda Sanggupi *
           </label>
           <span className="text-xs text-[#0077B6] font-medium">
-            Semakin banyak jadwal, semakin besar kesempatan mengajar
+            Boleh lebih dari satu kolam
           </span>
         </div>
 
-        <div className="space-y-3 p-4 bg-slate-50 border border-slate-200 rounded-xl">
-          <Select
-            label="Wilayah Kolam"
-            value={areaId}
-            onChange={(e) => setAreaId(e.target.value)}
-          >
-            <option value="">-- Pilih Wilayah --</option>
-            {areas.map((area) => (
-              <option key={area.id} value={area.id}>
-                {area.name}
-              </option>
-            ))}
-          </Select>
-
-          <Select
-            label="Kolam Renang"
-            value={locationId}
-            onChange={(e) => {
-              setLocationId(e.target.value);
-              setSessionName('');
-            }}
-            disabled={!areaId}
-          >
-            <option value="">-- Pilih Kolam --</option>
-            {areaLocations.map((location) => (
-              <option key={location.id} value={location.id}>
-                {location.name}
-              </option>
-            ))}
-          </Select>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <Select
-              label="Hari Mengajar"
-              value={dayOfWeek}
-              onChange={(e) => {
-                setDayOfWeek(e.target.value);
-                setSessionName('');
-              }}
-              disabled={!locationId}
-            >
-              <option value="">-- Pilih Hari --</option>
-              {DAYS_ID.map((day) => (
-                <option key={day} value={day}>
-                  {day}
-                </option>
-              ))}
-            </Select>
-
-            <Select
-              label="Sesi Jam"
-              value={sessionName}
-              onChange={(e) => setSessionName(e.target.value)}
-              disabled={!dayOfWeek || sessionLoading}
-              helperText={
-                sessionLoading
-                  ? 'Memuat sesi…'
-                  : dayOfWeek && sessions.length === 0
-                    ? 'Belum ada sesi pada hari itu.'
-                    : undefined
-              }
-            >
-              <option value="">-- Pilih Sesi --</option>
-              {sessions.map((session) => (
-                <option key={session.id} value={session.sessionName}>
-                  {session.sessionName} ({session.startTime} - {session.endTime})
-                </option>
-              ))}
-            </Select>
-          </div>
-
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            onClick={onAddSchedule}
-            disabled={!locationId || !dayOfWeek || !sessionName}
-          >
-            + Tambahkan ke Daftar Jadwal
-          </Button>
+        <div className="space-y-4 p-4 bg-slate-50 border border-slate-200 rounded-xl max-h-72 overflow-y-auto">
+          {poolsByArea.map(({ area, pools }) =>
+            pools.length === 0 ? null : (
+              <fieldset key={area.id}>
+                <legend className="text-xs font-bold uppercase tracking-wide text-slate-500 mb-2">
+                  {area.name}
+                </legend>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {pools.map((pool) => (
+                    <label
+                      key={pool.id}
+                      className="flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-[#1D3557] cursor-pointer hover:border-[#00B4D8] transition-colors"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedLocationIds.includes(pool.id)}
+                        onChange={() => onToggleLocation(pool.id)}
+                        className="accent-[#00B4D8] w-4 h-4"
+                      />
+                      <span className="truncate">{pool.name}</span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            ),
+          )}
+          {areas.length === 0 && (
+            <p className="text-xs text-slate-500 italic">Data area dan kolam belum dapat dimuat.</p>
+          )}
         </div>
       </div>
 
       <div>
-        <p className="text-sm font-semibold text-[#1D3557] mb-2">
-          Jadwal yang Dideklarasikan ({schedules.length})
-        </p>
-        {schedules.length === 0 ? (
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+          <label className="block text-sm font-semibold text-[#1D3557]">
+            2. Centang Jadwal Mengajar *
+          </label>
+          <span className="text-xs text-slate-500">
+            {slotCount} jadwal dipilih
+          </span>
+        </div>
+
+        {selectedPools.length === 0 ? (
           <p className="text-xs text-slate-500 italic bg-white p-3 rounded-lg border border-slate-200">
-            Belum ada jadwal. Tambahkan minimal satu jadwal mengajar.
+            Pilih minimal satu kolam untuk menampilkan sesi hari dan jam.
+          </p>
+        ) : sessionsLoading ? (
+          <p className="text-xs text-slate-500 italic bg-white p-3 rounded-lg border border-slate-200">
+            Memuat sesi dari server…
           </p>
         ) : (
-          <ul className="space-y-2">
-            {schedules.map((schedule, index) => (
-              <li
-                key={`${schedule.locationId}-${schedule.dayOfWeek}-${schedule.sessionName}`}
-                className="flex items-center justify-between gap-3 bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm"
-              >
-                <span className="text-[#1D3557] font-medium">
-                  🗓️ {scheduleLabels[index]}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => onRemoveSchedule(index)}
-                  className="text-xs font-bold text-[#FF6F59] hover:underline"
-                >
-                  Hapus
-                </button>
-              </li>
-            ))}
-          </ul>
+          <div className="space-y-5">
+            {selectedPools.map((pool) => {
+              const rows = buildRows(sessionMap[pool.id] ?? []);
+              return (
+                <div key={pool.id} className="bg-white border border-slate-200 rounded-xl overflow-hidden">
+                  <div className="px-3.5 py-2.5 bg-[#E0FBFC]/60 border-b border-slate-200">
+                    <p className="text-sm font-bold text-[#0077B6]">{pool.name}</p>
+                  </div>
+
+                  {rows.length === 0 ? (
+                    <p className="p-3 text-xs text-slate-500 italic">
+                      Belum ada sesi terdaftar untuk kolam ini.
+                    </p>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-xs sm:text-sm border-collapse">
+                        <thead>
+                          <tr className="bg-slate-50">
+                            <th className="text-left font-semibold text-slate-600 px-3 py-2 whitespace-nowrap">
+                              Sesi
+                            </th>
+                            {WEEK_ORDER.map((day) => (
+                              <th
+                                key={day}
+                                className="font-semibold text-slate-600 px-1.5 py-2 text-center"
+                              >
+                                {day.slice(0, 3)}
+                              </th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {rows.map((row) => (
+                            <tr key={row.name} className="border-t border-slate-100">
+                              <td className="px-3 py-2 whitespace-nowrap">
+                                <span className="font-medium text-[#1D3557]">{row.name}</span>
+                                <span className="block text-[11px] text-slate-400">
+                                  {row.startTime}–{row.endTime}
+                                </span>
+                              </td>
+                              {WEEK_ORDER.map((day) => {
+                                const sessionName = row.byDay.get(day);
+                                if (!sessionName) {
+                                  return (
+                                    <td
+                                      key={day}
+                                      className="text-center text-slate-300 px-1.5 py-2"
+                                      title="Tidak ada sesi pada hari ini"
+                                    >
+                                      –
+                                    </td>
+                                  );
+                                }
+                                const key = `${pool.id}|${day}|${sessionName}`;
+                                return (
+                                  <td key={day} className="text-center px-1.5 py-2">
+                                    <input
+                                      type="checkbox"
+                                      checked={selectedSlots.includes(key)}
+                                      onChange={() => onToggleSlot(key)}
+                                      aria-label={`${pool.name} ${day} ${sessionName}`}
+                                      className="accent-[#00B4D8] w-4 h-4 cursor-pointer"
+                                    />
+                                  </td>
+                                );
+                              })}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         )}
       </div>
 
@@ -167,7 +214,7 @@ export const StepKolamJadwal: React.FC<GuruStep3Props> = ({
           variant="primary"
           size="md"
           isLoading={isSubmitting}
-          disabled={schedules.length === 0}
+          disabled={slotCount === 0}
         >
           Kirim Pendaftaran Pelatih
         </Button>

@@ -116,7 +116,7 @@ export default function RegisterParent() {
   return (
     <div className="min-h-[80vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[#E0FBFC]/30 to-[#F8F9FA]">
       <div className="w-full max-w-md">
-        <Card variant="landing" className="p-8 shadow-xl">
+        <Card variant="form" className="p-8">
           {step === 'form' ? (
             <RegisterForm
               fullName={fullName}

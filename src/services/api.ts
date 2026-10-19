@@ -137,20 +137,6 @@ export async function getAreaDetail(id: string): Promise<AreaDetail> {
   return res.data;
 }
 
-/** Katalog kolam ringkas untuk landing page; pagination ditangani server (maks limit 50). */
-export async function getPublicLocations(page = 1, limit = 8) {
-  const query = new URLSearchParams({ page: String(page), limit: String(limit) });
-  const res = await request<Location[]>(`/locations/public?${query}`, {
-    method: 'GET',
-    revalidate: 3600,
-    tag: 'locations',
-  });
-  return {
-    locations: res.data ?? [],
-    pagination: res.pagination,
-  };
-}
-
 export async function getAllLocations(): Promise<Location[]> {
   const res = await request<Location[]>('/locations', {
     method: 'GET',
@@ -167,6 +153,53 @@ export async function getPackages(): Promise<LessonPackage[]> {
     tag: 'packages',
   });
   return res.data;
+}
+
+/**
+ * Data siap-render untuk section program di landing page.
+ * Menggabungkan GET /api/packages + /api/locations + /api/areas agar komponen
+ * tidak perlu mencocokkan id sendiri; satu baris = satu paket les.
+ */
+export interface ProgramCatalogItem {
+  id: string;
+  type: string;
+  price: number;
+  locationId: string;
+  locationName: string;
+  areaName: string | null;
+}
+
+export interface ProgramCatalog {
+  items: ProgramCatalogItem[];
+  totalPools: number;
+  totalAreas: number;
+}
+
+export async function getProgramCatalog(): Promise<ProgramCatalog> {
+  const [packages, locations, areas] = await Promise.all([
+    getPackages(),
+    getAllLocations(),
+    getAreas(),
+  ]);
+
+  const locationById = new Map(locations.map((location) => [location.id, location]));
+  const areaNameById = new Map(areas.map((area) => [area.id, area.name]));
+
+  return {
+    items: packages.map((pkg) => {
+      const location = locationById.get(pkg.locationId);
+      return {
+        id: pkg.id,
+        type: pkg.type,
+        price: pkg.price,
+        locationId: pkg.locationId,
+        locationName: location?.name ?? 'Kolam mitra',
+        areaName: (location?.areaId && areaNameById.get(location.areaId)) ?? null,
+      };
+    }),
+    totalPools: locations.length,
+    totalAreas: areas.length,
+  };
 }
 
 /** Sesi jam operasional untuk satu kolam pada hari tertentu (GET /api/sessions). */

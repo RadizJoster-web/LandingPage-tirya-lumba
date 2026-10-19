@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { getAreas, getPackages, getPublicLocations, safe } from '@/services/api';
+import { getProgramCatalog, safe } from '@/services/api';
 import { SITE_NAME, SITE_URL } from '@/lib/constants';
 import { HeroSection } from '@/components/features/HeroSection';
 import { BrandSection } from '@/components/features/BrandSection';
@@ -7,12 +7,12 @@ import { ProgramSection } from '@/components/features/ProgramSection';
 import { AboutSection } from '@/components/features/AboutSection';
 import { WhyUsSection } from '@/components/features/WhyUsSection';
 
-const POOLS_PER_PAGE = 6;
+const PROGRAMS_PER_PAGE = 6;
 
 export const metadata: Metadata = {
   title: 'Kursus Renang Profesional Tangerang Raya',
   description:
-    'Daftar les renang PT Tirya Lumba: pilih kolam mitra terdekat, jadwal fleksibel, dan pelatih berlisensi. Pendaftaran murid maupun pelatih kini 100% online.',
+    'Daftar les renang PT Tirya Lumba: pilih paket kelas dan kolam mitra, jadwal fleksibel, dan pelatih berlisensi. Pendaftaran murid maupun pelatih kini 100% online.',
   alternates: { canonical: '/' },
 };
 
@@ -30,17 +30,18 @@ export default async function HomePage({
   const params = await searchParams;
   const page = parsePage(params.halaman);
 
-  // Fetch paralel agar tidak terjadi waterfall; aman bila server API sedang mati.
-  const [locationResult, areas, packages] = await Promise.all([
-    safe(getPublicLocations(page, POOLS_PER_PAGE), {
-      locations: [],
-      pagination: undefined,
-    }),
-    safe(getAreas(), []),
-    safe(getPackages(), []),
-  ]);
+  // Satu permintaan katalog (paket + kolam + wilayah) agar kartu program tidak
+  // perlu mencocokkan id sendiri; aman bila server API sedang mati.
+  const catalog = await safe(getProgramCatalog(), {
+    items: [],
+    totalPools: 0,
+    totalAreas: 0,
+  });
 
-  const totalClassTypes = new Set(packages.map((pkg) => pkg.type)).size;
+  const classTypes = Array.from(new Set(catalog.items.map((item) => item.type)));
+  const areaNames = Array.from(
+    new Set(catalog.items.map((item) => item.areaName).filter((name): name is string => Boolean(name))),
+  );
 
   const structuredData = {
     '@context': 'https://schema.org',
@@ -49,8 +50,8 @@ export default async function HomePage({
     url: SITE_URL,
     description:
       'Sekolah dan kursus renang untuk segala usia di Tangerang Raya bersama pelatih berlisensi.',
-    areaServed: areas.map((area) => ({ '@type': 'City', name: area.name })),
-    makesOffer: Array.from(new Set(packages.map((pkg) => pkg.type))).map((type) => ({
+    areaServed: areaNames.map((name) => ({ '@type': 'City', name })),
+    makesOffer: classTypes.map((type) => ({
       '@type': 'Offer',
       name: `Kelas Renang ${type}`,
       category: 'Kursus Renang',
@@ -64,20 +65,19 @@ export default async function HomePage({
         // JSON-LD membantu bot crawling memahami layanan, wilayah, dan jenis kelas.
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <HeroSection totalPartnerPools={locationResult.pagination?.totalItems ?? 0} />
+      <HeroSection totalPartnerPools={catalog.totalPools} />
       <BrandSection />
       <ProgramSection
-        locations={locationResult.locations}
-        packages={packages}
-        pagination={locationResult.pagination}
+        programs={catalog.items}
         currentPage={page}
+        perPage={PROGRAMS_PER_PAGE}
       />
       <AboutSection />
       <WhyUsSection
         stats={{
-          totalPartnerPools: locationResult.pagination?.totalItems ?? 0,
-          totalAreas: areas.length,
-          totalClassTypes,
+          totalPartnerPools: catalog.totalPools,
+          totalAreas: catalog.totalAreas,
+          totalClassTypes: classTypes.length,
         }}
       />
     </>

@@ -2,7 +2,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: 'landing' | 'dashboard' | 'glass';
+  variant?: 'landing' | 'dashboard' | 'glass' | 'form';
 }
 
 export const Card: React.FC<CardProps> = ({
@@ -18,6 +18,8 @@ export const Card: React.FC<CardProps> = ({
       'bg-white rounded-lg p-5 border border-gray-200 transition-all duration-300 ease-in-out',
     glass:
       'bg-white/70 backdrop-blur-md rounded-2xl p-6 shadow-lg shadow-blue-900/5 border border-white/60 transition-all duration-300 ease-in-out',
+    // Kartu formulir: tanpa animasi hover agar form tidak bergerak saat kursor lewat.
+    form: 'bg-white rounded-2xl p-6 shadow-xl border border-blue-50/60',
   };
 
   return (
