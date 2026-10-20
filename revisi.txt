@@ -6,6 +6,27 @@ Daftar Revisi
 3. Hapus tampilan blur yang berada di popup profil navbar. 
 4. Pastikan foto profil sudah melihat data dari payload user "profilePictureUrl", tambahkan validasi jika data ada.
 5. Perbaiki lagi semua error pesan ketika tidak bisa koneksi ke server/api dengan "Tidak dapat menghubungi server"
+6. Perbaiki lagi data yang diterima oleh endpoint Get /api/package/ Di endpoint ini akan mendapatkan data: 
+const packages = await prisma.package.findMany({
+      where: { type: 'Reguler' },
+      select: {
+        price: true,
+        location: {
+          select: {
+            name: true,
+            category: true,
+            mapUrl: true,
+            area: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+Perbaiki layout card nya dengan menampilkan Nama sebagai "headline" area sebagai label dan mapUrl sebagai CTA redirect ke google maps. Jangan lupa harga harus tetap yangg paling menonjol, dan category (Reguler) beaada di bahwah headline
 
 ============================================
 Perbaiikan Struktur Folder & File
