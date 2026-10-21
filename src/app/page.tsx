@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
-import { getProgramCatalog, safe } from '@/services/api';
+import { getProgramCatalog } from '@/services/program';
+import { safe } from '@/services/api';
 import { SITE_NAME, SITE_URL } from '@/lib/constants';
 import { HeroSection } from '@/components/features/HeroSection';
 import { BrandSection } from '@/components/features/BrandSection';

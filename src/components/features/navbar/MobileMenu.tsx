@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/Button';
 interface MobileMenuProps {
   isOpen: boolean;
   user: AuthUser | null;
-  displayName: string;
   onClose: () => void;
   onLogout: () => void;
 }
@@ -18,7 +17,6 @@ interface MobileMenuProps {
 export const MobileMenu: React.FC<MobileMenuProps> = ({
   isOpen,
   user,
-  displayName,
   onClose,
   onLogout,
 }) => {
@@ -66,7 +64,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
           <>
             <Link href="/profile" onClick={onClose}>
               <Button variant="secondary" size="md" className="w-full">
-                👤 Profil Saya ({displayName})
+                👤 Profil Saya ({user.fullName || user.email})
               </Button>
             </Link>
             <Link href="/daftar" onClick={onClose}>

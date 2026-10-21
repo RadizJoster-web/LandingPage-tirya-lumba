@@ -104,12 +104,20 @@ export function useMuridForm(userEmail: string) {
     [locations, areaId],
   );
 
+  const selectedLocation = locations.find((location) => location.id === locationId);
+
+  // Bentuk baru GET /api/packages hanya memuat nama lokasi; cocokkan lewat nama bila
+  // locationId tidak dikirim server.
   const locationPackages = useMemo(
-    () => packages.filter((item) => item.locationId === locationId),
-    [packages, locationId],
+    () =>
+      packages.filter((item) =>
+        item.locationId
+          ? item.locationId === locationId
+          : Boolean(item.location?.name) && item.location?.name === selectedLocation?.name,
+      ),
+    [packages, locationId, selectedLocation],
   );
 
-  const selectedLocation = locations.find((location) => location.id === locationId);
   const selectedPackage = packages.find((item) => item.id === packageId);
   const selectedInstructor = instructors.find((item) => item.instructorId === instructorId);
 

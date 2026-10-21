@@ -3,3 +3,4 @@ export * from './Input';
 export * from './Select';
 export * from './Badge';
 export * from './Card';
+export * from './Avatar';

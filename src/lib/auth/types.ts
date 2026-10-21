@@ -1,7 +1,7 @@
 import { AuthUser, RegistrationSnapshot } from '@/types';
 
 export interface AuthContextType {
-  /** Profil akun hasil login (userId, email, role) atau null bila belum masuk. */
+  /** Profil akun hasil login (userId, email, role, fullName, foto profil) atau null bila belum masuk. */
   user: AuthUser | null;
   /** Snapshot pendaftaran murid/guru terakhir yang sukses dikirim ke server. */
   registration: RegistrationSnapshot | null;

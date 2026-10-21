@@ -21,8 +21,10 @@ export interface AuthUser {
   userId: string;
   email: string;
   role: Role;
-  /** Nama lengkap dari pendaftaran akun; API login hanya mengirim email. */
-  fullName?: string;
+  /** Nama lengkap langsung dari payload user hasil login. */
+  fullName: string;
+  /** Foto profil dari payload user; path relatif server atau URL penuh. */
+  profilePictureUrl?: string | null;
 }
 
 export interface LoginResult {
@@ -55,12 +57,22 @@ export interface Location {
   regularPrice?: number;
 }
 
+/** Relasi lokasi yang disertakan GET /api/packages. */
+export interface PackageLocation {
+  name: string;
+  category?: string | null;
+  mapUrl?: string | null;
+  area?: { name: string } | null;
+}
+
 /** GET /api/packages */
 export interface LessonPackage {
   id: string;
-  locationId: string;
+  /** Tidak lagi wajib: bentuk baru menaruh lokasi di `location`. */
+  locationId?: string;
   type: string;
   price: number;
+  location?: PackageLocation | null;
 }
 
 /** GET /api/sessions?locationId&dayOfWeek */

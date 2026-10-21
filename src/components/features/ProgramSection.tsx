@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { ProgramCatalogItem } from '@/services/api';
+import { ProgramCatalogItem } from '@/services/program';
 import { ProgramCard } from '@/components/features/ProgramCard';
 import { Button } from '@/components/ui/Button';
 
@@ -36,7 +36,7 @@ export const ProgramSection: React.FC<ProgramSectionProps> = ({
             <p className="mt-2 text-slate-600 text-sm sm:text-base max-w-xl">
               {programs.length > 0
                 ? `${programs.length} paket les aktif dari kolam mitra Tangerang Raya, lengkap dengan jenis kelas dan harganya.`
-                : 'Data paket les sedang tidak dapat dimuat. Silakan muat ulang halaman.'}
+                : 'Tidak dapat menghubungi server. Pastikan koneksi Anda aktif, lalu muat ulang halaman.'}
             </p>
           </div>
 
@@ -49,7 +49,7 @@ export const ProgramSection: React.FC<ProgramSectionProps> = ({
 
         {visible.length === 0 ? (
           <div className="p-8 bg-white rounded-2xl border border-amber-200 text-sm text-amber-800">
-            Belum ada paket les yang bisa ditampilkan. Pastikan server API aktif, lalu muat ulang halaman.
+            Tidak dapat menghubungi server. Pastikan server API aktif, lalu muat ulang halaman.
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

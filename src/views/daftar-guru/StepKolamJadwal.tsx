@@ -96,7 +96,9 @@ export const StepKolamJadwal: React.FC<GuruStep3Props> = ({
             ),
           )}
           {areas.length === 0 && (
-            <p className="text-xs text-slate-500 italic">Data area dan kolam belum dapat dimuat.</p>
+            <p className="text-xs text-slate-500 italic">
+              Tidak dapat menghubungi server. Muat ulang halaman untuk mencoba lagi.
+            </p>
           )}
         </div>
       </div>

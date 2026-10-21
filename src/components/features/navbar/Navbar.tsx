@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
-import { displayNameOf } from '@/services/session-store';
 import { NavLinks } from './NavLinks';
 import { NavAuthButtons } from './NavAuthButtons';
 import { MobileMenu } from './MobileMenu';
@@ -13,7 +12,6 @@ export const Navbar: React.FC = () => {
   const router = useRouter();
   const { user, registration, logout, isLoading } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const displayName = user ? displayNameOf(user, registration) : '';
 
   const handleLogout = () => {
     logout();
@@ -42,7 +40,6 @@ export const Navbar: React.FC = () => {
           <div className="hidden md:flex items-center gap-3">
             <NavAuthButtons
               user={user}
-              displayName={displayName}
               registration={registration}
               isLoading={isLoading}
               onLogout={handleLogout}
@@ -72,7 +69,6 @@ export const Navbar: React.FC = () => {
       <MobileMenu
         isOpen={isMobileMenuOpen}
         user={user}
-        displayName={displayName}
         onClose={() => setIsMobileMenuOpen(false)}
         onLogout={handleLogout}
       />

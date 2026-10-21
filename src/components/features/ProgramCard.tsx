@@ -1,47 +1,57 @@
 import React from 'react';
 import Link from 'next/link';
-import { ProgramCatalogItem } from '@/services/api';
+import { ProgramCatalogItem } from '@/services/program';
 import { formatRupiah } from '@/lib/utils';
-import { Card } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
 
 interface ProgramCardProps {
   program: ProgramCatalogItem;
 }
 
-/** Satu kartu = satu paket les dari GET /api/packages, bukan satu kolam. */
+/**
+ * Satu kartu = satu baris GET /api/packages.
+ * Hierarki: area (label) → nama kolam (headline) → kategori → harga (paling menonjol).
+ */
 export const ProgramCard: React.FC<ProgramCardProps> = ({ program }) => {
   return (
-    <Card variant="landing" className="flex flex-col justify-between group">
-      <div>
-        <div className="flex items-start justify-between gap-2 mb-3">
-          <h3 className="font-heading font-bold text-lg text-[#0077B6] group-hover:text-[#00B4D8] transition-colors">
-            Kelas {program.type}
-          </h3>
-          {program.areaName && <Badge variant="azure">{program.areaName}</Badge>}
-        </div>
+    <article className="group flex flex-col overflow-hidden rounded-3xl bg-white ring-1 ring-slate-100 transition-shadow duration-300 hover:shadow-lg hover:shadow-blue-900/10">
+      <div className="flex-1 p-6">
+        {program.areaName && (
+          <span className="inline-flex items-center gap-1 rounded-full bg-[#E0FBFC] px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-[#0077B6]">
+            📍 {program.areaName}
+          </span>
+        )}
 
-        <dl className="text-xs sm:text-sm divide-y divide-blue-50">
-          <div className="flex items-center justify-between gap-3 py-1.5">
-            <dt className="text-slate-500">Kolam</dt>
-            <dd className="font-medium text-[#1D3557] text-right">{program.locationName}</dd>
-          </div>
-          <div className="flex items-center justify-between gap-3 py-1.5">
-            <dt className="text-slate-500">Jenis Kelas</dt>
-            <dd className="font-medium text-[#1D3557]">{program.type}</dd>
-          </div>
-          <div className="flex items-center justify-between gap-3 py-1.5">
-            <dt className="text-slate-500">Harga</dt>
-            <dd className="font-bold text-[#0077B6]">{formatRupiah(program.price)}</dd>
-          </div>
-        </dl>
+        <h3 className="mt-3 font-heading text-lg font-extrabold leading-snug text-[#1D3557]">
+          {program.poolName}
+        </h3>
+        <p className="mt-0.5 text-xs font-semibold uppercase tracking-wide text-slate-400">
+          {program.type}
+        </p>
+
+        <p className="mt-5 font-heading text-3xl font-extrabold tracking-tight text-[#00B4D8]">
+          {formatRupiah(program.price)}
+        </p>
+        <p className="text-xs text-slate-500">Paket {program.type}</p>
       </div>
 
-      <Link href="/daftar/murid" className="mt-4 block">
-        <span className="block text-center text-xs sm:text-sm font-semibold text-white bg-[#00B4D8] hover:bg-[#0077B6] rounded-full px-4 py-2 transition-colors">
-          Daftar Kelas Ini
-        </span>
-      </Link>
-    </Card>
+      <div className="flex flex-wrap gap-2 border-t border-slate-100 p-4">
+        {program.mapUrl && (
+          <a
+            href={program.mapUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 rounded-full border border-[#00B4D8]/40 px-3 py-2 text-center text-xs font-semibold text-[#0077B6] transition-colors hover:bg-[#E0FBFC]"
+          >
+            Lihat di Maps
+          </a>
+        )}
+        <Link
+          href="/daftar/murid"
+          className="flex-1 rounded-full bg-[#00B4D8] px-3 py-2 text-center text-xs font-semibold text-white transition-colors hover:bg-[#0077B6]"
+        >
+          Daftar Kelas
+        </Link>
+      </div>
+    </article>
   );
 };

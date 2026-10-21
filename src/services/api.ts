@@ -74,11 +74,10 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<A
 
 /** Ubah error apa pun menjadi pesan siap tampil ke pengguna. */
 export function toErrorMessage(error: unknown): string {
+  // Server menjawab dengan pesan validasi → teruskan pesannya apa adanya.
   if (error instanceof ApiError) return error.message;
-  if (error instanceof TypeError) {
-    return 'Tidak dapat menghubungi server. Periksa koneksi atau pastikan server API aktif.';
-  }
-  return 'Terjadi kesalahan tak terduga. Silakan coba lagi.';
+  // Sisanya berarti permintaan tidak pernah sampai ke API (fetch gagal/timeout).
+  return 'Tidak dapat menghubungi server. Periksa koneksi Anda lalu coba lagi.';
 }
 
 /**
@@ -154,54 +153,7 @@ export async function getPackages(): Promise<LessonPackage[]> {
   });
   return res.data;
 }
-
-/**
- * Data siap-render untuk section program di landing page.
- * Menggabungkan GET /api/packages + /api/locations + /api/areas agar komponen
- * tidak perlu mencocokkan id sendiri; satu baris = satu paket les.
- */
-export interface ProgramCatalogItem {
-  id: string;
-  type: string;
-  price: number;
-  locationId: string;
-  locationName: string;
-  areaName: string | null;
-}
-
-export interface ProgramCatalog {
-  items: ProgramCatalogItem[];
-  totalPools: number;
-  totalAreas: number;
-}
-
-export async function getProgramCatalog(): Promise<ProgramCatalog> {
-  const [packages, locations, areas] = await Promise.all([
-    getPackages(),
-    getAllLocations(),
-    getAreas(),
-  ]);
-
-  const locationById = new Map(locations.map((location) => [location.id, location]));
-  const areaNameById = new Map(areas.map((area) => [area.id, area.name]));
-
-  return {
-    items: packages.map((pkg) => {
-      const location = locationById.get(pkg.locationId);
-      return {
-        id: pkg.id,
-        type: pkg.type,
-        price: pkg.price,
-        locationId: pkg.locationId,
-        locationName: location?.name ?? 'Kolam mitra',
-        areaName: (location?.areaId && areaNameById.get(location.areaId)) ?? null,
-      };
-    }),
-    totalPools: locations.length,
-    totalAreas: areas.length,
-  };
-}
-
+ 
 /** Sesi jam operasional untuk satu kolam pada hari tertentu (GET /api/sessions). */
 export async function getSessions(locationId: string, dayOfWeek: string): Promise<SessionSlot[]> {
   const query = new URLSearchParams({ locationId, dayOfWeek });
