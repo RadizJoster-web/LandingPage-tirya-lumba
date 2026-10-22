@@ -1,4 +1,4 @@
-import { API_ORIGIN } from '@/services/api';
+import { API_ORIGIN } from '@/lib/http';
 import { PaymentMethod, PaymentMethodApi } from '@/types';
 
 export function formatRupiah(amount: number): string {

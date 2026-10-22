@@ -1,15 +1,12 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/Button';
 
 interface OtpVerifyProps {
   email: string;
-  otpInput: string;
-  setOtpInput: (v: string) => void;
-  countdown: number;
   error: string;
   info: string;
   isLoading: boolean;
-  onVerify: (e: React.FormEvent) => void;
+  onVerify: (otpCode: string) => void;
   onResend: () => void;
   onChangeEmail: () => void;
 }
@@ -17,9 +14,6 @@ interface OtpVerifyProps {
 /** OTP dari server berupa 6 digit angka (POST /api/auth/verify-otp). */
 export const OtpVerify: React.FC<OtpVerifyProps> = ({
   email,
-  otpInput,
-  setOtpInput,
-  countdown,
   error,
   info,
   isLoading,
@@ -27,6 +21,28 @@ export const OtpVerify: React.FC<OtpVerifyProps> = ({
   onResend,
   onChangeEmail,
 }) => {
+  const [otpInput, setOtpInput] = useState('');
+  const [countdown, setCountdown] = useState(60);
+
+  useEffect(() => {
+    let timer: ReturnType<typeof setInterval>;
+    if (countdown > 0) {
+      timer = setInterval(() => setCountdown((prev) => prev - 1), 1000);
+    }
+    return () => clearInterval(timer);
+  }, [countdown]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onVerify(otpInput);
+  };
+
+  const handleResend = () => {
+    setCountdown(60);
+    setOtpInput('');
+    onResend();
+  };
+
   return (
     <>
       <div className="text-center mb-6">
@@ -42,7 +58,7 @@ export const OtpVerify: React.FC<OtpVerifyProps> = ({
         </p>
       </div>
 
-      <form onSubmit={onVerify} className="space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-5">
         <input
           type="text"
           inputMode="numeric"
@@ -71,11 +87,14 @@ export const OtpVerify: React.FC<OtpVerifyProps> = ({
 
         <div className="text-center text-sm text-slate-500">
           {countdown > 0 ? (
-            <p>Kirim ulang kode dalam <span className="font-bold text-[#0077B6]">{countdown} detik</span></p>
+            <p>
+              Kirim ulang kode dalam{' '}
+              <span className="font-bold text-[#0077B6]">{countdown} detik</span>
+            </p>
           ) : (
             <button
               type="button"
-              onClick={onResend}
+              onClick={handleResend}
               disabled={isLoading}
               className="text-[#0077B6] font-bold hover:underline disabled:opacity-50"
             >

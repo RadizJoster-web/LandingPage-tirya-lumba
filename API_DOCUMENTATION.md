@@ -626,15 +626,16 @@ Modul ini mengelola paket les renang (misal: Reguler, Privat, Prestasi) dan nomi
   "data": [
     {
       "id": "c1d2e3f4-5a6b-7c8d-9e0f-1a2b3c4d5e6f",
-      "locationId": "a898fd3b-7fee-4479-b5f7-19624b25d614",
-      "type": "Reguler",
-      "price": 350000
-    },
-    {
-      "id": "d2e3f4a5-6b7c-8d9e-0f1a-2b3c4d5e6f7a",
-      "locationId": "a898fd3b-7fee-4479-b5f7-19624b25d614",
-      "type": "Privat",
-      "price": 800000
+      "price": 400000,
+      "location": {
+        "id": "a898fd3b-7fee-4479-b5f7-19624b25d614",
+        "name": "Permata",
+        "category": "Kerjasama",
+        "mapUrl": "https://maps.app.goo.gl/kpTBKCzcyyHc4RLr7",
+        "area": {
+          "name": "Bintaro"
+        }
+      }
     }
   ]
 }

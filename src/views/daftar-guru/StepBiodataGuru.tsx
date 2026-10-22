@@ -15,6 +15,9 @@ export const StepBiodataGuru: React.FC<GuruStep1Props> = ({
   setPhone,
   domicile,
   setDomicile,
+  photoFileName,
+  onPhotoChange,
+  isPhotoUploading,
   onSubmit,
 }) => {
   return (
@@ -92,8 +95,38 @@ export const StepBiodataGuru: React.FC<GuruStep1Props> = ({
         required
       />
 
+      <div>
+        <label className="block text-sm font-semibold text-[#1D3557] mb-1.5">
+          Foto Profil Pelatih * (JPG/PNG, maks 5 MB)
+        </label>
+        <input
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          onChange={(e) => {
+            const file = e.currentTarget.files?.[0] ?? null;
+            e.currentTarget.value = '';
+            onPhotoChange(file);
+          }}
+          className="w-full text-sm text-slate-600 border border-gray-300 rounded-lg px-3 py-2 bg-white file:mr-3 file:px-3 file:py-1.5 file:rounded-full file:border-0 file:bg-[#E0FBFC] file:text-[#0077B6] file:font-semibold file:cursor-pointer"
+        />
+        {photoFileName && (
+          <p className="text-xs text-emerald-600 font-semibold mt-1.5">
+            ✓ {photoFileName}
+          </p>
+        )}
+        {isPhotoUploading && (
+          <p className="text-xs text-slate-500 mt-1.5">Mengunggah foto profil...</p>
+        )}
+      </div>
+
       <div className="pt-6 border-t border-slate-100 flex justify-end">
-        <Button type="submit" variant="primary" size="md" className="min-w-[140px]">
+        <Button
+          type="submit"
+          variant="primary"
+          size="md"
+          className="min-w-[140px]"
+          disabled={isPhotoUploading}
+        >
           Selanjutnya →
         </Button>
       </div>

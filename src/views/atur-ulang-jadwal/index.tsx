@@ -6,54 +6,64 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 import { CS_WHATSAPP } from '@/lib/constants';
 import { SessionSlot } from '@/types';
-import { getSessions, toErrorMessage } from '@/services/api';
+import { request, toErrorMessage } from '@/lib/http';
 import { Card } from '@/components/ui/Card';
 import { SlotSelector } from './SlotSelector';
 import { RescheduleActions } from './RescheduleActions';
 
-/**
- * API belum menyediakan endpoint reschedule jadwal, sehingga pengajuan
- * dikirim ke admin melalui WhatsApp dan dicatat pada pesan berisi ID pendaftaran.
- */
+/** Ambil sesi jam operasional kolam untuk hari tertentu dari server. */
+async function fetchSessions(
+  locationId: string,
+  dayOfWeek: string,
+): Promise<SessionSlot[]> {
+  const query = new URLSearchParams({ locationId, dayOfWeek });
+  const res = await request<SessionSlot[]>(`/sessions?${query}`, {
+    method: 'GET',
+  });
+  return res.data;
+}
+
 export default function AturUlangJadwalParent() {
   const router = useRouter();
   const { user, registration, isLoading } = useAuth();
-
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [newDay, setNewDay] = useState('');
   const [newSession, setNewSession] = useState('');
-  const [sessionState, setSessionState] = useState<{ key: string; rows: SessionSlot[] } | null>(null);
+  const [sessionState, setSessionState] = useState<{
+    key: string;
+    rows: SessionSlot[];
+  } | null>(null);
   const [notification, setNotification] = useState<string>('');
 
-  const instructorRegistration =
+  const instructorReg =
     registration?.kind === 'instructor' ? registration : null;
-
   const schedules = useMemo(
-    () => instructorRegistration?.schedules ?? [],
-    [instructorRegistration],
+    () => instructorReg?.schedules ?? [],
+    [instructorReg],
   );
-
   const scheduleLabels = useMemo(
-    () => instructorRegistration?.scheduleLabels ?? [],
-    [instructorRegistration],
+    () => instructorReg?.scheduleLabels ?? [],
+    [instructorReg],
   );
 
   useEffect(() => {
-    if (!isLoading && (!user || !instructorRegistration)) {
-      router.push('/profile');
-    }
-  }, [user, isLoading, instructorRegistration, router]);
+    if (!isLoading && (!user || !instructorReg)) router.push('/profile');
+  }, [user, isLoading, instructorReg, router]);
 
   const selectedSchedule = schedules[selectedIndex];
-  const sessionKey = selectedSchedule && newDay ? `${selectedSchedule.locationId}|${newDay}` : '';
+  const sessionKey =
+    selectedSchedule && newDay
+      ? `${selectedSchedule.locationId}|${newDay}`
+      : '';
   const sessions = sessionState?.key === sessionKey ? sessionState.rows : [];
-  const sessionLoading = Boolean(sessionKey) && sessionState?.key !== sessionKey;
+  const sessionLoading =
+    Boolean(sessionKey) && sessionState?.key !== sessionKey;
 
   useEffect(() => {
     if (!sessionKey) return;
     const [locationKey, day] = sessionKey.split('|');
     let active = true;
-    getSessions(locationKey, day)
+    fetchSessions(locationKey, day)
       .then((rows) => {
         if (active) setSessionState({ key: sessionKey, rows });
       })
@@ -68,7 +78,7 @@ export default function AturUlangJadwalParent() {
     };
   }, [sessionKey]);
 
-  if (isLoading || !user || !instructorRegistration) {
+  if (isLoading || !user || !instructorReg) {
     return (
       <div className="min-h-[70vh] flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-[#00B4D8] border-t-transparent rounded-full animate-spin" />
@@ -78,27 +88,26 @@ export default function AturUlangJadwalParent() {
 
   const handleSubmit = () => {
     setNotification('');
-    const selected = schedules[selectedIndex];
-
-    if (!selected) {
-      setNotification('Silakan pilih jadwal yang ingin diganti terlebih dahulu.');
+    if (selectedIndex < 0 || !newDay || !newSession) {
+      setNotification(
+        'Pilih jadwal lama serta hari dan sesi baru yang diinginkan.',
+      );
       return;
     }
-    if (!newDay || !newSession) {
-      setNotification('Tentukan hari dan sesi baru yang Anda inginkan.');
-      return;
-    }
-
     const message = encodeURIComponent(
-      `Halo Admin PT Tirya Lumba, saya ${instructorRegistration.fullName} (ID pendaftaran: ${instructorRegistration.registrationId}).\n` +
+      `Halo Admin PT Tirya Lumba, saya ${instructorReg.fullName} (ID: ${instructorReg.registrationId}).\n` +
         `Saya ingin mengajukan reschedule jadwal mengajar:\n` +
-        `- Jadwal lama: ${scheduleLabels[selectedIndex]}\n` +
-        `- Jadwal baru yang diinginkan: ${newDay}, ${newSession}\n` +
+        `- Lama: ${scheduleLabels[selectedIndex]}\n- Baru: ${newDay}, ${newSession}\n` +
         `Mohon dibantu pembaruannya. Terima kasih.`,
     );
-
-    window.open(`https://wa.me/${CS_WHATSAPP}?text=${message}`, '_blank', 'noopener');
-    setNotification('Pengajuan reschedule dibuka di WhatsApp. Kirim pesan tersebut agar admin memprosesnya.');
+    window.open(
+      `https://wa.me/${CS_WHATSAPP}?text=${message}`,
+      '_blank',
+      'noopener',
+    );
+    setNotification(
+      'Pengajuan reschedule dibuka di WhatsApp. Kirim pesan tersebut ke admin.',
+    );
   };
 
   return (
@@ -119,7 +128,8 @@ export default function AturUlangJadwalParent() {
               Atur Ulang Jadwal Mengajar
             </h1>
             <p className="text-xs sm:text-sm text-slate-500">
-              Pilih jadwal yang ingin diganti, lalu tentukan hari dan sesi baru dari jadwal resmi server.
+              Pilih jadwal yang ingin diganti, lalu tentukan hari dan sesi baru
+              dari jadwal resmi server.
             </p>
           </div>
 
@@ -131,15 +141,15 @@ export default function AturUlangJadwalParent() {
 
           {schedules.length === 0 ? (
             <p className="text-sm text-slate-500 italic bg-white p-4 rounded-xl border border-slate-200">
-              Anda belum mendeklarasikan jadwal mengajar. Silakan ajukan pendaftaran pelatih terlebih dahulu.
+              Anda belum mendeklarasikan jadwal mengajar.
             </p>
           ) : (
             <div className="space-y-5">
               <SlotSelector
                 scheduleLabels={scheduleLabels}
                 selectedIndex={selectedIndex}
-                setSelectedIndex={(value) => {
-                  setSelectedIndex(value);
+                setSelectedIndex={(val) => {
+                  setSelectedIndex(val);
                   setNewDay('');
                   setNewSession('');
                   setNotification('');

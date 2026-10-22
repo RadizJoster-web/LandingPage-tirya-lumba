@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { ProgramCatalogItem } from '@/services/program';
+import { ProgramCatalogItem } from '@/types';
 import { ProgramCard } from '@/components/features/ProgramCard';
 import { Button } from '@/components/ui/Button';
 
@@ -17,10 +17,12 @@ export const ProgramSection: React.FC<ProgramSectionProps> = ({
   currentPage,
   perPage,
 }) => {
-  const totalPages = Math.max(1, Math.ceil(programs.length / perPage));
+  const regulerPackages = programs.filter((program) => program.type === 'Reguler');
+  console.log(programs)
+  const totalPages = Math.max(1, Math.ceil(regulerPackages.length / perPage));
   const safePage = Math.min(currentPage, totalPages);
   const start = (safePage - 1) * perPage;
-  const visible = programs.slice(start, start + perPage);
+  const visible = regulerPackages.slice(start, start + perPage);
 
   return (
     <section id="program" className="py-20 bg-[#E0FBFC]/50 scroll-mt-20">
@@ -34,14 +36,19 @@ export const ProgramSection: React.FC<ProgramSectionProps> = ({
               Program &amp; Paket Les
             </h2>
             <p className="mt-2 text-slate-600 text-sm sm:text-base max-w-xl">
-              {programs.length > 0
-                ? `${programs.length} paket les aktif dari kolam mitra Tangerang Raya, lengkap dengan jenis kelas dan harganya.`
-                : 'Tidak dapat menghubungi server. Pastikan koneksi Anda aktif, lalu muat ulang halaman.'}
+              {regulerPackages.length > 0
+                ? `${regulerPackages.length} paket Reguler aktif dari kolam mitra Tangerang Raya, lengkap dengan harganya.`
+                : 'Paket kelas renang belum tersedia. Silakan cek kembali dalam beberapa saat.'}
             </p>
           </div>
 
           <Link href="/daftar/murid" className="shrink-0">
-            <Button variant="primary" size="md" isFullRounded={true} className="shadow-md">
+            <Button
+              variant="primary"
+              size="md"
+              isFullRounded={true}
+              className="shadow-md"
+            >
               Daftar Sebagai Murid
             </Button>
           </Link>
@@ -49,7 +56,9 @@ export const ProgramSection: React.FC<ProgramSectionProps> = ({
 
         {visible.length === 0 ? (
           <div className="p-8 bg-white rounded-2xl border border-amber-200 text-sm text-amber-800">
-            Tidak dapat menghubungi server. Pastikan server API aktif, lalu muat ulang halaman.
+            {programs.length > 0
+              ? 'Belum ada paket Reguler yang tersedia saat ini. Silakan cek kembali dalam beberapa saat.'
+              : 'Belum ada paket kelas renang yang tersedia saat ini. Silakan cek kembali dalam beberapa saat.'}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -60,7 +69,10 @@ export const ProgramSection: React.FC<ProgramSectionProps> = ({
         )}
 
         {totalPages > 1 && (
-          <nav className="flex justify-center items-center gap-2 mt-12" aria-label="Navigasi halaman paket">
+          <nav
+            className="flex justify-center items-center gap-2 mt-12"
+            aria-label="Navigasi halaman paket"
+          >
             <Link
               href={`/?halaman=${Math.max(1, safePage - 1)}#program`}
               aria-disabled={safePage === 1}

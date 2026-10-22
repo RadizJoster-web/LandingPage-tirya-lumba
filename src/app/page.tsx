@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
-import { getProgramCatalog } from '@/services/program';
-import { safe } from '@/services/api';
+import { Area, LessonPackage, Location, ProgramCatalogItem } from '@/types';
+import { request, safe } from '@/lib/http';
 import { SITE_NAME, SITE_URL } from '@/lib/constants';
 import { HeroSection } from '@/components/features/HeroSection';
 import { BrandSection } from '@/components/features/BrandSection';
@@ -17,6 +17,41 @@ export const metadata: Metadata = {
   alternates: { canonical: '/' },
 };
 
+async function fetchProgramCatalog(): Promise<{
+  items: ProgramCatalogItem[];
+  totalPools: number;
+  totalAreas: number;
+}> {
+  const [pkgs, locs, areas] = await Promise.all([
+    request<LessonPackage[]>('/packages', { method: 'GET', revalidate: 3600, tag: 'packages' }),
+    request<Location[]>('/locations', { method: 'GET', revalidate: 3600, tag: 'locations' }),
+    request<Area[]>('/areas', { method: 'GET', revalidate: 3600, tag: 'areas' }),
+  ]);
+
+  const locationById = new Map(locs.data.map((loc) => [loc.id, loc]));
+  const areaNameById = new Map(areas.data.map((area) => [area.id, area.name]));
+
+  const items: ProgramCatalogItem[] = pkgs.data.map((pkg) => {
+    const pkgLocId = pkg.locationId ?? pkg.location?.id;
+    const joined =
+      (pkgLocId ? locationById.get(pkgLocId) : undefined) ??
+      locs.data.find((loc) => loc.name === pkg.location?.name);
+    const areaId = joined?.areaId;
+
+    return {
+      id: pkg.id,
+      type: pkg.type,
+      price: pkg.price,
+      poolName: pkg.location?.name ?? joined?.name ?? 'Kolam mitra',
+      areaName: pkg.location?.area?.name ?? (areaId ? areaNameById.get(areaId) ?? null : null),
+      mapUrl: pkg.location?.mapUrl ?? joined?.mapUrl ?? null,
+      category: pkg.location?.category ?? joined?.category ?? null,
+    };
+  });
+
+  return { items, totalPools: locs.data.length, totalAreas: areas.data.length };
+}
+
 function parsePage(value: string | string[] | undefined): number {
   const raw = Array.isArray(value) ? value[0] : value;
   const parsed = Number.parseInt(raw ?? '1', 10);
@@ -31,17 +66,21 @@ export default async function HomePage({
   const params = await searchParams;
   const page = parsePage(params.halaman);
 
-  // Satu permintaan katalog (paket + kolam + wilayah) agar kartu program tidak
-  // perlu mencocokkan id sendiri; aman bila server API sedang mati.
-  const catalog = await safe(getProgramCatalog(), {
+  const catalog = await safe(fetchProgramCatalog(), {
     items: [],
     totalPools: 0,
     totalAreas: 0,
   });
 
-  const classTypes = Array.from(new Set(catalog.items.map((item) => item.type)));
+  const classTypes = Array.from(
+    new Set(catalog.items.map((item) => item.type).filter((type): type is string => Boolean(type))),
+  );
   const areaNames = Array.from(
-    new Set(catalog.items.map((item) => item.areaName).filter((name): name is string => Boolean(name))),
+    new Set(
+      catalog.items
+        .map((item) => item.areaName)
+        .filter((name): name is string => Boolean(name)),
+    ),
   );
 
   const structuredData = {
@@ -63,7 +102,6 @@ export default async function HomePage({
     <>
       <script
         type="application/ld+json"
-        // JSON-LD membantu bot crawling memahami layanan, wilayah, dan jenis kelas.
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
       <HeroSection totalPartnerPools={catalog.totalPools} />

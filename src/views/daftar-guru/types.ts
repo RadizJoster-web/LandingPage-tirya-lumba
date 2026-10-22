@@ -12,6 +12,9 @@ export interface GuruStep1Props {
   setPhone: (v: string) => void;
   domicile: string;
   setDomicile: (v: string) => void;
+  photoFileName: string;
+  onPhotoChange: (file: File | null) => void;
+  isPhotoUploading: boolean;
   onSubmit: (e: React.FormEvent) => void;
 }
 
@@ -24,8 +27,7 @@ export interface GuruStep2Props {
   setShortBio: (v: string) => void;
   cvFileName: string;
   onCvChange: (file: File | null) => void;
-  photoFileName: string;
-  onPhotoChange: (file: File | null) => void;
+  isCvUploading: boolean;
   onSubmit: (e: React.FormEvent) => void;
   onBack: () => void;
 }

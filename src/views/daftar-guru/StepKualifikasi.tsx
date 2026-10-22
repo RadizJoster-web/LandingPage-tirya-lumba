@@ -12,8 +12,7 @@ export const StepKualifikasi: React.FC<GuruStep2Props> = ({
   setShortBio,
   cvFileName,
   onCvChange,
-  photoFileName,
-  onPhotoChange,
+  isCvUploading,
   onSubmit,
   onBack,
 }) => {
@@ -56,26 +55,20 @@ export const StepKualifikasi: React.FC<GuruStep2Props> = ({
         <input
           type="file"
           accept="application/pdf"
-          onChange={(e) => onCvChange(e.target.files?.[0] ?? null)}
+          onChange={(e) => {
+            const file = e.currentTarget.files?.[0] ?? null;
+            e.currentTarget.value = '';
+            onCvChange(file);
+          }}
           className="w-full text-sm text-slate-600 border border-gray-300 rounded-lg px-3 py-2 bg-white file:mr-3 file:px-3 file:py-1.5 file:rounded-full file:border-0 file:bg-[#E0FBFC] file:text-[#0077B6] file:font-semibold file:cursor-pointer"
         />
         {cvFileName && (
-          <p className="text-xs text-emerald-600 font-semibold mt-1.5">✓ {cvFileName}</p>
+          <p className="text-xs text-emerald-600 font-semibold mt-1.5">
+            ✓ {cvFileName}
+          </p>
         )}
-      </div>
-
-      <div>
-        <label className="block text-sm font-semibold text-[#1D3557] mb-1.5">
-          Foto Profil Pelatih * (JPG/PNG, maks 5 MB)
-        </label>
-        <input
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          onChange={(e) => onPhotoChange(e.target.files?.[0] ?? null)}
-          className="w-full text-sm text-slate-600 border border-gray-300 rounded-lg px-3 py-2 bg-white file:mr-3 file:px-3 file:py-1.5 file:rounded-full file:border-0 file:bg-[#E0FBFC] file:text-[#0077B6] file:font-semibold file:cursor-pointer"
-        />
-        {photoFileName && (
-          <p className="text-xs text-emerald-600 font-semibold mt-1.5">✓ {photoFileName}</p>
+        {isCvUploading && (
+          <p className="text-xs text-slate-500 mt-1.5">Mengunggah CV...</p>
         )}
       </div>
 
@@ -83,7 +76,7 @@ export const StepKualifikasi: React.FC<GuruStep2Props> = ({
         <Button type="button" variant="outline" size="md" onClick={onBack}>
           ← Kembali
         </Button>
-        <Button type="submit" variant="primary" size="md">
+        <Button type="submit" variant="primary" size="md" disabled={isCvUploading}>
           Selanjutnya →
         </Button>
       </div>

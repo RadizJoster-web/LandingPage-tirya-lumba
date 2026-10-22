@@ -4,6 +4,7 @@ import { Select } from '@/components/ui/Select';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { CoachSelector } from './CoachSelector';
+import { PoolPackagePicker } from './PoolPackagePicker';
 
 export const StepKelasJadwal: React.FC<MuridStep2Props> = ({
   areas,
@@ -33,55 +34,18 @@ export const StepKelasJadwal: React.FC<MuridStep2Props> = ({
 }) => {
   return (
     <form onSubmit={onSubmit} className="space-y-5">
-      <Select
-        label="Wilayah Kolam Renang *"
-        value={areaId}
-        onChange={(e) => setAreaId(e.target.value)}
-        disabled={isLoadingData}
-        helperText="Data wilayah diambil langsung dari server."
-      >
-        <option value="">-- Pilih Wilayah --</option>
-        {areas.map((area) => (
-          <option key={area.id} value={area.id}>
-            {area.name}
-          </option>
-        ))}
-      </Select>
-
-      <Select
-        label="Pilihan Lokasi Kolam Renang *"
-        value={locationId}
-        onChange={(e) => onSelectLocation(e.target.value)}
-        disabled={!areaId || areaLocations.length === 0}
-      >
-        <option value="">
-          {areaId
-            ? '-- Pilih Kolam Renang --'
-            : '-- Pilih wilayah terlebih dahulu --'}
-        </option>
-        {areaLocations.map((location) => (
-          <option key={location.id} value={location.id}>
-            {location.name}
-          </option>
-        ))}
-      </Select>
-
-      <Select
-        label="Jenis Kelas / Paket Les *"
-        value={packageId}
-        onChange={(e) => setPackageId(e.target.value)}
-        disabled={!locationId}
-        helperText="Harga diambil dari paket resmi kolam yang dipilih."
-      >
-        <option value="">
-          {locationId ? '-- Pilih Paket Les --' : '-- Pilih kolam terlebih dahulu --'}
-        </option>
-        {locationPackages.map((item) => (
-          <option key={item.id} value={item.id}>
-            {item.type} — Rp {item.price.toLocaleString('id-ID')}
-          </option>
-        ))}
-      </Select>
+      <PoolPackagePicker
+        areas={areas}
+        areaId={areaId}
+        setAreaId={setAreaId}
+        areaLocations={areaLocations}
+        locationId={locationId}
+        onSelectLocation={onSelectLocation}
+        locationPackages={locationPackages}
+        packageId={packageId}
+        setPackageId={setPackageId}
+        isLoadingData={isLoadingData}
+      />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Input
