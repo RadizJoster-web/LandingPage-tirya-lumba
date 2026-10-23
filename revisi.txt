@@ -1,63 +1,33 @@
-======================
-Daftar Revisi
-======================
-1. Ambil Tampilkan username menggunakan data FullName langsung dari payload user, bukan display name. Hapaus semua fungsi yang bersangkutan dengan display name dan ganti dengan value FullName dari payload user.
-2. Halaman profil terlihat sangat kaku, jangan buat card seperti itu. Perbaiki lagi agar profil terlihat moderen dan clean bukana card yang terlihat jadul. Tapi pertahankan UI blur nya.
-3. Hapus tampilan blur yang berada di popup profil navbar. 
-4. Pastikan foto profil sudah melihat data dari payload user "profilePictureUrl", tambahkan validasi jika data ada.
-5. Perbaiki lagi semua error pesan ketika tidak bisa koneksi ke server/api dengan "Tidak dapat menghubungi server"
-6. Perbaiki lagi data yang diterima oleh endpoint Get /api/package/ Di endpoint ini akan mendapatkan data: 
-const packages = await prisma.package.findMany({
-      where: { type: 'Reguler' },
-      select: {
-        price: true,
-        location: {
-          select: {
-            name: true,
-            category: true,
-            mapUrl: true,
-            area: {
-              select: {
-                name: true,
-              },
-            },
-          },
-        },
-      },
-    });
+Revisi.
 
-Perbaiki layout card nya dengan menampilkan Nama sebagai "headline" area sebagai label dan mapUrl sebagai CTA redirect ke google maps. Jangan lupa harga harus tetap yangg paling menonjol, dan category (Reguler) beaada di bahwah headline
+1. Ketika logout kirim request ke server dengan endpoint "/api/auth/logout".
 
-============================================
-Perbaiikan Struktur Folder & File
-============================================
-Role & Objective:
-Kamu adalah Expert Next.js & TypeScript Developer. Tugas utamamu adalah melakukan refactoring, modularisasi, dan restrukturisasi folder/file pada project Next.js + Tailwind CSS ini sesuai dengan guidelines arsitektur yang sangat spesifik.
+2. Di halaman profil ketika belum diverifikasi ada beberapa yang harus diperbaiki
+    1. Hilangkan bedge profil atau header. 
+    2. ketika user belum register jangan tampilkan bedge tapi tampilkan data step dua tapi data yang ditampilkan bukan data setelaha register melainkan data awal ketika login seperti 
+        - profil (jika ada, jika tidak ada samakan dengan navbar)
+        - fullName,
+        - Email,
+        - status, belum mendaftar.
+    jika user sudah mendaftar guru/murid makaa tampilannya akan terbuka dan full seperti yang dia daftarkan dengan layout yang sama seperti sekarang hanya saja
+        - teks "Kualifikasi Pelatih" (jika daaftar sebagai pelatih) diganti dengan fullName seperti sebelum daftar 
+        - data sebelum daftar diperbarui setelah daftar + dilengkapi dengan deskripsi, no whatsap, dll. 
+    
+    3. Hilangkan Ringkasan dan taruh di profil ini.
+    4. jangan lupa untuk memperbarui prorfil sebelum daftar agar yang di lock data yang belum ada sedangkan yang sudah ada seperti name / email di tunjukan di componen itu.
+    5. Section Jadwal Mengajar yang Dideklarasikan. Perbaiki layout nya dan konten datanya, jangan hanya menampilkan daftar teks tapi tampilkan data table dengan colom tempat kolam, hari, sesi, jam. 
+    6. jangan tampilkan pengajuan atur ulang jadwal jika belum diverifikasi. 
+    7. Di form pengajuan ulang jadwal. Berikan data jam agar lebih jelas dan jangan kirim data lewat whatsap melainkan kirim request ke server dengan api "/api/portal/reschedules". Aku belum buat api nya jadi siistem nya sama seperti register, menunggu admin verifikasi.
 
-Konteks Project:
-Terdapat fitur yang sudah berjalan dan beberapa yang memiliki bug. Aturan Mutlak: Dilarang keras mencoba melakukan debugging, mengubah business logic yang kompleks, atau memperbaiki bug logic. Fokusmu 100% pada pemecahan file, pemindahan kode, dan merapihkan struktur (termasuk memastikan imports/exports tidak error).
+3. Di form pendaftaran murid. Pindahkan posisi upload foto profil dari step 2 ke ke step 1
 
-Aturan Ketat Modularisasi (Wajib Diikuti Tanpa Terkecuali):
-1. Folder sebagai Direktori Komponen & index.tsx/.ts sebagai Parent:
-- Setiap komponen/fitur yang memiliki sub-elemen atau logic sendiri WAJIB dibuatkan foldernya.
-- File entry-point di dalam folder tersebut harus bernama index.tsx (untuk UI) atau index.ts (untuk logic).
-- index.tsx bertindak secara eksklusif sebagai Parent Component yang HANYA bertugas mengurus:
-    - State Management (deklarasi state).
-    - Action Functions (fungsi fetch API, event handler, fungsi submit).
-    - Layout Management (menyusun dan mengorkestrasi child components, meneruskan state/function sebagai props).
-2. Batas Maksimal 150 Baris:
-- Dilarang keras ada file tunggal yang melebihi 150 baris kode.
-- Jika sebuah file mendekati batas ini, itu adalah indikator bahwa file tersebut kehilangan tujuan spesifiknya. Segera ekstraksi elemen UI atau logic ke dalam file terpisah di dalam folder komponen tersebut.
-3. Separation of Concerns (Berbasis Konteks):
-- Jangan menunggu hingga 150 baris jika di dalam satu file terdapat kode dengan konteks/tugas yang berbeda. Pecah file tersebut sejak awal.
-- Contoh Implementasi Target: Untuk komponen navigasi, buat folder Navbar. Jadikan Navbar/index.tsx sebagai parent. Ekstraksi bagian UI yang spesifik menjadi sibling files di dalam folder yang sama:
-    - BrandLogo.tsx (Fokus pada logo & nama brand)
-    - NavigationList.tsx (Fokus pada list menu & routing)
-    - AuthProfile.tsx (Fokus pada tombol login/profil)
-- Navbar/index.tsx akan memanggil ketiga file tersebut dan mengatur layout serta logic autentikasinya.
-Langkah Eksekusi:
-1. Analisis file yang saya berikan. Evaluasi total baris kode dan tumpang-tindih tanggung jawab.
-2. Buat direktori folder baru dan pecah kode menjadi pola index.tsx (Parent) + SpecificChild.tsx (Children).
-3. Ekstraksi semua state dan fetch/submit logic ke index.tsx, lalu teruskan ke child component melalui props (buatkan TypeScript interface yang sesuai untuk props tersebut).
-4. Perbarui dan pastikan semua baris import yang terdampak akibat pemindahan file ini sudah benar.
-5. Berikan saya tree structure hasil akhir dari folder tersebut setelah direfaktor.
+4. perbaiki pesan error ini
+[browser] Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. 
+    at DaftarMuridParent.useEffect (src/views/daftar-murid/index.tsx:126:5)
+  124 |
+  125 |   useEffect(() => {
+> 126 |     setTempLocs(data.locations);
+      |     ^
+  127 |     setTempPkgs(data.packages);
+  128 |     setTempInsts(data.instructors);
+  129 |   }, [data.locations, data.packages, data.instructors]); (src/views/daftar-murid/index.tsx:126:5)

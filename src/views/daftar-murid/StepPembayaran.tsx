@@ -1,9 +1,9 @@
 import React from 'react';
 import { MuridStep3Props } from './types';
 import { PaymentMethod } from '@/types';
-import { formatDateId, formatRupiah } from '@/lib/utils';
 import { Button } from '@/components/ui/Button';
 import { PaymentDetails } from './PaymentDetails';
+import { CourseReceipt } from './CourseReceipt';
 
 const PAYMENT_OPTIONS: PaymentMethod[] = ['QRIS', 'Transfer Bank', 'Cash'];
 
@@ -24,54 +24,22 @@ export const StepPembayaran: React.FC<MuridStep3Props> = ({
   onSubmit,
   onBack,
 }) => {
-  const needsProofLabel = paymentMethod === 'Cash'
-    ? 'Unggah Foto Dokumentasi Pembayaran Tunai * (JPG/PNG maks 5 MB)'
-    : 'Unggah Bukti Pembayaran * (JPG/PNG maks 5 MB)';
+  const needsProofLabel =
+    paymentMethod === 'Cash'
+      ? 'Unggah Foto Dokumentasi Pembayaran Tunai * (JPG/PNG maks 5 MB)'
+      : 'Unggah Bukti Pembayaran * (JPG/PNG maks 5 MB)';
 
   return (
     <form onSubmit={onSubmit} className="space-y-6">
-      {/* Nota Invoice — seluruh angka berasal dari paket resmi di server */}
-      <div className="p-5 bg-[#E0FBFC]/60 rounded-2xl border border-[#00B4D8]/30 space-y-3">
-        <div className="flex items-center justify-between pb-3 border-b border-[#00B4D8]/20">
-          <h3 className="font-heading font-extrabold text-base text-[#0077B6]">
-            Rincian Nota Kursus
-          </h3>
-          <span className="text-xs font-semibold px-2.5 py-1 bg-white rounded-full border border-[#00B4D8]/40 text-[#0077B6]">
-            {packageType || 'Paket Les'}
-          </span>
-        </div>
-
-        <div className="space-y-1.5 text-xs sm:text-sm text-slate-700">
-          <div className="flex justify-between gap-4">
-            <span>Nama Murid</span>
-            <span className="font-semibold text-right">{name}</span>
-          </div>
-          <div className="flex justify-between gap-4">
-            <span>Kolam Renang</span>
-            <span className="font-semibold text-right">{locationName || '-'}</span>
-          </div>
-          <div className="flex justify-between gap-4">
-            <span>Guru / Pelatih</span>
-            <span className="font-semibold text-right">{instructorName || '-'}</span>
-          </div>
-          <div className="flex justify-between gap-4">
-            <span>Pertemuan Pertama</span>
-            <span className="font-semibold text-right">
-              {firstMeetDate ? formatDateId(firstMeetDate) : '-'}
-              {sessionName ? ` • ${sessionName}` : ''}
-            </span>
-          </div>
-        </div>
-
-        <div className="pt-3 border-t border-[#00B4D8]/20 flex items-center justify-between">
-          <span className="font-heading font-bold text-sm text-[#1D3557]">
-            Total Pembayaran
-          </span>
-          <span className="font-heading font-extrabold text-xl text-[#0077B6]">
-            {formatRupiah(packagePrice)}
-          </span>
-        </div>
-      </div>
+      <CourseReceipt
+        name={name}
+        locationName={locationName}
+        packageType={packageType}
+        instructorName={instructorName}
+        firstMeetDate={firstMeetDate}
+        sessionName={sessionName}
+        packagePrice={packagePrice}
+      />
 
       <div>
         <label className="block text-sm font-semibold text-[#1D3557] mb-2">
@@ -126,7 +94,13 @@ export const StepPembayaran: React.FC<MuridStep3Props> = ({
       )}
 
       <div className="flex items-center justify-between gap-3 pt-2">
-        <Button type="button" variant="outline" size="md" onClick={onBack} disabled={isSubmitting}>
+        <Button
+          type="button"
+          variant="outline"
+          size="md"
+          onClick={onBack}
+          disabled={isSubmitting}
+        >
           ← Kembali
         </Button>
         <Button

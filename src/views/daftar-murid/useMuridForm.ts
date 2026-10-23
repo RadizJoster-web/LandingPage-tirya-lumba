@@ -36,8 +36,14 @@ export function useMuridForm(
   const [paymentProofFile, setPaymentProofFile] = useState<File | null>(null);
 
   const currentAge = useMemo(() => calculateAge(birthDate), [birthDate]);
-  const areaLocations = useMemo(() => locations.filter((loc) => !areaId || loc.areaId === areaId), [locations, areaId]);
-  const locationPackages = useMemo(() => packages.filter((pkg) => (pkg.locationId ?? pkg.location?.id) === locationId), [packages, locationId]);
+  const areaLocations = useMemo(
+    () => locations.filter((loc) => !areaId || loc.areaId === areaId),
+    [locations, areaId],
+  );
+  const locationPackages = useMemo(
+    () => packages.filter((pkg) => (pkg.locationId ?? pkg.location?.id) === locationId),
+    [packages, locationId],
+  );
 
   const selectedLocation = useMemo(() => locations.find((l) => l.id === locationId), [locations, locationId]);
   const selectedPackage = useMemo(() => packages.find((p) => p.id === packageId), [packages, packageId]);
@@ -54,16 +60,67 @@ export function useMuridForm(
     setInstructorId('');
   };
 
+  const handleNextStep1 = (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMsg('');
+    if (!name || !birthPlace || !birthDate || !address || !phone || !schoolOrOffice) {
+      setErrorMsg('Mohon lengkapi seluruh kolom biodata bertanda bintang (*).');
+      return;
+    }
+    setStep(2);
+  };
+
   return {
-    step, setStep, errorMsg, setErrorMsg, isSubmitting, setIsSubmitting, userEmail,
-    name, setName, birthPlace, setBirthPlace, birthDate, setBirthDate, currentAge,
-    gender, setGender, address, setAddress, phone, setPhone, schoolOrOffice, setSchoolOrOffice,
-    shirtSize, setShirtSize,
-    areaId, setAreaId, locationId, onSelectLocation, packageId, setPackageId,
-    firstMeetDate, setFirstMeetDate, sessionName, setSessionName,
-    instructorId, setInstructorId, photoFile, setPhotoFile,
-    paymentMethod, setPaymentMethod, paymentProofFile, setPaymentProofFile,
-    areaLocations, locationPackages, selectedLocation, selectedPackage, selectedInstructor,
-    coursePrice, adminFee, grandTotal,
+    step,
+    setStep,
+    errorMsg,
+    setErrorMsg,
+    isSubmitting,
+    setIsSubmitting,
+    userEmail,
+    name,
+    setName,
+    birthPlace,
+    setBirthPlace,
+    birthDate,
+    setBirthDate,
+    currentAge,
+    gender,
+    setGender,
+    address,
+    setAddress,
+    phone,
+    setPhone,
+    schoolOrOffice,
+    setSchoolOrOffice,
+    shirtSize,
+    setShirtSize,
+    areaId,
+    setAreaId,
+    locationId,
+    onSelectLocation,
+    packageId,
+    setPackageId,
+    firstMeetDate,
+    setFirstMeetDate,
+    sessionName,
+    setSessionName,
+    instructorId,
+    setInstructorId,
+    photoFile,
+    setPhotoFile,
+    paymentMethod,
+    setPaymentMethod,
+    paymentProofFile,
+    setPaymentProofFile,
+    areaLocations,
+    locationPackages,
+    selectedLocation,
+    selectedPackage,
+    selectedInstructor,
+    coursePrice,
+    adminFee,
+    grandTotal,
+    handleNextStep1,
   };
 }

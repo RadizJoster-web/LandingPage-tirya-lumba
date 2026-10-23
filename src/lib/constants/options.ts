@@ -12,9 +12,9 @@ export const DAYS_ID = [
 ] as const;
 
 /** Nomor WhatsApp Customer Service untuk pengajuan reschedule & bantuan verifikasi. */
-export const CS_WHATSAPP = '6281234567890';
+export const CS_WHATSAPP = '6285782599453';
 
 /** Ganti dengan domain produksi landing page saat deploy. */
 export const SITE_URL = 'https://tiryalumba.id';
 
-export const SITE_NAME = 'PT Tirya Lumba';
+export const SITE_NAME = 'Tirya Lumba';

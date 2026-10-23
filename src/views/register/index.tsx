@@ -5,7 +5,9 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 import { toErrorMessage } from '@/lib/http';
 import { Card } from '@/components/ui/Card';
+import { RegisterHeader } from './RegisterHeader';
 import { RegisterForm } from './RegisterForm';
+import { RegisterFooter } from './RegisterFooter';
 import { OtpVerify } from './OtpVerify';
 
 export default function RegisterParent() {
@@ -33,14 +35,25 @@ export default function RegisterParent() {
       setError('Masukkan alamat email yang valid.');
       return;
     }
-    if (password.length < 6) {
+    
+    const minPassword = 6;
+    const maxPassword = 12
+    if (password.length < minPassword) {
       setError('Password minimal 6 karakter.');
+      return;
+    }
+    if (password.length > maxPassword) {
+      setError('Password maximal 12 karakter.');
       return;
     }
 
     setIsLoading(true);
     try {
-      const target = await register({ fullName: fullName.trim(), email, password });
+      const target = await register({
+        fullName: fullName.trim(),
+        email,
+        password,
+      });
       setEmail(target || email);
       setStep('otp');
       setInfo('Kode OTP sudah dikirim ke email Anda.');
@@ -89,17 +102,21 @@ export default function RegisterParent() {
       <div className="max-w-md w-full">
         <Card variant="form" className="p-6 sm:p-8">
           {step === 'form' ? (
-            <RegisterForm
-              fullName={fullName}
-              setFullName={setFullName}
-              email={email}
-              setEmail={setEmail}
-              password={password}
-              setPassword={setPassword}
-              error={error}
-              isLoading={isLoading}
-              onSubmit={handleSendOtp}
-            />
+            <>
+              <RegisterHeader />
+              <RegisterForm
+                fullName={fullName}
+                setFullName={setFullName}
+                email={email}
+                setEmail={setEmail}
+                password={password}
+                setPassword={setPassword}
+                error={error}
+                isLoading={isLoading}
+                onSubmit={handleSendOtp}
+              />
+              <RegisterFooter />
+            </>
           ) : (
             <OtpVerify
               email={email}

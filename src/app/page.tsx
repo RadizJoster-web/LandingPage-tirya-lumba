@@ -1,12 +1,12 @@
 import type { Metadata } from 'next';
 import { Area, LessonPackage, Location, ProgramCatalogItem } from '@/types';
 import { request, safe } from '@/lib/http';
-import { SITE_NAME, SITE_URL } from '@/lib/constants';
 import { HeroSection } from '@/components/features/HeroSection';
 import { BrandSection } from '@/components/features/BrandSection';
 import { ProgramSection } from '@/components/features/ProgramSection';
 import { AboutSection } from '@/components/features/AboutSection';
 import { WhyUsSection } from '@/components/features/WhyUsSection';
+import { parsePage, buildHomeStructuredData } from './lib/homeStructuredData';
 
 const PROGRAMS_PER_PAGE = 6;
 
@@ -52,12 +52,6 @@ async function fetchProgramCatalog(): Promise<{
   return { items, totalPools: locs.data.length, totalAreas: areas.data.length };
 }
 
-function parsePage(value: string | string[] | undefined): number {
-  const raw = Array.isArray(value) ? value[0] : value;
-  const parsed = Number.parseInt(raw ?? '1', 10);
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
-}
-
 export default async function HomePage({
   searchParams,
 }: {
@@ -83,20 +77,7 @@ export default async function HomePage({
     ),
   );
 
-  const structuredData = {
-    '@context': 'https://schema.org',
-    '@type': 'SportsActivityLocation',
-    name: SITE_NAME,
-    url: SITE_URL,
-    description:
-      'Sekolah dan kursus renang untuk segala usia di Tangerang Raya bersama pelatih berlisensi.',
-    areaServed: areaNames.map((name) => ({ '@type': 'City', name })),
-    makesOffer: classTypes.map((type) => ({
-      '@type': 'Offer',
-      name: `Kelas Renang ${type}`,
-      category: 'Kursus Renang',
-    })),
-  };
+  const structuredData = buildHomeStructuredData(areaNames, classTypes);
 
   return (
     <>

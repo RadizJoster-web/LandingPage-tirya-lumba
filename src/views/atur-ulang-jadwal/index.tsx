@@ -1,15 +1,16 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
-import { CS_WHATSAPP } from '@/lib/constants';
 import { SessionSlot } from '@/types';
 import { request, toErrorMessage } from '@/lib/http';
 import { Card } from '@/components/ui/Card';
 import { SlotSelector } from './SlotSelector';
 import { RescheduleActions } from './RescheduleActions';
+import { RescheduleHeader } from './RescheduleHeader';
+import { EmptyScheduleNotice } from './EmptyScheduleNotice';
+import { formatRescheduleWaUrl } from './lib/formatRescheduleWa';
 
 /** Ambil sesi jam operasional kolam untuk hari tertentu dari server. */
 async function fetchSessions(
@@ -94,17 +95,14 @@ export default function AturUlangJadwalParent() {
       );
       return;
     }
-    const message = encodeURIComponent(
-      `Halo Admin PT Tirya Lumba, saya ${instructorReg.fullName} (ID: ${instructorReg.registrationId}).\n` +
-        `Saya ingin mengajukan reschedule jadwal mengajar:\n` +
-        `- Lama: ${scheduleLabels[selectedIndex]}\n- Baru: ${newDay}, ${newSession}\n` +
-        `Mohon dibantu pembaruannya. Terima kasih.`,
-    );
-    window.open(
-      `https://wa.me/${CS_WHATSAPP}?text=${message}`,
-      '_blank',
-      'noopener',
-    );
+    const waUrl = formatRescheduleWaUrl({
+      fullName: instructorReg.fullName,
+      registrationId: instructorReg.registrationId,
+      oldScheduleLabel: scheduleLabels[selectedIndex],
+      newDay,
+      newSession,
+    });
+    window.open(waUrl, '_blank', 'noopener');
     setNotification(
       'Pengajuan reschedule dibuka di WhatsApp. Kirim pesan tersebut ke admin.',
     );
@@ -113,36 +111,10 @@ export default function AturUlangJadwalParent() {
   return (
     <div className="min-h-[85vh] py-12 px-4 sm:px-6 lg:px-8 bg-[#F3F4F6]">
       <div className="max-w-xl mx-auto">
-        <div className="mb-4">
-          <Link
-            href="/profile"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0077B6] hover:text-[#00B4D8]"
-          >
-            ← Kembali ke Profil
-          </Link>
-        </div>
-
+        <RescheduleHeader notification={notification} />
         <Card variant="dashboard" className="p-6 sm:p-8 shadow-sm">
-          <div className="mb-6">
-            <h1 className="font-heading font-extrabold text-2xl text-[#1D3557] mb-1">
-              Atur Ulang Jadwal Mengajar
-            </h1>
-            <p className="text-xs sm:text-sm text-slate-500">
-              Pilih jadwal yang ingin diganti, lalu tentukan hari dan sesi baru
-              dari jadwal resmi server.
-            </p>
-          </div>
-
-          {notification && (
-            <div className="mb-6 p-4 rounded-lg text-xs font-semibold bg-[#E0FBFC] text-[#0077B6] border border-[#00B4D8]/30">
-              {notification}
-            </div>
-          )}
-
           {schedules.length === 0 ? (
-            <p className="text-sm text-slate-500 italic bg-white p-4 rounded-xl border border-slate-200">
-              Anda belum mendeklarasikan jadwal mengajar.
-            </p>
+            <EmptyScheduleNotice />
           ) : (
             <div className="space-y-5">
               <SlotSelector

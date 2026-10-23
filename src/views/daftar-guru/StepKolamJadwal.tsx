@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { GuruStep3Props } from './types';
 import { Button } from '@/components/ui/Button';
 import { ScheduleMatrixTable } from './ScheduleMatrixTable';
+import { PoolSelectionList } from './PoolSelectionList';
 
 export const StepKolamJadwal: React.FC<GuruStep3Props> = ({
   areas,
@@ -44,38 +45,12 @@ export const StepKolamJadwal: React.FC<GuruStep3Props> = ({
           </span>
         </div>
 
-        <div className="space-y-4 p-4 bg-slate-50 border border-slate-200 rounded-xl max-h-72 overflow-y-auto">
-          {poolsByArea.map(({ area, pools }) =>
-            pools.length === 0 ? null : (
-              <fieldset key={area.id}>
-                <legend className="text-xs font-bold uppercase tracking-wide text-slate-500 mb-2">
-                  {area.name}
-                </legend>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {pools.map((pool) => (
-                    <label
-                      key={pool.id}
-                      className="flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-[#1D3557] cursor-pointer hover:border-[#00B4D8] transition-colors"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedLocationIds.includes(pool.id)}
-                        onChange={() => onToggleLocation(pool.id)}
-                        className="accent-[#00B4D8] w-4 h-4"
-                      />
-                      <span className="truncate">{pool.name}</span>
-                    </label>
-                  ))}
-                </div>
-              </fieldset>
-            ),
-          )}
-          {areas.length === 0 && (
-            <p className="text-xs text-slate-500 italic">
-              Tidak dapat menghubungi server. Muat ulang halaman untuk mencoba lagi.
-            </p>
-          )}
-        </div>
+        <PoolSelectionList
+          poolsByArea={poolsByArea}
+          selectedLocationIds={selectedLocationIds}
+          onToggleLocation={onToggleLocation}
+          hasAreas={areas.length > 0}
+        />
       </div>
 
       <div>
@@ -111,7 +86,13 @@ export const StepKolamJadwal: React.FC<GuruStep3Props> = ({
       )}
 
       <div className="pt-2 flex items-center justify-between gap-3">
-        <Button type="button" variant="outline" size="md" onClick={onBack} disabled={isSubmitting}>
+        <Button
+          type="button"
+          variant="outline"
+          size="md"
+          onClick={onBack}
+          disabled={isSubmitting}
+        >
           ← Kembali
         </Button>
         <Button
