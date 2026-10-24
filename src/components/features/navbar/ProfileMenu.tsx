@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { AuthUser, RegistrationSnapshot } from '@/types';
 import { Avatar } from '@/components/ui/Avatar';
+import { BlurredDashboard } from '@/views/profile/BlurredDashboard';
 
 export const ROLE_LABEL: Record<string, string> = {
   STUDENT: 'Murid',
@@ -31,7 +32,7 @@ export const ProfileMenu: React.FC<ProfileMenuProps> = ({
   return (
     <div
       role="menu"
-      className="absolute right-0 mt-2 w-72 origin-top-right rounded-2xl border border-slate-100 bg-white p-4 shadow-xl shadow-slate-900/10 animate-fade-in"
+      className="absolute right-0 mt-2 max-h-[calc(100vh-6rem)] w-80 origin-top-right overflow-y-auto rounded-2xl border border-slate-100 bg-white p-4 shadow-xl shadow-slate-900/10 animate-fade-in"
     >
       <div className="flex items-center gap-3">
         <Avatar name={name} src={user.profilePictureUrl} size="md" />
@@ -57,6 +58,17 @@ export const ProfileMenu: React.FC<ProfileMenuProps> = ({
       </div>
 
       <div className="mt-4 space-y-1 border-t border-slate-100 pt-3">
+        {!registration && (
+          <div className="mb-3 space-y-2">
+            <p className="px-1 text-xs font-semibold text-[#1D3557]">
+              Dasbor Anda belum aktif
+            </p>
+            <BlurredDashboard />
+            <p className="px-1 text-[11px] leading-relaxed text-slate-500">
+              Dasbor murid dan pelatih terbuka setelah pendaftaran Anda diverifikasi admin.
+            </p>
+          </div>
+        )}
         <Link
           href="/profile"
           role="menuitem"
@@ -69,9 +81,13 @@ export const ProfileMenu: React.FC<ProfileMenuProps> = ({
           href={registration ? '/profile' : '/daftar'}
           role="menuitem"
           onClick={onNavigate}
-          className="block rounded-xl px-3 py-2 text-sm font-medium text-[#1D3557] hover:bg-[#E0FBFC]/60"
+          className={
+            registration
+              ? 'block rounded-xl px-3 py-2 text-sm font-medium text-[#1D3557] hover:bg-[#E0FBFC]/60'
+              : 'block rounded-xl bg-[#00B4D8] px-3 py-2 text-center text-sm font-semibold text-white hover:bg-[#0077B6]'
+          }
         >
-          {registration ? '📋 Status Pendaftaran' : '📝 Pendaftaran Murid / Pelatih'}
+          {registration ? '📋 Status Pendaftaran' : '📝 Daftar Murid / Pelatih'}
         </Link>
         <button
           type="button"
