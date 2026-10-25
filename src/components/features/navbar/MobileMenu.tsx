@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { AuthUser } from '@/types';
+import { mediaUrl } from '@/lib/utils';
 import { Button } from '@/components/ui/Button';
 
 interface MobileMenuProps {
@@ -20,6 +21,9 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
   onClose,
   onLogout,
 }) => {
+  const avatar = user ? mediaUrl(user.profilePictureUrl) : null;
+  const initial = (user?.fullName || user?.email || 'U').charAt(0).toUpperCase();
+
   return (
     <div
       aria-hidden={!isOpen}
@@ -59,14 +63,47 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
         Kenapa Kami
       </Link>
 
-      <div className="pt-3 border-t border-gray-100 flex flex-col gap-2">
+      <div className="pt-3 border-t border-gray-100 flex flex-col gap-2.5">
         {user ? (
           <>
-            <Link href="/profile" onClick={onClose}>
-              <Button variant="secondary" size="md" className="w-full">
-                👤 Profil Saya ({user.fullName || user.email})
-              </Button>
+            {/* Kartu Profil Pengguna Elegan di Mobile */}
+            <Link
+              href="/profile"
+              onClick={onClose}
+              className="flex items-center gap-3 p-3 rounded-2xl bg-gradient-to-r from-[#E0FBFC]/80 via-white to-white border border-[#00B4D8]/30 shadow-xs hover:border-[#00B4D8] transition-all group"
+            >
+              {avatar ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={avatar}
+                  alt={user.fullName || user.email}
+                  className="w-10 h-10 rounded-full object-cover border border-[#00B4D8]/50 shrink-0"
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-[#0077B6] text-white flex items-center justify-center text-sm font-bold shrink-0 shadow-xs">
+                  {initial}
+                </div>
+              )}
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5">
+                  <span className="font-heading text-sm font-bold text-[#1D3557] truncate group-hover:text-[#0077B6] transition-colors">
+                    {user.fullName || 'Pengguna'}
+                  </span>
+                  <span className="rounded-full bg-[#0077B6]/10 px-2 py-0.5 text-[10px] font-bold text-[#0077B6] shrink-0">
+                    {user.role === 'INSTRUCTOR'
+                      ? 'Pelatih'
+                      : user.role === 'STUDENT'
+                        ? 'Murid'
+                        : 'Profil'}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 truncate mt-0.5">{user.email}</p>
+              </div>
+              <span className="text-slate-400 group-hover:text-[#0077B6] group-hover:translate-x-0.5 transition-all text-sm font-bold pr-1">
+                →
+              </span>
             </Link>
+
             <Link href="/daftar" onClick={onClose}>
               <Button variant="primary" size="md" className="w-full">
                 Portal Pendaftaran

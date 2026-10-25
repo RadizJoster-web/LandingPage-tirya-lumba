@@ -8,6 +8,7 @@ import { BlurredDashboard } from './BlurredDashboard';
 import { StudentDetail } from './StudentDetail';
 import { InstructorDetail } from './InstructorDetail';
 import { ScheduleHighlightCard } from './ScheduleHighlightCard';
+import { StudentScheduleCard } from './StudentScheduleCard';
 
 interface RegistrationStatusProps {
   snapshot: RegistrationSnapshot;
@@ -182,6 +183,11 @@ export const RegistrationStatus: React.FC<RegistrationStatusProps> = ({ snapshot
             schedules={snapshot.schedules}
             scheduleLabels={snapshot.scheduleLabels ?? []}
           />
+        )}
+
+        {/* KARTU JADWAL & PENGINGAT LATIHAN MURID */}
+        {isStudent && (
+          <StudentScheduleCard snapshot={snapshot} />
         )}
 
         {/* Detail Rincian Murid atau Pelatih */}
