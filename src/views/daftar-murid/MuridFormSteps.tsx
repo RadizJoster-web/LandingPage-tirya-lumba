@@ -13,6 +13,8 @@ interface MuridFormStepsProps {
   instructors: AvailableInstructor[];
   instructorLoading: boolean;
   isLoadingData: boolean;
+  savedPhotoUrl?: string;
+  savedPaymentProofUrl?: string;
   onNextStep2: (e: React.FormEvent) => void;
   onSubmit: (e: React.FormEvent) => void;
 }
@@ -25,9 +27,21 @@ export const MuridFormSteps: React.FC<MuridFormStepsProps> = ({
   instructors,
   instructorLoading,
   isLoadingData,
+  savedPhotoUrl,
+  savedPaymentProofUrl,
   onNextStep2,
   onSubmit,
 }) => {
+  const photoDisplayName =
+    form.photoFile?.name ??
+    (savedPhotoUrl ? 'Foto sebelumnya sudah tersimpan (unggah baru jika ingin mengganti)' : '');
+
+  const paymentProofDisplayName =
+    form.paymentProofFile?.name ??
+    (savedPaymentProofUrl
+      ? 'Bukti pembayaran sebelumnya sudah tersimpan (unggah baru jika ingin mengganti)'
+      : '');
+
   return (
     <div key={form.step} className="mt-8 animate-fade-in-up">
       {form.step === 1 && (
@@ -74,7 +88,7 @@ export const MuridFormSteps: React.FC<MuridFormStepsProps> = ({
           instructorLoading={instructorLoading}
           instructorId={form.instructorId}
           setInstructorId={form.setInstructorId}
-          photoFileName={form.photoFile?.name ?? ''}
+          photoFileName={photoDisplayName}
           onPhotoChange={form.setPhotoFile}
           isLoadingData={isLoadingData}
           errorMsg={form.errorMsg}
@@ -93,7 +107,7 @@ export const MuridFormSteps: React.FC<MuridFormStepsProps> = ({
           packagePrice={form.coursePrice}
           paymentMethod={form.paymentMethod}
           setPaymentMethod={form.setPaymentMethod}
-          paymentProofName={form.paymentProofFile?.name ?? ''}
+          paymentProofName={paymentProofDisplayName}
           onPaymentProofChange={form.setPaymentProofFile}
           isSubmitting={form.isSubmitting}
           errorMsg={form.errorMsg}

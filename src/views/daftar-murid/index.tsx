@@ -49,35 +49,64 @@ async function submitStudent(payload: StudentRegistrationPayload) {
 
 export default function DaftarMuridParent() {
   const router = useRouter();
-  const { user, isLoading: authLoading, persistRegistration } = useAuth();
-  const [photoUrl, setPhotoUrl] = useState('');
+  const {
+    user,
+    registration,
+    isLoading: authLoading,
+    persistRegistration,
+    refreshRegistration,
+  } = useAuth();
 
-  const form = useMuridForm(user?.email ?? '');
+  const studentSnapshot =
+    registration?.kind === 'student' ? registration : null;
+
+  const [photoUrl, setPhotoUrl] = useState(
+    studentSnapshot?.profilePictureUrl ?? user?.profilePictureUrl ?? '',
+  );
+  const [paymentProofUrl, setPaymentProofUrl] = useState(
+    studentSnapshot?.paymentProofUrl ?? '',
+  );
+
+  const form = useMuridForm(user?.email ?? '', studentSnapshot, user);
 
   useEffect(() => {
     if (!authLoading && !user) router.push('/login');
   }, [user, authLoading, router]);
 
+  useEffect(() => {
+    if (studentSnapshot?.profilePictureUrl && !photoUrl) {
+      setPhotoUrl(studentSnapshot.profilePictureUrl);
+    }
+    if (studentSnapshot?.paymentProofUrl && !paymentProofUrl) {
+      setPaymentProofUrl(studentSnapshot.paymentProofUrl);
+    }
+  }, [studentSnapshot, photoUrl, paymentProofUrl]);
+
   const handleNextStep2 = async (e: React.FormEvent) => {
     e.preventDefault();
     form.setErrorMsg('');
+
+    const hasPhoto = Boolean(form.photoFile || photoUrl);
     if (
       !form.locationId ||
       !form.packageId ||
       !form.firstMeetDate ||
       !form.sessionName ||
       !form.instructorId ||
-      !form.photoFile
+      !hasPhoto
     ) {
       form.setErrorMsg(
         'Pastikan kolam, paket, tanggal, sesi, guru, dan foto 4x6 sudah dipilih.',
       );
       return;
     }
+
     form.setIsSubmitting(true);
     try {
-      const photo = await uploadStudentPhoto(form.photoFile);
-      setPhotoUrl(photo.url);
+      if (form.photoFile) {
+        const photo = await uploadStudentPhoto(form.photoFile);
+        setPhotoUrl(photo.url);
+      }
       form.setStep(3);
     } catch (err) {
       form.setErrorMsg(`Gagal mengunggah foto profil 4x6: ${toErrorMessage(err)}`);
@@ -89,18 +118,32 @@ export default function DaftarMuridParent() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     form.setErrorMsg('');
-    if (!form.paymentProofFile) {
+
+    const hasPaymentProof = Boolean(form.paymentProofFile || paymentProofUrl);
+    if (!hasPaymentProof) {
       form.setErrorMsg('Bukti pembayaran wajib diunggah.');
       return;
     }
+
     form.setIsSubmitting(true);
     try {
-      const proof = await uploadPaymentProof(form.paymentProofFile);
-      const payload = buildStudentPayload(form, photoUrl, proof.url);
+      let finalProofUrl = paymentProofUrl;
+      let reported = Boolean(paymentProofUrl);
+
+      if (form.paymentProofFile) {
+        const proof = await uploadPaymentProof(form.paymentProofFile);
+        finalProofUrl = proof.url;
+        reported = proof.urlReported;
+      }
+
+      const payload = buildStudentPayload(form, photoUrl, finalProofUrl);
       const res = await submitStudent(payload);
+
       persistRegistration(
-        createStudentSnapshot(form, payload, res, proof.urlReported),
+        createStudentSnapshot(form, payload, res, reported),
       );
+      await refreshRegistration();
+
       router.push('/profile');
     } catch (err) {
       form.setErrorMsg(`Gagal memproses pendaftaran murid: ${toErrorMessage(err)}`);
@@ -127,6 +170,8 @@ export default function DaftarMuridParent() {
         instructors={form.instructors}
         instructorLoading={form.instructorLoading}
         isLoadingData={form.isLoadingData}
+        savedPhotoUrl={photoUrl}
+        savedPaymentProofUrl={paymentProofUrl}
         onNextStep2={handleNextStep2}
         onSubmit={handleSubmit}
       />

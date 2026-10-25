@@ -1,35 +1,91 @@
-import { useMemo, useState } from 'react';
-import { PaymentMethod, ShirtSize } from '@/types';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  AuthUser,
+  PaymentMethod,
+  ShirtSize,
+  StudentRegistrationSnapshot,
+} from '@/types';
 import { calculateAge } from '@/lib/utils';
 import { useMuridData } from './useMuridData';
 
-export function useMuridForm(userEmail: string) {
+export function useMuridForm(
+  userEmail: string,
+  initialSnapshot?: StudentRegistrationSnapshot | null,
+  currentUser?: AuthUser | null,
+) {
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [errorMsg, setErrorMsg] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Step 1
-  const [name, setName] = useState('');
-  const [birthPlace, setBirthPlace] = useState('');
-  const [birthDate, setBirthDate] = useState('');
-  const [gender, setGender] = useState<'Laki-Laki' | 'Perempuan'>('Laki-Laki');
-  const [address, setAddress] = useState('');
-  const [phone, setPhone] = useState('');
-  const [schoolOrOffice, setSchoolOrOffice] = useState('');
-  const [shirtSize, setShirtSize] = useState<ShirtSize>('M');
+  const [name, setName] = useState(initialSnapshot?.fullName || currentUser?.fullName || '');
+  const [birthPlace, setBirthPlace] = useState(initialSnapshot?.birthPlace || '');
+  const [birthDate, setBirthDate] = useState(initialSnapshot?.birthDate || '');
+  const [gender, setGender] = useState<'Laki-Laki' | 'Perempuan'>(
+    (initialSnapshot?.gender as 'Laki-Laki' | 'Perempuan') || 'Laki-Laki',
+  );
+  const [address, setAddress] = useState(initialSnapshot?.address || '');
+  const [phone, setPhone] = useState(initialSnapshot?.phone || currentUser?.phone || '');
+  const [schoolOrOffice, setSchoolOrOffice] = useState(initialSnapshot?.schoolOrOffice || '');
+  const [shirtSize, setShirtSize] = useState<ShirtSize>(initialSnapshot?.tshirtSize || 'M');
 
   // Step 2
   const [areaId, setAreaId] = useState('');
-  const [locationId, setLocationId] = useState('');
-  const [packageId, setPackageId] = useState('');
-  const [firstMeetDate, setFirstMeetDate] = useState('');
-  const [sessionName, setSessionName] = useState('');
-  const [instructorId, setInstructorId] = useState('');
+  const [locationId, setLocationId] = useState(initialSnapshot?.locationId || '');
+  const [packageId, setPackageId] = useState(initialSnapshot?.packageId || '');
+  const [firstMeetDate, setFirstMeetDate] = useState(initialSnapshot?.firstMeetDate || '');
+  const [sessionName, setSessionName] = useState(initialSnapshot?.firstMeetSession || '');
+  const [instructorId, setInstructorId] = useState(initialSnapshot?.instructorId || '');
   const [photoFile, setPhotoFile] = useState<File | null>(null);
 
   // Step 3
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('QRIS');
+  const initialPaymentMethod: PaymentMethod =
+    initialSnapshot?.paymentMethod === 'BANK_TRANSFER'
+      ? 'Transfer Bank'
+      : initialSnapshot?.paymentMethod === 'CASH'
+        ? 'Cash'
+        : 'QRIS';
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(initialPaymentMethod);
   const [paymentProofFile, setPaymentProofFile] = useState<File | null>(null);
+
+  // Flag apakah data dari snapshot sudah di-sinkronkan saat pertama kali
+  const initializedRef = useRef(false);
+
+  useEffect(() => {
+    if (initializedRef.current) return;
+    if (initialSnapshot) {
+      if (initialSnapshot.fullName) setName(initialSnapshot.fullName);
+      if (initialSnapshot.phone) setPhone(initialSnapshot.phone);
+      if (initialSnapshot.birthPlace) setBirthPlace(initialSnapshot.birthPlace);
+      if (initialSnapshot.birthDate) setBirthDate(initialSnapshot.birthDate);
+      if (initialSnapshot.gender) {
+        setGender(initialSnapshot.gender as 'Laki-Laki' | 'Perempuan');
+      }
+      if (initialSnapshot.address) setAddress(initialSnapshot.address);
+      if (initialSnapshot.schoolOrOffice) setSchoolOrOffice(initialSnapshot.schoolOrOffice);
+      if (initialSnapshot.tshirtSize) setShirtSize(initialSnapshot.tshirtSize);
+
+      if (initialSnapshot.locationId) setLocationId(initialSnapshot.locationId);
+      if (initialSnapshot.packageId) setPackageId(initialSnapshot.packageId);
+      if (initialSnapshot.firstMeetDate) setFirstMeetDate(initialSnapshot.firstMeetDate);
+      if (initialSnapshot.firstMeetSession) setSessionName(initialSnapshot.firstMeetSession);
+      if (initialSnapshot.instructorId) setInstructorId(initialSnapshot.instructorId);
+
+      if (initialSnapshot.paymentMethod) {
+        setPaymentMethod(
+          initialSnapshot.paymentMethod === 'BANK_TRANSFER'
+            ? 'Transfer Bank'
+            : initialSnapshot.paymentMethod === 'CASH'
+              ? 'Cash'
+              : 'QRIS',
+        );
+      }
+      initializedRef.current = true;
+    } else if (currentUser) {
+      if (currentUser.fullName && !name) setName(currentUser.fullName);
+      if (currentUser.phone && !phone) setPhone(currentUser.phone);
+    }
+  }, [initialSnapshot, currentUser, name, phone]);
 
   // Data fetching hook
   const data = useMuridData({
@@ -39,6 +95,16 @@ export function useMuridForm(userEmail: string) {
     packageId,
     onError: setErrorMsg,
   });
+
+  // Otomatis sinkronkan areaId jika locationId sudah ada dari data snapshot registrasi sebelumnya
+  useEffect(() => {
+    if (locationId && !areaId && data.locations.length > 0) {
+      const matchedLoc = data.locations.find((l) => l.id === locationId);
+      if (matchedLoc?.areaId) {
+        setAreaId(matchedLoc.areaId);
+      }
+    }
+  }, [locationId, areaId, data.locations]);
 
   const currentAge = useMemo(() => calculateAge(birthDate), [birthDate]);
 
