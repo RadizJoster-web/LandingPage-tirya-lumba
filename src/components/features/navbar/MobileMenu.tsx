@@ -104,12 +104,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
               </span>
             </Link>
 
-            <Link href="/daftar" onClick={onClose}>
-              <Button variant="primary" size="md" className="w-full">
-                Portal Pendaftaran
-              </Button>
-            </Link>
-            <Button variant="outline" size="md" className="w-full" onClick={onLogout}>
+            <Button variant="outline" size="md" className="w-full text-[#FF6F59] border-red-200 hover:bg-red-50" onClick={onLogout}>
               Keluar
             </Button>
           </>
