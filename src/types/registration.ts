@@ -23,8 +23,12 @@ export interface StudentRegistrationPayload {
 
 export interface InstructorScheduleInput {
   locationId: string;
+  locationName?: string;
   dayOfWeek: string;
   sessionName: string;
+  startTime?: string;
+  endTime?: string;
+  timeRange?: string;
 }
 
 export interface InstructorRegistrationPayload {
@@ -61,6 +65,7 @@ export interface StudentRegistrationSnapshot extends StudentRegistrationPayload 
   instructorName: string;
   photoFileName?: string;
   uploadNotice?: string;
+  rejectionReason?: string | null;
 }
 
 export interface InstructorRegistrationSnapshot extends InstructorRegistrationPayload {
@@ -70,6 +75,7 @@ export interface InstructorRegistrationSnapshot extends InstructorRegistrationPa
   submittedAt: number;
   scheduleLabels: string[];
   uploadNotice?: string;
+  rejectionReason?: string | null;
 }
 
 export type RegistrationSnapshot =

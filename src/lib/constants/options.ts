@@ -11,8 +11,9 @@ export const DAYS_ID = [
   'Sabtu',
 ] as const;
 
-/** Nomor WhatsApp Customer Service untuk pengajuan reschedule & bantuan verifikasi. */
-export const CS_WHATSAPP = '6285782599453';
+/** Nomor WhatsApp Customer Service untuk pengajuan reschedule & bantuan verifikasi (dapat dikonfigurasi via env). */
+export const CS_WHATSAPP =
+  process.env.NEXT_PUBLIC_CS_WHATSAPP || '6285782599453';
 
 /** Ganti dengan domain produksi landing page saat deploy. */
 export const SITE_URL = 'https://tiryalumba.id';

@@ -1,6 +1,4 @@
 // Penyimpanan sesi di browser: JWT + profil user + snapshot pendaftaran terakhir.
-// API hanya mengirim token melalui body login dan cookie HttpOnly, sehingga token
-// disalin ke localStorage agar bisa dipakai ulang oleh klien non-cookie.
 import { AuthUser, RegistrationSnapshot } from '@/types';
 
 const TOKEN_KEY = 'tirya_access_token';
@@ -42,6 +40,15 @@ export function saveSession(user: AuthUser, token: string) {
   localStorage.setItem(TOKEN_KEY, token);
   localStorage.setItem(USER_KEY, JSON.stringify(user));
   writeSessionCookie(SESSION_MAX_AGE);
+  window.dispatchEvent(new Event(SYNC_EVENT));
+}
+
+export function updateUser(partial: Partial<AuthUser>) {
+  if (!isBrowser()) return;
+  const current = getAuthUser();
+  if (!current) return;
+  const updated = { ...current, ...partial };
+  localStorage.setItem(USER_KEY, JSON.stringify(updated));
   window.dispatchEvent(new Event(SYNC_EVENT));
 }
 

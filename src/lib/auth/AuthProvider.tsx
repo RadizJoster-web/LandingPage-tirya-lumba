@@ -1,6 +1,13 @@
 'use client';
 
-import React, { createContext, useMemo, useSyncExternalStore, useCallback } from 'react';
+import React, {
+  createContext,
+  useMemo,
+  useSyncExternalStore,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
 import { LoginResult, RegistrationSnapshot } from '@/types';
 import { request } from '@/lib/http';
 import {
@@ -11,6 +18,7 @@ import {
   saveRegistration,
   saveSession,
   subscribe,
+  updateUser,
 } from '@/services/session-store';
 import { AuthContextType } from './types';
 
@@ -44,11 +52,60 @@ async function loginAccount(input: {
   return res.data;
 }
 
+async function fetchMyRegistration(): Promise<RegistrationSnapshot | null> {
+  try {
+    const res = await request<RegistrationSnapshot | null>('/register/me', {
+      method: 'GET',
+    });
+    return res.data ?? null;
+  } catch (err) {
+    console.warn('[AuthProvider] Gagal mengambil snapshot registrasi dari server:', err);
+    return null;
+  }
+}
+
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const snapshot = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-  const { user, registration } = useMemo(() => readSnapshot(snapshot), [snapshot]);
+  const { user, registration: storedRegistration } = useMemo(
+    () => readSnapshot(snapshot),
+    [snapshot],
+  );
+
+  // State live untuk menyimpan respons registrasi langsung dari API
+  const [liveRegistration, setLiveRegistration] = useState<RegistrationSnapshot | null>(null);
+  const [isRegistrationLoading, setIsRegistrationLoading] = useState<boolean>(false);
+
+  // Prioritaskan data live API, lalu fallback ke session store
+  const registration = liveRegistration || storedRegistration;
+
+  const refreshRegistration = useCallback(async () => {
+    setIsRegistrationLoading(true);
+    try {
+      const serverReg = await fetchMyRegistration();
+      if (serverReg) {
+        setLiveRegistration(serverReg);
+        saveRegistration(serverReg);
+        if (serverReg.profilePictureUrl) {
+          updateUser({ profilePictureUrl: serverReg.profilePictureUrl });
+        }
+      }
+      return serverReg;
+    } finally {
+      setIsRegistrationLoading(false);
+    }
+  }, []);
+
+  // Sinkronisasi status pendaftaran dari server saat user login atau refresh halaman
+  useEffect(() => {
+    if (user?.userId) {
+      refreshRegistration();
+    } else {
+      setIsRegistrationLoading(false);
+      setLiveRegistration(null);
+    }
+  }, [user?.userId, refreshRegistration]);
 
   const register = useCallback(
     (input: { fullName: string; email: string; password: string }) => registerAccount(input),
@@ -60,16 +117,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     [],
   );
 
-  const login = useCallback(async (email: string, password: string) => {
-    const result = await loginAccount({ email, password });
-    saveSession(result.user, result.token);
-    return result.user;
+  const login = useCallback(
+    async (email: string, password: string) => {
+      const result = await loginAccount({ email, password });
+      saveSession(result.user, result.token);
+
+      // Ambil registrasi terbaru langsung setelah login
+      const serverReg = await refreshRegistration();
+      if (serverReg?.profilePictureUrl && !result.user.profilePictureUrl) {
+        saveSession(
+          { ...result.user, profilePictureUrl: serverReg.profilePictureUrl },
+          result.token,
+        );
+      }
+
+      return result.user;
+    },
+    [refreshRegistration],
+  );
+
+  const logout = useCallback(() => {
+    setLiveRegistration(null);
+    clearSession();
   }, []);
 
-  const logout = useCallback(() => clearSession(), []);
-
   const persistRegistration = useCallback(
-    (next: RegistrationSnapshot) => saveRegistration(next),
+    (next: RegistrationSnapshot) => {
+      setLiveRegistration(next);
+      saveRegistration(next);
+      if (next.profilePictureUrl) {
+        updateUser({ profilePictureUrl: next.profilePictureUrl });
+      }
+    },
     [],
   );
 
@@ -78,13 +157,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       user,
       registration,
       isLoading: snapshot === null,
+      isRegistrationLoading,
+      refreshRegistration,
       register,
       verifyOtp,
       login,
       logout,
       persistRegistration,
     }),
-    [user, registration, snapshot, register, verifyOtp, login, logout, persistRegistration],
+    [
+      user,
+      registration,
+      snapshot,
+      isRegistrationLoading,
+      refreshRegistration,
+      register,
+      verifyOtp,
+      login,
+      logout,
+      persistRegistration,
+    ],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

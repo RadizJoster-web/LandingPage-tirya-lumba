@@ -1,7 +1,13 @@
 import React from 'react';
 
+interface BlurredDashboardProps {
+  message?: string;
+}
+
 /** Kerangka dasbor murid/pelatih: bentuknya terlihat, datanya tidak (blur). */
-export const BlurredDashboard: React.FC = () => {
+export const BlurredDashboard: React.FC<BlurredDashboardProps> = ({
+  message = 'Dasbor murid / pelatih aktif setelah pendaftaran diverifikasi',
+}) => {
   return (
     <div className="relative overflow-hidden rounded-3xl bg-slate-50/80 p-5 ring-1 ring-slate-200/70">
       <div className="blur-[4px] select-none pointer-events-none space-y-4" aria-hidden="true">
@@ -34,7 +40,7 @@ export const BlurredDashboard: React.FC = () => {
       </div>
 
       <span className="absolute inset-0 flex items-center justify-center px-6 text-center text-xs font-semibold text-[#1D3557]/70 sm:text-sm">
-        Dasbor murid / pelatih aktif setelah pendaftaran diverifikasi
+        {message}
       </span>
     </div>
   );
