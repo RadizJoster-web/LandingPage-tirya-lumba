@@ -1,22 +1,20 @@
-// Tipe data model dan master data dari REST API PT Tirya Lumba.
-
-export interface ApiPagination {
-  totalItems: number;
-  totalPages: number;
-  currentPage: number;
-  limit: number;
-}
-
-export interface ApiResponse<T> {
+export interface ApiResponse<T = unknown> {
   success: boolean;
   message?: string;
   data: T;
-  pagination?: ApiPagination;
 }
 
-export type Role = 'ADMIN' | 'POOL_MANAGER' | 'STUDENT' | 'INSTRUCTOR';
+export type Role = 'USER' | 'STUDENT' | 'INSTRUCTOR' | 'POOL_MANAGER' | 'ADMIN';
 
 export interface AuthUser {
+  userId: string;
+  email: string;
+  role: Role;
+  fullName?: string;
+  profilePictureUrl?: string;
+}
+
+export interface UserSummary {
   userId: string;
   email: string;
   role: Role;
@@ -82,6 +80,7 @@ export interface AvailableInstructor {
   profilePictureUrl?: string | null;
   experience?: string | null;
   license?: string | null;
+  shortBio?: string | null;
   currentStudentCount: number;
   maxCapacity: number;
 }

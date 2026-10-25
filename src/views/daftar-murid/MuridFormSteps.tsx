@@ -57,7 +57,7 @@ export const MuridFormSteps: React.FC<MuridFormStepsProps> = ({
         <StepKelasJadwal
           areas={areas}
           areaId={form.areaId}
-          setAreaId={form.setAreaId}
+          setAreaId={form.onSelectArea}
           areaLocations={form.areaLocations}
           locationId={form.locationId}
           onSelectLocation={form.onSelectLocation}

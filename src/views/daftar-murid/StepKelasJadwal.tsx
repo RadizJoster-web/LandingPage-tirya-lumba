@@ -32,6 +32,8 @@ export const StepKelasJadwal: React.FC<MuridStep2Props> = ({
   onSubmit,
   onBack,
 }) => {
+  const todayStr = new Date().toISOString().split('T')[0];
+
   return (
     <form onSubmit={onSubmit} className="space-y-5">
       <PoolPackagePicker
@@ -51,6 +53,7 @@ export const StepKelasJadwal: React.FC<MuridStep2Props> = ({
         <Input
           label="Rencana Pertemuan Pertama *"
           type="date"
+          min={todayStr}
           value={firstMeetDate}
           onChange={(e) => setFirstMeetDate(e.target.value)}
           required
@@ -103,9 +106,6 @@ export const StepKelasJadwal: React.FC<MuridStep2Props> = ({
             ✓ {photoFileName}
           </p>
         )}
-        <p className="text-xs text-slate-400 mt-1">
-          Berkas langsung diunggah ke server saat Anda menekan Lanjut.
-        </p>
       </div>
 
       <div className="flex items-center justify-between gap-3 pt-2">

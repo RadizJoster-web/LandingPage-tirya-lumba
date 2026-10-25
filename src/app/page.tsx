@@ -28,14 +28,14 @@ async function fetchProgramCatalog(): Promise<{
     request<Area[]>('/areas', { method: 'GET', revalidate: 3600, tag: 'areas' }),
   ]);
 
-  const locationById = new Map(locs.data.map((loc) => [loc.id, loc]));
-  const areaNameById = new Map(areas.data.map((area) => [area.id, area.name]));
+  const locationById = new Map(locs.data.map((loc: Location) => [loc.id, loc]));
+  const areaNameById = new Map(areas.data.map((area: Area) => [area.id, area.name]));
 
-  const items: ProgramCatalogItem[] = pkgs.data.map((pkg) => {
+  const items: ProgramCatalogItem[] = pkgs.data.map((pkg: LessonPackage) => {
     const pkgLocId = pkg.locationId ?? pkg.location?.id;
     const joined =
       (pkgLocId ? locationById.get(pkgLocId) : undefined) ??
-      locs.data.find((loc) => loc.name === pkg.location?.name);
+      locs.data.find((loc: Location) => loc.name === pkg.location?.name);
     const areaId = joined?.areaId;
 
     return {

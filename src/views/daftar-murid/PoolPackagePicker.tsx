@@ -34,7 +34,13 @@ export const PoolPackagePicker: React.FC<PoolPackagePickerProps> = ({
         value={areaId}
         onChange={(e) => setAreaId(e.target.value)}
         disabled={isLoadingData}
-        helperText="Data wilayah diambil langsung dari server."
+        helperText={
+          isLoadingData
+            ? 'Memuat data wilayah…'
+            : areas.length === 0
+              ? 'Belum ada wilayah yang terdaftar di server.'
+              : 'Pilih wilayah kota kolam renang yang Anda inginkan.'
+        }
       >
         <option value="">-- Pilih Wilayah --</option>
         {areas.map((area) => (
@@ -49,9 +55,20 @@ export const PoolPackagePicker: React.FC<PoolPackagePickerProps> = ({
         value={locationId}
         onChange={(e) => onSelectLocation(e.target.value)}
         disabled={!areaId || areaLocations.length === 0}
+        helperText={
+          !areaId
+            ? undefined
+            : areaLocations.length === 0
+              ? 'Belum ada kolam renang terdaftar di wilayah ini.'
+              : undefined
+        }
       >
         <option value="">
-          {areaId ? '-- Pilih Kolam Renang --' : '-- Pilih wilayah terlebih dahulu --'}
+          {!areaId
+            ? '-- Pilih wilayah terlebih dahulu --'
+            : areaLocations.length === 0
+              ? '-- Tidak ada kolam di wilayah ini --'
+              : '-- Pilih Kolam Renang --'}
         </option>
         {areaLocations.map((loc) => (
           <option key={loc.id} value={loc.id}>
@@ -64,11 +81,21 @@ export const PoolPackagePicker: React.FC<PoolPackagePickerProps> = ({
         label="Jenis Kelas / Paket Les *"
         value={packageId}
         onChange={(e) => setPackageId(e.target.value)}
-        disabled={!locationId}
-        helperText="Harga diambil dari paket resmi kolam yang dipilih."
+        disabled={!locationId || locationPackages.length === 0}
+        helperText={
+          !locationId
+            ? undefined
+            : locationPackages.length === 0
+              ? 'Belum ada paket les terdaftar untuk kolam ini.'
+              : 'Harga diambil dari paket resmi kolam yang dipilih.'
+        }
       >
         <option value="">
-          {locationId ? '-- Pilih Paket Les --' : '-- Pilih kolam terlebih dahulu --'}
+          {!locationId
+            ? '-- Pilih kolam terlebih dahulu --'
+            : locationPackages.length === 0
+              ? '-- Tidak ada paket les di kolam ini --'
+              : '-- Pilih Paket Les --'}
         </option>
         {locationPackages.map((item) => (
           <option key={item.id} value={item.id}>

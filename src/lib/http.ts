@@ -51,8 +51,17 @@ export async function request<T>(
   const json = (await res.json().catch(() => null)) as ApiResponse<T> | null;
 
   if (!res.ok || !json || json.success === false) {
+    let fallbackMessage = `Permintaan ke server gagal (HTTP ${res.status}).`;
+    if (res.status === 404) {
+      fallbackMessage = `Layanan atau rute ${path} tidak ditemukan di server (404 Not Found).`;
+    } else if (res.status === 500) {
+      fallbackMessage = `Terjadi kendala pada pemrosesan internal server (HTTP 500). Silakan coba lagi.`;
+    } else if (res.status === 401 || res.status === 403) {
+      fallbackMessage = `Akses tidak diizinkan atau sesi telah berakhir (HTTP ${res.status}). Silakan login ulang.`;
+    }
+
     throw new ApiError(
-      json?.message || `Permintaan ke server gagal (HTTP ${res.status}).`,
+      json?.message || fallbackMessage,
       res.status,
     );
   }
@@ -62,6 +71,7 @@ export async function request<T>(
 
 export function toErrorMessage(error: unknown): string {
   if (error instanceof ApiError) return error.message;
+  if (error instanceof Error) return error.message;
   return 'Tidak dapat menghubungi server. Periksa koneksi Anda lalu coba lagi.';
 }
 
