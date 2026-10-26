@@ -15,6 +15,7 @@ interface MuridFormStepsProps {
   isLoadingData: boolean;
   savedPhotoUrl?: string;
   savedPaymentProofUrl?: string;
+  onNextStep1: (e: React.FormEvent) => void;
   onNextStep2: (e: React.FormEvent) => void;
   onSubmit: (e: React.FormEvent) => void;
 }
@@ -29,6 +30,7 @@ export const MuridFormSteps: React.FC<MuridFormStepsProps> = ({
   isLoadingData,
   savedPhotoUrl,
   savedPaymentProofUrl,
+  onNextStep1,
   onNextStep2,
   onSubmit,
 }) => {
@@ -64,7 +66,9 @@ export const MuridFormSteps: React.FC<MuridFormStepsProps> = ({
           setSchoolOrOffice={form.setSchoolOrOffice}
           shirtSize={form.shirtSize}
           setShirtSize={form.setShirtSize}
-          onSubmit={form.handleNextStep1}
+          photoFileName={photoDisplayName}
+          onPhotoChange={form.setPhotoFile}
+          onSubmit={onNextStep1}
         />
       )}
       {form.step === 2 && (
@@ -88,8 +92,6 @@ export const MuridFormSteps: React.FC<MuridFormStepsProps> = ({
           instructorLoading={instructorLoading}
           instructorId={form.instructorId}
           setInstructorId={form.setInstructorId}
-          photoFileName={photoDisplayName}
-          onPhotoChange={form.setPhotoFile}
           isLoadingData={isLoadingData}
           errorMsg={form.errorMsg}
           onSubmit={onNextStep2}

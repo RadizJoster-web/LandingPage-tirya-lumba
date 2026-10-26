@@ -23,6 +23,8 @@ export const StepBiodata: React.FC<MuridStep1Props> = ({
   setSchoolOrOffice,
   shirtSize,
   setShirtSize,
+  photoFileName,
+  onPhotoChange,
   onSubmit,
 }) => {
   return (
@@ -131,6 +133,28 @@ export const StepBiodata: React.FC<MuridStep1Props> = ({
       />
 
       <ShirtSizeSelector shirtSize={shirtSize} setShirtSize={setShirtSize} />
+
+      {/* Upload Foto Profil Murid (Pindah dari Step 2 ke Step 1) */}
+      <div className="rounded-2xl border border-slate-200 bg-slate-50/60 p-4">
+        <label className="block text-sm font-semibold text-[#1D3557] mb-1.5">
+          Pas Foto Profil Murid (4x6) * (JPG/PNG maks 5 MB)
+        </label>
+        <input
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          onChange={(e) => onPhotoChange(e.target.files?.[0] ?? null)}
+          className="w-full text-sm text-slate-600 border border-gray-300 rounded-lg px-3 py-2 bg-white file:mr-3 file:px-3 file:py-1.5 file:rounded-full file:border-0 file:bg-[#E0FBFC] file:text-[#0077B6] file:font-semibold file:cursor-pointer"
+        />
+        {photoFileName ? (
+          <p className="text-xs text-emerald-600 font-semibold mt-1.5">
+            ✓ {photoFileName}
+          </p>
+        ) : (
+          <p className="text-xs text-slate-400 mt-1">
+            Digunakan untuk verifikasi akun kesiswaan dan pengenalan oleh pelatih saat latihan.
+          </p>
+        )}
+      </div>
 
       <div className="pt-6 border-t border-slate-100 flex justify-end">
         <Button type="submit" variant="primary" size="md" isFullRounded={true} className="min-w-[140px]">

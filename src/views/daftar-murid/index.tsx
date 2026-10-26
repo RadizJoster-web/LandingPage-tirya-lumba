@@ -78,22 +78,25 @@ export default function DaftarMuridParent() {
     }
   }, [studentSnapshot, photoUrl]);
 
-  const handleNextStep2 = async (e: React.FormEvent) => {
+  const handleNextStep1 = async (e: React.FormEvent) => {
     e.preventDefault();
     form.setErrorMsg('');
 
-    const hasPhoto = Boolean(form.photoFile || photoUrl);
     if (
-      !form.locationId ||
-      !form.packageId ||
-      !form.firstMeetDate ||
-      !form.sessionName ||
-      !form.instructorId ||
-      !hasPhoto
+      !form.name ||
+      !form.birthPlace ||
+      !form.birthDate ||
+      !form.address ||
+      !form.phone ||
+      !form.schoolOrOffice
     ) {
-      form.setErrorMsg(
-        'Pastikan kolam, paket, tanggal, sesi, guru, dan foto 4x6 sudah dipilih.',
-      );
+      form.setErrorMsg('Mohon lengkapi seluruh kolom biodata bertanda bintang (*).');
+      return;
+    }
+
+    const hasPhoto = Boolean(form.photoFile || photoUrl);
+    if (!hasPhoto) {
+      form.setErrorMsg('Silakan unggah pas foto profil 4x6 murid terlebih dahulu.');
       return;
     }
 
@@ -103,12 +106,32 @@ export default function DaftarMuridParent() {
         const photo = await uploadStudentPhoto(form.photoFile);
         setPhotoUrl(photo.url);
       }
-      form.setStep(3);
+      form.setStep(2);
     } catch (err) {
       form.setErrorMsg(`Gagal mengunggah foto profil 4x6: ${toErrorMessage(err)}`);
     } finally {
       form.setIsSubmitting(false);
     }
+  };
+
+  const handleNextStep2 = (e: React.FormEvent) => {
+    e.preventDefault();
+    form.setErrorMsg('');
+
+    if (
+      !form.locationId ||
+      !form.packageId ||
+      !form.firstMeetDate ||
+      !form.sessionName ||
+      !form.instructorId
+    ) {
+      form.setErrorMsg(
+        'Pastikan kolam renang, paket, tanggal mulai, jam sesi, dan pelatih sudah dipilih.',
+      );
+      return;
+    }
+
+    form.setStep(3);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -168,6 +191,7 @@ export default function DaftarMuridParent() {
         isLoadingData={form.isLoadingData}
         savedPhotoUrl={photoUrl}
         savedPaymentProofUrl={paymentProofUrl}
+        onNextStep1={handleNextStep1}
         onNextStep2={handleNextStep2}
         onSubmit={handleSubmit}
       />

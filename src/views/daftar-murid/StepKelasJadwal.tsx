@@ -26,8 +26,6 @@ export const StepKelasJadwal: React.FC<MuridStep2Props> = ({
   instructorLoading,
   instructorId,
   setInstructorId,
-  photoFileName,
-  onPhotoChange,
   isLoadingData,
   onSubmit,
   onBack,
@@ -35,7 +33,7 @@ export const StepKelasJadwal: React.FC<MuridStep2Props> = ({
   const todayStr = new Date().toISOString().split('T')[0];
 
   return (
-    <form onSubmit={onSubmit} className="space-y-5">
+    <form onSubmit={onSubmit} className="space-y-6">
       <PoolPackagePicker
         areas={areas}
         areaId={areaId}
@@ -51,7 +49,7 @@ export const StepKelasJadwal: React.FC<MuridStep2Props> = ({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Input
-          label="Rencana Pertemuan Pertama *"
+          label="Tanggal Mulai Les Pertama *"
           type="date"
           min={todayStr}
           value={firstMeetDate}
@@ -60,21 +58,19 @@ export const StepKelasJadwal: React.FC<MuridStep2Props> = ({
         />
 
         <Select
-          label="Sesi Jam Latihan *"
+          label="Pilih Jam Sesi Latihan *"
           value={sessionName}
           onChange={(e) => setSessionName(e.target.value)}
           disabled={!firstMeetDate || sessionLoading}
-          helperText={
-            !firstMeetDate
-              ? 'Pilih tanggal pertemuan terlebih dahulu.'
-              : sessionLoading
-                ? 'Memuat sesi tersedia…'
-                : sessions.length === 0
-                  ? 'Belum ada sesi terdaftar pada hari itu.'
-                  : undefined
-          }
+          required
         >
-          <option value="">-- Pilih Sesi --</option>
+          <option value="">
+            {sessionLoading
+              ? 'Memuat sesi tersedia...'
+              : !firstMeetDate
+                ? 'Pilih tanggal mulai terlebih dahulu'
+                : 'Pilih sesi jam latihan'}
+          </option>
           {sessions.map((session) => (
             <option key={session.id} value={session.sessionName}>
               {session.sessionName} ({session.startTime} - {session.endTime})
@@ -90,23 +86,6 @@ export const StepKelasJadwal: React.FC<MuridStep2Props> = ({
         coachId={instructorId}
         setCoachId={setInstructorId}
       />
-
-      <div>
-        <label className="block text-sm font-semibold text-[#1D3557] mb-1.5">
-          Foto 4x6 Murid * (JPG/PNG maks 5 MB)
-        </label>
-        <input
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          onChange={(e) => onPhotoChange(e.target.files?.[0] ?? null)}
-          className="w-full text-sm text-slate-600 border border-gray-300 rounded-lg px-3 py-2 bg-white file:mr-3 file:px-3 file:py-1.5 file:rounded-full file:border-0 file:bg-[#E0FBFC] file:text-[#0077B6] file:font-semibold file:cursor-pointer"
-        />
-        {photoFileName && (
-          <p className="text-xs text-emerald-600 font-semibold mt-1.5">
-            ✓ {photoFileName}
-          </p>
-        )}
-      </div>
 
       <div className="flex items-center justify-between gap-3 pt-2">
         <Button type="button" variant="outline" size="md" onClick={onBack}>

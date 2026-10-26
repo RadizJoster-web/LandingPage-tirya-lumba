@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Link from 'next/link';
+import { request, toErrorMessage } from '@/lib/http';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 
@@ -23,6 +23,37 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   onSubmit,
 }) => {
   const [showPassword, setShowPassword] = useState(false);
+  const [forgotStatus, setForgotStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [forgotMessage, setForgotMessage] = useState('');
+
+  const handleForgotPassword = async () => {
+    setForgotMessage('');
+    const cleanEmail = email.trim();
+    if (!cleanEmail || !/^\S+@\S+\.\S+$/.test(cleanEmail)) {
+      setForgotStatus('error');
+      setForgotMessage(
+        'Silakan masukkan alamat email akun Anda pada kolom di atas terlebih dahulu, lalu klik Lupa Password.',
+      );
+      return;
+    }
+
+    setForgotStatus('loading');
+    try {
+      const res = await request<{ message?: string }>('/auth/forgot-password', {
+        method: 'POST',
+        body: { email: cleanEmail },
+      });
+      setForgotStatus('success');
+      setForgotMessage(
+        res.data?.message ||
+          res.message ||
+          `Tautan reset kata sandi telah dikirim ke email ${cleanEmail}. Silakan periksa kotak masuk atau spam email Anda.`,
+      );
+    } catch (err) {
+      setForgotStatus('error');
+      setForgotMessage(toErrorMessage(err));
+    }
+  };
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
@@ -31,7 +62,13 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         type="email"
         placeholder="nama@email.com"
         value={email}
-        onChange={(e) => setEmail(e.target.value)}
+        onChange={(e) => {
+          setEmail(e.target.value);
+          if (forgotStatus !== 'idle') {
+            setForgotStatus('idle');
+            setForgotMessage('');
+          }
+        }}
         autoComplete="email"
         required
       />
@@ -41,12 +78,14 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           <label className="block text-sm font-semibold text-[#1D3557]">
             Password
           </label>
-          <Link
-            href="/forgot-password"
-            className="text-xs font-semibold text-[#0077B6] hover:text-[#00B4D8] transition-colors"
+          <button
+            type="button"
+            onClick={handleForgotPassword}
+            disabled={forgotStatus === 'loading'}
+            className="text-xs font-semibold text-[#0077B6] hover:text-[#00B4D8] transition-colors disabled:opacity-50"
           >
-            Lupa Password?
-          </Link>
+            {forgotStatus === 'loading' ? 'Mengirim tautan...' : 'Lupa Password?'}
+          </button>
         </div>
         <Input
           type={showPassword ? 'text' : 'password'}
@@ -92,6 +131,23 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           }
         />
       </div>
+
+      {/* Notifikasi Lupa Password Langsung di Form Login */}
+      {forgotStatus === 'success' && (
+        <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 animate-fade-in flex items-start gap-2.5">
+          <span className="text-base">✉️</span>
+          <div>
+            <p className="font-bold">Tautan Reset Terkirim!</p>
+            <p className="mt-0.5 leading-relaxed text-emerald-700">{forgotMessage}</p>
+          </div>
+        </div>
+      )}
+
+      {forgotStatus === 'error' && (
+        <div className="p-3 rounded-lg bg-amber-50 border border-amber-200 text-xs font-semibold text-amber-800 animate-fade-in">
+          ⚠️ {forgotMessage}
+        </div>
+      )}
 
       {error && (
         <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-xs font-semibold text-[#FF6F59]">

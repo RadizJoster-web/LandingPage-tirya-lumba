@@ -29,6 +29,8 @@ export interface MuridStep1Props {
   setSchoolOrOffice: (v: string) => void;
   shirtSize: ShirtSize;
   setShirtSize: (v: ShirtSize) => void;
+  photoFileName?: string;
+  onPhotoChange: (file: File | null) => void;
   onSubmit: (e: React.FormEvent) => void;
 }
 
@@ -52,8 +54,6 @@ export interface MuridStep2Props {
   instructorLoading: boolean;
   instructorId: string;
   setInstructorId: (v: string) => void;
-  photoFileName: string;
-  onPhotoChange: (file: File | null) => void;
   isLoadingData: boolean;
   errorMsg: string;
   onSubmit: (e: React.FormEvent) => void;
