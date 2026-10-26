@@ -9,6 +9,8 @@ import { StudentDetail } from './StudentDetail';
 import { InstructorDetail } from './InstructorDetail';
 import { ScheduleHighlightCard } from './ScheduleHighlightCard';
 import { StudentScheduleCard } from './StudentScheduleCard';
+import { InstructorProfileWidget } from './InstructorProfileWidget';
+import { StudentAttendanceHistory } from './StudentAttendanceHistory';
 
 interface RegistrationStatusProps {
   snapshot: RegistrationSnapshot;
@@ -236,9 +238,19 @@ export const RegistrationStatus: React.FC<RegistrationStatusProps> = ({ snapshot
           />
         )}
 
+        {/* WIDGET PROFIL GURU & JADWAL LATIHAN MURID */}
+        {isStudent && isApproved && (
+          <InstructorProfileWidget snapshot={snapshot} />
+        )}
+
         {/* KARTU JADWAL & PENGINGAT LATIHAN MURID */}
         {isStudent && (
           <StudentScheduleCard snapshot={snapshot} />
+        )}
+
+        {/* RIWAYAT PERTEMUAN & PRESENSI MURID */}
+        {isStudent && isApproved && (
+          <StudentAttendanceHistory />
         )}
 
         {/* Detail Rincian Murid atau Pelatih */}

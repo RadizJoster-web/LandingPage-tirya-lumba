@@ -52,6 +52,21 @@ async function fetchProgramCatalog(): Promise<{
   return { items, totalPools: locs.data.length, totalAreas: areas.data.length };
 }
 
+async function fetchPublicStats(): Promise<{
+  totalStudents: number;
+  totalInstructors: number;
+  totalPools: number;
+  totalAreas: number;
+}> {
+  const res = await request<{
+    totalStudents: number;
+    totalInstructors: number;
+    totalPools: number;
+    totalAreas: number;
+  }>('/stats', { method: 'GET', revalidate: 3600, tag: 'stats' });
+  return res.data;
+}
+
 export default async function HomePage({
   searchParams,
 }: {
@@ -60,11 +75,19 @@ export default async function HomePage({
   const params = await searchParams;
   const page = parsePage(params.halaman);
 
-  const catalog = await safe(fetchProgramCatalog(), {
-    items: [],
-    totalPools: 0,
-    totalAreas: 0,
-  });
+  const [catalog, publicStats] = await Promise.all([
+    safe(fetchProgramCatalog(), {
+      items: [],
+      totalPools: 0,
+      totalAreas: 0,
+    }),
+    safe(fetchPublicStats(), {
+      totalStudents: 0,
+      totalInstructors: 0,
+      totalPools: 0,
+      totalAreas: 0,
+    }),
+  ]);
 
   const classTypes = Array.from(
     new Set(catalog.items.map((item) => item.type).filter((type): type is string => Boolean(type))),
@@ -95,8 +118,10 @@ export default async function HomePage({
       <AboutSection />
       <WhyUsSection
         stats={{
-          totalPartnerPools: catalog.totalPools,
-          totalAreas: catalog.totalAreas,
+          totalStudents: publicStats.totalStudents,
+          totalInstructors: publicStats.totalInstructors,
+          totalPartnerPools: publicStats.totalPools || catalog.totalPools,
+          totalAreas: publicStats.totalAreas || catalog.totalAreas,
           totalClassTypes: classTypes.length,
         }}
       />

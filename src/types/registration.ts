@@ -64,6 +64,10 @@ export interface StudentRegistrationSnapshot extends StudentRegistrationPayload 
   packageType: string;
   packagePrice: number;
   instructorName: string;
+  instructorProfilePictureUrl?: string;
+  instructorLicense?: string;
+  instructorExperience?: string;
+  instructorBio?: string;
   activeSessions?: number;
   photoFileName?: string;
   uploadNotice?: string;

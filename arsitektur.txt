@@ -24,7 +24,7 @@ A. Halaman Beranda (/)
   - Alamat kolam renang beserta jika di klik langsung redirect ke koordinat kolam renang tersebut melalui Google Maps
   - Harga jika memilih kelas reguler dan private
 - Tentang Kami (/#tentang-kami): Deskripsi perusahaan, pengalaman melatih, CTA "Kenal kami lebih dalam" (desain link modern dengan hover animasi dari bawah, bukan tombol kaku).
-- Kenapa Pilih Kami (/#kenapa-pilih-kami): Alasan memilih Tirta Lumba, kualitas guru, kelas fleksibel, statistik total murid & guru, CTA "Daftar Sebagai Murid".
+- Kenapa Pilih Kami (/#kenapa-pilih-kami): Alasan memilih Tirta Lumba, kualitas guru, kelas fleksibel, statistik riil total murid & guru (dari GET /api/stats), total kolam renang & wilayah layanan, CTA "Daftar Sebagai Murid".
 
 C. Autentikasi (/register & /login)
 - /register: Input Email, Password, submit, dan verifikasi 4 karakter OTP (dengan countdown timer).
@@ -60,18 +60,18 @@ G. Portal Pengguna (/profile)
 Dasbor dinamis (multi-role) berdasarkan akun yang login.
 - Jika pendaftaran ditolak: Tampilkan status pendaftaran, alasan ditolak, dan CTA link WhatsApp CS/Pengelola.
 - Jika Siswa:
-  - Widget profil guru yang akan mengajar (gambar, nama, link lisensi).
-  - Widget Jadwal Les.
-  - Riwayat pertemuan.
-  - Quick Renew: CTA "Perpanjang Paket" (Hanya muncul jika activeSessions = 0).
+  - Widget profil guru yang akan mengajar (foto, nama, pengalaman, dan modal lisensi resmi).
+  - Widget Jadwal & Pengingat Latihan.
+  - Riwayat pertemuan (tabel log presensi kehadiran resmi dari /attendances/my-history).
+  - Quick Renew: CTA "Daftar Ulang Sekarang" (Hanya muncul jika activeSessions = 0, form pendaftaran terisi otomatis).
 - Jika Pelatih:
-  - Jadwal mengajar (hari, sesi, lokasi).
-  - Total murid yang diajar per jadwal.
-  - CTA form pengajuan jadwal ulang.
+  - Jadwal mengajar (hari, sesi, lokasi, dan jam).
+  - Total murid aktif yang diajar per jadwal sesi.
+  - CTA "Atur Ulang Jadwal".
 - Atur Ulang Jadwal (/guru/atur-ulang-jadwal):
-  - Memilih hari dan sesi yang ingin diganti, lalu menginput jadwal baru.
-  - CTA "Hapus Jadwal": Menghapus ketersediaan mengajar di hari tersebut.
-  - CTA "Request Persetujuan": Mengirim permintaan reschedule ke admin. Syarat mutlak: Request hanya bisa dikirim jika guru TIDAK memiliki jadwal mengajar/murid di hari tersebut. Jika ada murid, otomatis batal terkirim.
+  - Pelatih dapat mengatur ulang jadwal dan kolam mengajar secara mandiri (kuota 1 kali per 30 hari).
+  - Validasi ketat: Sesi yang sedang aktif memiliki murid tidak dapat dihapus. Minimal mempertahankan 1 sesi mengajar.
+  - Eksekusi langsung otomatis memperbarui ketersediaan jadwal di sistem.
 
 
 4. GLOBAL LAYOUT
@@ -106,10 +106,10 @@ Menggunakan standar Next.js App Router:
 Parent Component bertanggung jawab penuh atas pengambilan data dari API, pengecekan state loading/error awal, penerapan pagination (melalui search params), dan pengaturan layout grid utama. Parent dilarang keras memuat logika styling spesifik item atau logika interaksi hover/klik; semua itu harus dikirim sebagai props ke Child Component.
 
 
-8. EXAMPLE PARENT RESPONSIBILITY
+8. PARENT RESPONSIBILITY (CATATAN REVISI: KATALOG PELATIH DIINTEGRASIKAN LANGSUNG KE STEP 2 BOOKING WIZARD)
 
 TypeScript
-// app/pelatih/page.tsx (Parent)
+// app/pelatih/page.tsx (Contoh Pola Parent Component)
 import InstructorCard from '@/components/features/InstructorCard';
 import { getInstructors } from '@services/api';
 

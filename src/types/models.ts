@@ -63,6 +63,7 @@ export interface LessonPackage {
   locationId?: string;
   type?: string;
   price: number;
+  sessionCount?: number;
   location?: PackageLocation | null;
 }
 

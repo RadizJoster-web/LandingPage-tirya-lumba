@@ -4,8 +4,9 @@ import { WhyUsFeatures } from './WhyUsFeatures';
 import { WhyUsStats } from './WhyUsStats';
 
 interface WhyUsSectionProps {
-  /** Angka nyata dari API: jumlah kolam mitra, wilayah, dan jenis kelas yang tersedia. */
   stats: {
+    totalStudents: number;
+    totalInstructors: number;
     totalPartnerPools: number;
     totalAreas: number;
     totalClassTypes: number;
