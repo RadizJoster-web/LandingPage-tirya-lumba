@@ -29,6 +29,7 @@ export interface InstructorScheduleInput {
   startTime?: string;
   endTime?: string;
   timeRange?: string;
+  totalStudents?: number;
 }
 
 export interface InstructorRegistrationPayload {
@@ -63,6 +64,7 @@ export interface StudentRegistrationSnapshot extends StudentRegistrationPayload 
   packageType: string;
   packagePrice: number;
   instructorName: string;
+  activeSessions?: number;
   photoFileName?: string;
   uploadNotice?: string;
   rejectionReason?: string | null;

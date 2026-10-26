@@ -26,6 +26,18 @@ export const StudentDetail: React.FC<{ snapshot: StudentRegistrationSnapshot }> 
       <dl className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         <DetailField label="Kolam Renang" value={snapshot.locationLabel || '-'} />
         <DetailField label="Paket Kelas" value={snapshot.packageType || '-'} />
+        <DetailField
+          label="Sisa Pertemuan"
+          value={
+            <span
+              className={`font-extrabold ${
+                (snapshot.activeSessions ?? 0) > 0 ? 'text-[#0077B6]' : 'text-rose-600'
+              }`}
+            >
+              {snapshot.activeSessions ?? 0} Sesi Pertemuan
+            </span>
+          }
+        />
         <DetailField label="Guru / Pelatih" value={snapshot.instructorName || '-'} />
         <DetailField
           label="Pertemuan Pertama"

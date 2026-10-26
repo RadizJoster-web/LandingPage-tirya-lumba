@@ -63,9 +63,8 @@ export default function DaftarMuridParent() {
   const [photoUrl, setPhotoUrl] = useState(
     studentSnapshot?.profilePictureUrl ?? user?.profilePictureUrl ?? '',
   );
-  const [paymentProofUrl, setPaymentProofUrl] = useState(
-    studentSnapshot?.paymentProofUrl ?? '',
-  );
+  // Step 3 bukti bayar selalu dikosongkan agar pengguna mengunggah bukti baru
+  const [paymentProofUrl, setPaymentProofUrl] = useState('');
 
   const form = useMuridForm(user?.email ?? '', studentSnapshot, user);
 
@@ -77,10 +76,7 @@ export default function DaftarMuridParent() {
     if (studentSnapshot?.profilePictureUrl && !photoUrl) {
       setPhotoUrl(studentSnapshot.profilePictureUrl);
     }
-    if (studentSnapshot?.paymentProofUrl && !paymentProofUrl) {
-      setPaymentProofUrl(studentSnapshot.paymentProofUrl);
-    }
-  }, [studentSnapshot, photoUrl, paymentProofUrl]);
+  }, [studentSnapshot, photoUrl]);
 
   const handleNextStep2 = async (e: React.FormEvent) => {
     e.preventDefault();

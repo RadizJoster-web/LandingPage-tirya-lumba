@@ -44,9 +44,23 @@ export const RegistrationStatus: React.FC<RegistrationStatusProps> = ({ snapshot
             </span>
           )}
           {isApproved && (
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300 bg-emerald-100/90 px-3.5 py-1 text-xs font-bold text-emerald-900 shadow-xs">
-              <span className="h-2 w-2 rounded-full bg-emerald-500" />
-              Terverifikasi & Aktif
+            <span
+              className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1 text-xs font-bold shadow-xs ${
+                isStudent && (snapshot.activeSessions ?? 0) === 0
+                  ? 'border-amber-300 bg-amber-100 text-amber-900'
+                  : 'border-emerald-300 bg-emerald-100/90 text-emerald-900'
+              }`}
+            >
+              <span
+                className={`h-2 w-2 rounded-full ${
+                  isStudent && (snapshot.activeSessions ?? 0) === 0
+                    ? 'bg-amber-500'
+                    : 'bg-emerald-500'
+                }`}
+              />
+              {isStudent && (snapshot.activeSessions ?? 0) === 0
+                ? 'Paket Selesai (0 Sesi)'
+                : 'Terverifikasi & Aktif'}
             </span>
           )}
           {isRejected && (
@@ -173,6 +187,43 @@ export const RegistrationStatus: React.FC<RegistrationStatusProps> = ({ snapshot
                   </Link>
                 </div>
               </div>
+            </div>
+          </section>
+        )}
+
+        {/* BANNER AJAKAN DAFTAR ULANG JIKA SESI LATIHAN MURID TELAH HABIS (0 SESI) */}
+        {isApproved && isStudent && (snapshot.activeSessions ?? 0) === 0 && (
+          <section className="overflow-hidden rounded-3xl border-2 border-[#00B4D8] bg-gradient-to-br from-[#E0FBFC] via-white to-sky-50/50 p-6 sm:p-8 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5">
+              <div className="flex items-start gap-4">
+                <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[#0077B6] text-2xl text-white shadow-xs">
+                  🏊‍♂️
+                </div>
+                <div>
+                  <span className="inline-block rounded-md bg-[#0077B6] px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-white">
+                    Sesi Latihan Telah Habis
+                  </span>
+                  <h2 className="mt-1 font-heading text-lg font-extrabold text-[#1D3557] sm:text-xl">
+                    Waktunya Melanjutkan Latihan Renang Anda!
+                  </h2>
+                  <p className="mt-1 text-xs sm:text-sm text-slate-600 leading-relaxed max-w-xl">
+                    Paket latihan Anda sebelumnya telah selesai (0 pertemuan tersisa). Silakan
+                    lakukan pendaftaran ulang untuk memilih paket dan jadwal latihan baru. Data diri
+                    Anda telah tersimpan dan akan terisi secara otomatis.
+                  </p>
+                </div>
+              </div>
+
+              <Link href="/daftar/murid" className="shrink-0 self-start sm:self-auto">
+                <Button
+                  variant="primary"
+                  size="md"
+                  isFullRounded={true}
+                  className="w-full sm:w-auto shadow-md"
+                >
+                  🔄 Daftar Ulang Sekarang
+                </Button>
+              </Link>
             </div>
           </section>
         )}

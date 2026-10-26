@@ -37,7 +37,16 @@ export const StudentScheduleCard: React.FC<StudentScheduleCardProps> = ({
           </div>
         </div>
 
-        <div className="self-start sm:self-auto">
+        <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+          <span
+            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold ${
+              (snapshot.activeSessions ?? 0) > 0
+                ? 'bg-sky-100 text-[#0077B6] border border-sky-300'
+                : 'bg-rose-100 text-rose-800 border border-rose-300'
+            }`}
+          >
+            <span>🏊</span> Sisa: {snapshot.activeSessions ?? 0} Pertemuan
+          </span>
           <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             Jadwal Terjadwal
@@ -120,6 +129,25 @@ export const StudentScheduleCard: React.FC<StudentScheduleCardProps> = ({
                   </div>
                   <span className="text-xs font-bold text-slate-700 bg-white px-2 py-0.5 rounded-md border border-slate-200">
                     {snapshot.packageType || 'Reguler'}
+                  </span>
+                </div>
+
+                {/* Sisa Pertemuan Aktif */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-[#0077B6]">🎫</span>
+                    <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                      Sisa Pertemuan
+                    </span>
+                  </div>
+                  <span
+                    className={`text-xs font-extrabold px-2.5 py-0.5 rounded-md border ${
+                      (snapshot.activeSessions ?? 0) > 0
+                        ? 'bg-sky-50 text-[#0077B6] border-sky-200'
+                        : 'bg-rose-50 text-rose-700 border-rose-200'
+                    }`}
+                  >
+                    {snapshot.activeSessions ?? 0} Sesi Latihan
                   </span>
                 </div>
               </div>

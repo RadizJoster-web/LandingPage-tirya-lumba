@@ -15,6 +15,7 @@ interface NormalizedScheduleItem {
   timeRange: string;
   startTime?: string;
   endTime?: string;
+  totalStudents?: number;
 }
 
 const DAYS_ORDER = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
@@ -39,6 +40,7 @@ export const ScheduleHighlightCard: React.FC<ScheduleHighlightCardProps> = ({
           timeRange,
           startTime: s.startTime,
           endTime: s.endTime,
+          totalStudents: s.totalStudents ?? 0,
         };
       });
     }
@@ -191,13 +193,20 @@ export const ScheduleHighlightCard: React.FC<ScheduleHighlightCardProps> = ({
                         </span>
                       </div>
 
-                      {/* Disusul dengan Lokasi Mengajar */}
-                      <div className="mt-2 flex items-center gap-1.5 text-xs text-slate-600">
-                        <span className="text-slate-400">📍</span>
-                        <span className="truncate font-medium">
-                          {item.locationName.toLowerCase().startsWith('kolam')
-                            ? item.locationName
-                            : `Kolam Renang ${item.locationName}`}
+                      {/* Disusul dengan Lokasi Mengajar & Total Murid */}
+                      <div className="mt-2.5 flex items-center justify-between gap-2 border-t border-slate-200/60 pt-2 text-xs">
+                        <div className="flex items-center gap-1.5 text-slate-600 truncate min-w-0">
+                          <span className="text-slate-400">📍</span>
+                          <span className="truncate font-medium">
+                            {item.locationName.toLowerCase().startsWith('kolam')
+                              ? item.locationName
+                              : `Kolam Renang ${item.locationName}`}
+                          </span>
+                        </div>
+
+                        <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[#E0FBFC] px-2.5 py-0.5 text-[11px] font-bold text-[#0077B6] ring-1 ring-[#0077B6]/20">
+                          <span>👥</span>
+                          <span>{item.totalStudents ?? 0} Murid</span>
                         </span>
                       </div>
                     </div>

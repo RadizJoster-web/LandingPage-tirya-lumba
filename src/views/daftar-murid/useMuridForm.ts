@@ -29,23 +29,17 @@ export function useMuridForm(
   const [schoolOrOffice, setSchoolOrOffice] = useState(initialSnapshot?.schoolOrOffice || '');
   const [shirtSize, setShirtSize] = useState<ShirtSize>(initialSnapshot?.tshirtSize || 'M');
 
-  // Step 2
+  // Step 2 - Dikosongkan untuk pemilihan baru saat daftar ulang / revisi
   const [areaId, setAreaId] = useState('');
-  const [locationId, setLocationId] = useState(initialSnapshot?.locationId || '');
-  const [packageId, setPackageId] = useState(initialSnapshot?.packageId || '');
-  const [firstMeetDate, setFirstMeetDate] = useState(initialSnapshot?.firstMeetDate || '');
-  const [sessionName, setSessionName] = useState(initialSnapshot?.firstMeetSession || '');
-  const [instructorId, setInstructorId] = useState(initialSnapshot?.instructorId || '');
+  const [locationId, setLocationId] = useState('');
+  const [packageId, setPackageId] = useState('');
+  const [firstMeetDate, setFirstMeetDate] = useState('');
+  const [sessionName, setSessionName] = useState('');
+  const [instructorId, setInstructorId] = useState('');
   const [photoFile, setPhotoFile] = useState<File | null>(null);
 
-  // Step 3
-  const initialPaymentMethod: PaymentMethod =
-    initialSnapshot?.paymentMethod === 'BANK_TRANSFER'
-      ? 'Transfer Bank'
-      : initialSnapshot?.paymentMethod === 'CASH'
-        ? 'Cash'
-        : 'QRIS';
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(initialPaymentMethod);
+  // Step 3 - Dikosongkan untuk pembayaran baru
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('Transfer Bank');
   const [paymentProofFile, setPaymentProofFile] = useState<File | null>(null);
 
   // Flag apakah data dari snapshot sudah di-sinkronkan saat pertama kali
@@ -54,6 +48,7 @@ export function useMuridForm(
   useEffect(() => {
     if (initializedRef.current) return;
     if (initialSnapshot) {
+      // Step 1: Terisi penuh dari data pendaftaran / profil sebelumnya
       if (initialSnapshot.fullName) setName(initialSnapshot.fullName);
       if (initialSnapshot.phone) setPhone(initialSnapshot.phone);
       if (initialSnapshot.birthPlace) setBirthPlace(initialSnapshot.birthPlace);
@@ -65,21 +60,8 @@ export function useMuridForm(
       if (initialSnapshot.schoolOrOffice) setSchoolOrOffice(initialSnapshot.schoolOrOffice);
       if (initialSnapshot.tshirtSize) setShirtSize(initialSnapshot.tshirtSize);
 
-      if (initialSnapshot.locationId) setLocationId(initialSnapshot.locationId);
-      if (initialSnapshot.packageId) setPackageId(initialSnapshot.packageId);
-      if (initialSnapshot.firstMeetDate) setFirstMeetDate(initialSnapshot.firstMeetDate);
-      if (initialSnapshot.firstMeetSession) setSessionName(initialSnapshot.firstMeetSession);
-      if (initialSnapshot.instructorId) setInstructorId(initialSnapshot.instructorId);
-
-      if (initialSnapshot.paymentMethod) {
-        setPaymentMethod(
-          initialSnapshot.paymentMethod === 'BANK_TRANSFER'
-            ? 'Transfer Bank'
-            : initialSnapshot.paymentMethod === 'CASH'
-              ? 'Cash'
-              : 'QRIS',
-        );
-      }
+      // Step 2 & 3 sengaja dikosongkan agar murid bebas memilih kolam, paket, jadwal,
+      // dan pembayaran baru saat daftar ulang atau setelah pendaftaran ditolak.
       initializedRef.current = true;
     } else if (currentUser) {
       if (currentUser.fullName && !name) setName(currentUser.fullName);
