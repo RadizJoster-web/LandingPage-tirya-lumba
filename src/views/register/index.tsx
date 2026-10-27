@@ -35,9 +35,9 @@ export default function RegisterParent() {
       setError('Masukkan alamat email yang valid.');
       return;
     }
-    
+
     const minPassword = 6;
-    const maxPassword = 12
+    const maxPassword = 12;
     if (password.length < minPassword) {
       setError('Password minimal 6 karakter.');
       return;
@@ -56,7 +56,7 @@ export default function RegisterParent() {
       });
       setEmail(target || email);
       setStep('otp');
-      setInfo('Kode OTP sudah dikirim ke email Anda.');
+      setInfo('Kode OTP telah dikirimkan ke email Anda.');
     } catch (err) {
       setError(toErrorMessage(err));
     } finally {
@@ -69,7 +69,7 @@ export default function RegisterParent() {
     setInfo('');
 
     if (otpCode.length !== 6) {
-      setError('Kode OTP terdiri dari 6 digit.');
+      setError('Kode OTP harus terdiri dari 6 digit.');
       return;
     }
 
@@ -89,7 +89,7 @@ export default function RegisterParent() {
     setIsLoading(true);
     try {
       await register({ fullName: fullName.trim(), email, password });
-      setInfo('Kode OTP baru telah dikirim ulang.');
+      setInfo('Kode OTP baru telah dikirimkan ulang.');
     } catch (err) {
       setError(toErrorMessage(err));
     } finally {
@@ -98,9 +98,9 @@ export default function RegisterParent() {
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-[#F3F4F6]">
+    <div className="min-h-[85vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-[#F8F9FA] dark:bg-slate-950">
       <div className="max-w-md w-full">
-        <Card variant="form" className="p-6 sm:p-8">
+        <Card variant="form" className="p-7 sm:p-8">
           {step === 'form' ? (
             <>
               <RegisterHeader />

@@ -50,9 +50,9 @@ export default function LoginParent() {
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[#E0FBFC]/30 to-[#F8F9FA]">
+    <div className="min-h-[85vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-[#F8F9FA] dark:bg-slate-950">
       <div className="w-full max-w-md">
-        <Card variant="form" className="p-8">
+        <Card variant="form" className="p-7 sm:p-8">
           <LoginHeader justVerified={justVerified} />
           <LoginForm
             email={email}

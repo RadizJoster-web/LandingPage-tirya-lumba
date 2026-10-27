@@ -7,6 +7,7 @@ import { request, toErrorMessage } from '@/lib/http';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
+import { Eye, EyeOff, CheckCircle2, AlertCircle, ArrowLeft } from 'lucide-react';
 
 export default function ResetPasswordView() {
   const router = useRouter();
@@ -25,7 +26,7 @@ export default function ResetPasswordView() {
     setError('');
 
     if (!token) {
-      setError('Token reset kata sandi tidak ditemukan atau tautan tidak valid.');
+      setError('Token reset kata sandi tidak ditemukan atau tautan sudah kedaluwarsa.');
       return;
     }
 
@@ -60,80 +61,62 @@ export default function ResetPasswordView() {
     <button
       type="button"
       onClick={() => setShowPassword(!showPassword)}
-      className="text-slate-400 hover:text-[#0077B6] p-1 transition-colors"
+      className="p-1 text-slate-400 hover:text-slate-600 transition-colors"
       title={showPassword ? 'Sembunyikan password' : 'Lihat password'}
       aria-label={showPassword ? 'Sembunyikan password' : 'Lihat password'}
     >
-      {showPassword ? (
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={1.8}
-            d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"
-          />
-        </svg>
-      ) : (
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={1.8}
-            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-          />
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={1.8}
-            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-          />
-        </svg>
-      )}
+      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
     </button>
   );
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[#E0FBFC]/30 to-[#F8F9FA]">
+    <div className="min-h-[85vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-[#F8F9FA] dark:bg-slate-950">
       <div className="w-full max-w-md">
-        <Card variant="form" className="p-8">
-          <div className="text-center mb-6">
-            <div className="w-12 h-12 rounded-2xl bg-[#E0FBFC] text-[#0077B6] grid place-items-center text-2xl mx-auto mb-3 shadow-xs">
-              🔒
-            </div>
-            <h1 className="font-heading text-2xl font-extrabold text-[#1D3557]">
-              Atur Ulang Kata Sandi
+        <Card variant="form" className="p-7 sm:p-8">
+          <div className="text-center mb-7">
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 block mb-2">
+              Keamanan Akun
+            </span>
+            <h1 className="font-heading font-bold text-2xl sm:text-3xl text-[#1D3557] tracking-tight dark:text-slate-100">
+              Atur Kata Sandi Baru
             </h1>
             <p className="text-slate-500 text-xs sm:text-sm mt-1.5 leading-relaxed">
-              Buat kata sandi baru yang aman untuk akun Anda.
+              Buat kata sandi baru yang kuat untuk akun Tirya Lumba Anda
             </p>
           </div>
 
           {!token ? (
             <div className="space-y-4">
-              <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs sm:text-sm leading-relaxed">
-                Tautan tidak memiliki token valid. Pastikan Anda membuka tautan lengkap yang dikirimkan ke email Anda.
+              <div className="p-4 rounded-xl bg-amber-50 border border-amber-200/80 text-amber-800 text-xs sm:text-sm leading-relaxed flex items-start gap-2.5">
+                <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                <span>
+                  Tautan tidak memiliki token valid. Pastikan Anda membuka tautan lengkap yang kami kirimkan ke kotak masuk email Anda.
+                </span>
               </div>
               <Link href="/forgot-password">
-                <Button variant="outline" size="md" isFullRounded={true} className="w-full">
+                <Button variant="outline" size="md" isFullRounded={false} className="w-full">
                   Minta Tautan Baru
                 </Button>
               </Link>
             </div>
           ) : success ? (
             <div className="space-y-5 animate-fade-in text-center">
-              <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm">
-                <p className="font-bold text-base">Berhasil Diperbarui!</p>
-                <p className="mt-1 text-xs text-emerald-700 leading-relaxed">
-                  Kata sandi akun Anda telah berhasil diubah. Silakan masuk kembali menggunakan kata sandi baru.
-                </p>
+              <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200/80 text-emerald-800 text-xs sm:text-sm flex items-start gap-3 text-left">
+                <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-bold text-emerald-950">Kata Sandi Berhasil Diperbarui</p>
+                  <p className="mt-1 text-xs text-emerald-700 leading-relaxed">
+                    Kata sandi akun Anda telah berhasil diubah. Silakan masuk kembali menggunakan kata sandi baru Anda.
+                  </p>
+                </div>
               </div>
 
               <Button
                 type="button"
                 variant="primary"
                 size="md"
-                isFullRounded={true}
-                className="w-full"
+                isFullRounded={false}
+                className="w-full font-semibold"
                 onClick={() => router.push('/login')}
               >
                 Masuk Sekarang
@@ -168,8 +151,9 @@ export default function ResetPasswordView() {
               </div>
 
               {error && (
-                <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-xs font-semibold text-[#FF6F59]">
-                  {error}
+                <div className="p-3 rounded-lg bg-rose-50 border border-rose-200/80 text-xs font-medium text-rose-700 flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
+                  <span>{error}</span>
                 </div>
               )}
 
@@ -177,8 +161,8 @@ export default function ResetPasswordView() {
                 type="submit"
                 variant="primary"
                 size="md"
-                isFullRounded={true}
-                className="w-full mt-2"
+                isFullRounded={false}
+                className="w-full mt-2 font-semibold"
                 isLoading={isLoading}
               >
                 Simpan Kata Sandi Baru
@@ -187,9 +171,10 @@ export default function ResetPasswordView() {
               <div className="text-center pt-2">
                 <Link
                   href="/login"
-                  className="text-xs font-semibold text-slate-500 hover:text-[#0077B6] transition-colors"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-[#0077B6] transition-colors"
                 >
-                  ← Batal dan Kembali ke Login
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                  Batal dan Kembali ke Login
                 </Link>
               </div>
             </form>
