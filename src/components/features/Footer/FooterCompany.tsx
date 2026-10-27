@@ -1,4 +1,5 @@
 import React from 'react';
+import { MapPin, Phone, Mail } from 'lucide-react';
 
 export const FooterCompany: React.FC = () => {
   return (
@@ -24,17 +25,20 @@ export const FooterCompany: React.FC = () => {
         </span>
       </div>
       <p className="text-sm text-slate-300 leading-relaxed max-w-md">
-        Pusat pelatihan renang profesional untuk semua usia di Tangerang Raya. Menghadirkan pelatih berlisensi PRSI dengan metode bertahap dan lokasi kolam mitra terdekat.
+        Pusat pelatihan renang profesional untuk semua usia di Tangerang Raya. Menghadirkan pelatih berlisensi PRSI dengan kurikulum bertahap dan lokasi kolam mitra terdekat.
       </p>
-      <div className="text-xs text-slate-400 space-y-1.5 pt-1">
+      <div className="text-xs text-slate-400 space-y-2 pt-2">
         <p className="flex items-center gap-2">
-          <span>📍</span> Jl. Boulevard Raya No. 8, Tangerang, Banten
+          <MapPin className="w-3.5 h-3.5 text-[#00B4D8] shrink-0" />
+          Jl. Boulevard Raya No. 8, Tangerang, Banten
         </p>
         <p className="flex items-center gap-2">
-          <span>📞</span> 0812-3456-7890 (Customer Service)
+          <Phone className="w-3.5 h-3.5 text-[#00B4D8] shrink-0" />
+          0812-3456-7890 (Customer Service)
         </p>
         <p className="flex items-center gap-2">
-          <span>✉️</span> halo@tiryalumba.id
+          <Mail className="w-3.5 h-3.5 text-[#00B4D8] shrink-0" />
+          halo@tiryalumba.id
         </p>
       </div>
     </div>

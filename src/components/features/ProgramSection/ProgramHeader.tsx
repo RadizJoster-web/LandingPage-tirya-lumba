@@ -12,15 +12,15 @@ export const ProgramHeader: React.FC<ProgramHeaderProps> = ({
   return (
     <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
       <div>
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-white text-[#0077B6] border border-[#00B4D8]/30 mb-3 shadow-xs">
-          <span>🏊‍♂️</span> Paket Kelas Renang
-        </div>
-        <h2 className="font-heading font-extrabold text-3xl sm:text-4xl text-[#0077B6] tracking-tight">
-          Program &amp; Paket Les
+        <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 block mb-2">
+          Katalog Kolam Mitra
+        </span>
+        <h2 className="font-heading font-bold text-2xl sm:text-3xl lg:text-[32px] text-[#1D3557] tracking-tight">
+          Program &amp; Kolam Renang
         </h2>
-        <p className="mt-2 text-slate-600 text-sm sm:text-base max-w-xl">
+        <p className="mt-2 text-slate-500 text-sm sm:text-base max-w-xl">
           {totalRegulerCount > 0
-            ? `${totalRegulerCount} paket Reguler aktif dari kolam mitra Tangerang Raya, lengkap dengan harganya.`
+            ? `Pilih dari ${totalRegulerCount} kolam renang mitra aktif di Tangerang Raya dengan fasilitas terstandarisasi.`
             : 'Paket kelas renang belum tersedia. Silakan cek kembali dalam beberapa saat.'}
         </p>
       </div>
@@ -30,7 +30,7 @@ export const ProgramHeader: React.FC<ProgramHeaderProps> = ({
           variant="primary"
           size="md"
           isFullRounded={true}
-          className="shadow-md"
+          className="shadow-sm"
         >
           Daftar Sebagai Murid
         </Button>

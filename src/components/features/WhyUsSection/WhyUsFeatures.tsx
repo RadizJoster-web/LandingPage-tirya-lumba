@@ -1,44 +1,42 @@
 import React from 'react';
-import { Card } from '@/components/ui/Card';
 
 export const WhyUsFeatures: React.FC = () => {
+  const features = [
+    {
+      title: 'Instruktur Berlisensi Resmi',
+      description:
+        'Seluruh pelatih renang kami telah terverifikasi secara ketat: lisensi kepelatihan, rekam jejak pengajaran, dan dedikasi pedagogis.',
+    },
+    {
+      title: 'Jadwal & Lokasi Fleksibel',
+      description:
+        'Pilih kolam renang mitra terdekat, hari, dan sesi waktu latihan yang paling sesuai dengan jadwal harian Anda secara real-time.',
+    },
+    {
+      title: 'Kurikulum Aman & Terukur',
+      description:
+        'Metode bimbingan bertahap dari adaptasi air untuk pemula hingga pembinaan teknik dan stamina atlet tanpa risiko jadwal bentrok.',
+    },
+  ];
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-14 text-left">
-      <Card variant="landing" className="flex flex-col gap-3">
-        <div className="w-12 h-12 rounded-2xl bg-[#E0FBFC] text-[#0077B6] flex items-center justify-center text-2xl font-bold">
-          🎓
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 text-left">
+      {features.map((item, idx) => (
+        <div
+          key={item.title}
+          className="rounded-2xl bg-white/70 backdrop-blur-xs p-6 sm:p-7 border border-slate-200/60 shadow-sm dark:bg-slate-900/60 dark:border-slate-800"
+        >
+          <span className="text-xs font-bold text-[#00B4D8] font-heading block mb-3">
+            0{idx + 1}
+          </span>
+          <h3 className="font-heading font-bold text-lg text-[#1D3557] mb-2 dark:text-slate-100">
+            {item.title}
+          </h3>
+          <p className="text-xs sm:text-sm text-slate-500 leading-relaxed dark:text-slate-400">
+            {item.description}
+          </p>
         </div>
-        <h3 className="font-heading font-bold text-xl text-[#0077B6]">
-          Guru Berkualitas &amp; Berlisensi
-        </h3>
-        <p className="text-sm text-slate-600 leading-relaxed">
-          Setiap pelatih yang tampil di sistem sudah terverifikasi admin: lisensi pelatih, pengalaman mengajar, dan jadwal ketersediaannya tercatat resmi.
-        </p>
-      </Card>
-
-      <Card variant="landing" className="flex flex-col gap-3">
-        <div className="w-12 h-12 rounded-2xl bg-[#E0FBFC] text-[#0077B6] flex items-center justify-center text-2xl font-bold">
-          🕒
-        </div>
-        <h3 className="font-heading font-bold text-xl text-[#0077B6]">
-          Jadwal &amp; Lokasi Fleksibel
-        </h3>
-        <p className="text-sm text-slate-600 leading-relaxed">
-          Pilih kolam terdekat, hari, dan sesi jam les langsung dari jadwal asli pada sistem. Pelatih yang muncul sudah otomatis tersaring sesuai pilihanmu.
-        </p>
-      </Card>
-
-      <Card variant="landing" className="flex flex-col gap-3">
-        <div className="w-12 h-12 rounded-2xl bg-[#E0FBFC] text-[#0077B6] flex items-center justify-center text-2xl font-bold">
-          🛡️
-        </div>
-        <h3 className="font-heading font-bold text-xl text-[#0077B6]">
-          Kurikulum Aman &amp; Terarah
-        </h3>
-        <p className="text-sm text-slate-600 leading-relaxed">
-          Metode pengajaran bertahap dari pemula sampai gaya kompetisi. Status pendaftaran dan verifikasi tercatat digital tanpa jadwal bentrok.
-        </p>
-      </Card>
+      ))}
     </div>
   );
 };

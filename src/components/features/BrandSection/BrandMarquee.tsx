@@ -4,15 +4,16 @@ const BRANDS = [
   'AquaGear',
   'SpeedoPro',
   'Dispora Tangerang',
-  'PRSI',
+  'PRSI Banten',
   'HydroFit',
   'Tirta Sehat',
+  'Dolphin Club',
+  'Arena Pro',
 ];
 
-/** Marquee dua salinan identik agar loop mulus; hover menghentikan animasi. */
 export const BrandMarquee: React.FC = () => {
   return (
-    <div className="flex w-max animate-marquee group-hover:[animation-play-state:paused]">
+    <div className="flex w-max animate-marquee group-hover:[animation-play-state:paused] py-3">
       {[0, 1].map((copy) => (
         <ul
           key={copy}
@@ -22,7 +23,7 @@ export const BrandMarquee: React.FC = () => {
           {BRANDS.map((brand) => (
             <li
               key={brand}
-              className="px-8 sm:px-12 font-heading font-extrabold text-lg sm:text-2xl text-[#0077B6] whitespace-nowrap hover:text-[#00B4D8] transition-colors"
+              className="px-8 sm:px-14 font-heading font-bold text-lg sm:text-xl text-slate-400 whitespace-nowrap opacity-60 grayscale hover:opacity-100 hover:grayscale-0 hover:text-[#0077B6] transition-all duration-300 cursor-default select-none tracking-tight"
             >
               {brand}
             </li>

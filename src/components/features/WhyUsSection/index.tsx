@@ -15,7 +15,7 @@ interface WhyUsSectionProps {
 
 export const WhyUsSection: React.FC<WhyUsSectionProps> = ({ stats }) => {
   return (
-    <section id="kenapa-pilih-kami" className="py-24 bg-[#E0FBFC]/40 scroll-mt-16">
+    <section id="kenapa-pilih-kami" className="py-20 lg:py-28 bg-[#F8F9FA] scroll-mt-16 dark:bg-slate-950 border-t border-slate-100 dark:border-slate-800">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <WhyUsHeader />
         <WhyUsFeatures />

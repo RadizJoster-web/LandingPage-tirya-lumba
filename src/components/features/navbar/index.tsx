@@ -20,21 +20,29 @@ export const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-[#0077B6]/10 transition-all">
+    <nav className="sticky top-0 z-50 bg-white/75 backdrop-blur-md border-b border-slate-200/60 transition-all dark:bg-slate-900/80 dark:border-slate-800">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-[68px]">
-          <BrandLogo />
-          <NavigationList />
-          <AuthProfile
-            user={user}
-            registration={registration}
-            isLoading={isLoading}
-            onLogout={handleLogout}
-          />
-          <MobileToggle
-            isOpen={isMobileMenuOpen}
-            onToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          />
+          <div className="flex items-center gap-8">
+            <BrandLogo />
+          </div>
+
+          <div className="hidden md:flex flex-1 justify-center">
+            <NavigationList />
+          </div>
+
+          <div className="flex items-center gap-3">
+            <AuthProfile
+              user={user}
+              registration={registration}
+              isLoading={isLoading}
+              onLogout={handleLogout}
+            />
+            <MobileToggle
+              isOpen={isMobileMenuOpen}
+              onToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            />
+          </div>
         </div>
       </div>
 

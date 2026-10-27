@@ -1,77 +1,86 @@
 import React from 'react';
+import { Badge } from '@/components/ui/Badge';
+import { ArrowUpRight } from 'lucide-react';
 
-export const HeroGraphic: React.FC = () => {
+interface HeroGraphicProps {
+  totalPartnerPools: number;
+}
+
+export const HeroGraphic: React.FC<HeroGraphicProps> = ({ totalPartnerPools }) => {
+  const displayPools = totalPartnerPools > 0 ? totalPartnerPools : 12;
+
   return (
     <div className="lg:col-span-5 flex justify-center">
+      {/* Layered floating outer container (inspired by style.jpg) */}
       <div className="relative w-full max-w-md">
-        {/* Glassmorphic card illustration wrapper */}
-        <div className="relative rounded-3xl bg-gradient-to-tr from-[#0077B6] via-[#00B4D8] to-[#90e0ef] p-6 shadow-2xl shadow-blue-900/20 text-white overflow-hidden">
-          <div className="absolute -right-8 -top-8 w-36 h-36 bg-white/10 rounded-full blur-xl" />
-          <div className="absolute -left-8 -bottom-8 w-40 h-40 bg-[#FF6F59]/30 rounded-full blur-2xl" />
-
-          <div className="relative z-10 space-y-6">
-            {/* Decorative Waves SVG */}
-            <div className="h-44 sm:h-52 flex items-center justify-center">
-              <svg viewBox="0 0 320 200" className="w-full h-full drop-shadow-md">
-                <defs>
-                  <linearGradient id="waveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="#ffffff" stopOpacity="0.8" />
-                    <stop offset="100%" stopColor="#ffffff" stopOpacity="0.3" />
-                  </linearGradient>
-                </defs>
-                <path
-                  d="M 10,80 Q 80,40 160,80 T 310,80"
-                  fill="none"
-                  stroke="url(#waveGrad)"
-                  strokeWidth="5"
-                  strokeLinecap="round"
-                />
-                <path
-                  d="M 10,120 Q 80,80 160,120 T 310,120"
-                  fill="none"
-                  stroke="url(#waveGrad)"
-                  strokeWidth="4"
-                  strokeLinecap="round"
-                />
-                <path
-                  d="M 10,160 Q 80,120 160,160 T 310,160"
-                  fill="none"
-                  stroke="url(#waveGrad)"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                />
-                {/* Swimming circle / float ring */}
-                <circle cx="240" cy="50" r="22" fill="#FF6F59" opacity="0.9" />
-                <circle cx="240" cy="50" r="12" fill="#ffffff" />
-              </svg>
+        <div className="rounded-3xl bg-[#E0FBFC]/40 p-5 sm:p-7 border border-slate-200/60 shadow-lg shadow-blue-900/5 relative">
+          {/* Main Hero Showcase Card */}
+          <div className="bg-white rounded-2xl p-6 sm:p-7 shadow-lg shadow-blue-950/5 border border-slate-100">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                Jaringan Kolam Mitra
+              </span>
+              <Badge variant="azure" size="sm">
+                Aktif
+              </Badge>
             </div>
 
-            <div className="bg-white/20 backdrop-blur-md rounded-2xl p-4 border border-white/30 text-white">
-              <div className="flex items-center justify-between">
-                <span className="text-xs uppercase font-bold tracking-wider text-blue-100">
-                  Metode Belajar
-                </span>
-                <span className="text-xs bg-[#FF6F59] px-2.5 py-0.5 rounded-full font-bold">
-                  PRSI Standard
-                </span>
+            <div className="mt-4">
+              <div className="text-4xl sm:text-5xl font-extrabold tracking-tight text-[#0077B6] font-heading tabular-nums">
+                {displayPools}
               </div>
-              <p className="mt-1 text-sm font-semibold">
-                Pengenalan Air → Gaya Dada → Bebas → Prestasi
+              <p className="mt-1 text-sm font-medium text-[#1D3557]">
+                Lokasi Kolam di Tangerang Raya
               </p>
             </div>
-          </div>
-        </div>
 
-        {/* Floating review card */}
-        <div className="absolute -bottom-6 -left-4 bg-white/95 backdrop-blur-md rounded-2xl p-3.5 shadow-xl border border-blue-50 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-[#E0FBFC] flex items-center justify-center text-lg">
-            🏊
+            {/* Inner Comparison / Spec Row */}
+            <div className="mt-6 pt-5 border-t border-slate-100 grid grid-cols-2 gap-4">
+              <div>
+                <span className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                  Kurikulum
+                </span>
+                <p className="text-sm font-bold text-[#1D3557] mt-0.5">
+                  Standar PRSI
+                </p>
+              </div>
+              <div>
+                <span className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                  Kategori
+                </span>
+                <p className="text-sm font-bold text-[#1D3557] mt-0.5">
+                  Reguler &amp; Privat
+                </p>
+              </div>
+            </div>
           </div>
-          <div>
-            <div className="flex text-amber-400 text-xs">★★★★★</div>
-            <p className="text-xs font-bold text-[#1D3557]">
-              Pendaftaran 100% Online
+
+          {/* Floating Metric Badge 1 (Top-right overlap) */}
+          <div className="absolute -top-5 -right-3 sm:-right-5 bg-white/95 backdrop-blur-md rounded-2xl p-4 shadow-xl shadow-blue-950/10 border border-slate-100/90 hidden sm:block animate-fade-in">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-500" />
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                Pendaftaran
+              </span>
+            </div>
+            <p className="text-base font-extrabold text-[#1D3557] mt-1 font-heading">
+              100% Online
             </p>
+          </div>
+
+          {/* Floating Metric Badge 2 (Bottom-left overlap) */}
+          <div className="absolute -bottom-5 -left-3 sm:-left-5 bg-white/95 backdrop-blur-md rounded-2xl p-4 shadow-xl shadow-blue-950/10 border border-slate-100/90 flex items-center gap-4 animate-fade-in">
+            <div>
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                Pelatih Resmi
+              </span>
+              <p className="text-sm font-bold text-[#1D3557] font-heading mt-0.5">
+                Bersertifikat PRSI
+              </p>
+            </div>
+            <div className="w-8 h-8 rounded-full bg-[#E0FBFC] flex items-center justify-center text-[#0077B6]">
+              <ArrowUpRight className="w-4 h-4" />
+            </div>
           </div>
         </div>
       </div>
