@@ -8,9 +8,11 @@ import { DAYS_ID } from '@/lib/constants';
 import { request, toErrorMessage } from '@/lib/http';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
 import { RescheduleHeader } from './RescheduleHeader';
 import { PoolSelectionList } from '../daftar-guru/PoolSelectionList';
 import { ScheduleMatrixTable } from '../daftar-guru/ScheduleMatrixTable';
+import { Clock, CheckCircle2, AlertCircle, Save, ArrowLeft } from 'lucide-react';
 
 interface RescheduleStatusData {
   canReschedule: boolean;
@@ -198,7 +200,7 @@ export default function AturUlangJadwalParent() {
     // Jangan izinkan hapus sesi jika sedang terisi murid aktif
     if (activeStudentSlots.has(key) && selectedSlots.includes(key)) {
       setErrorMsg(
-        'Sesi ini tidak dapat dihapus karena ada murid aktif yang dijadwalkan pada jam tersebut.',
+        'Sesi ini tidak dapat dihapus karena terdapat murid aktif yang dijadwalkan pada jam tersebut.',
       );
       return;
     }
@@ -214,13 +216,13 @@ export default function AturUlangJadwalParent() {
     setNotification('');
 
     if (!rescheduleData?.canReschedule) {
-      setErrorMsg('Kesempatan reschedule bulan ini sudah habis. Silakan coba lagi bulan depan.');
+      setErrorMsg('Kesempatan atur ulang jadwal bulan ini sudah digunakan.');
       return;
     }
 
     // Aturan revisi: Guru tidak boleh menghapus semua jadwal, minimal ada 1 sesi dia ngajar
     if (selectedSlots.length < 1) {
-      setErrorMsg('Guru tidak boleh menghapus semua jadwal, minimal harus ada 1 sesi jadwal mengajar.');
+      setErrorMsg('Minimal harus menyisakan 1 sesi jadwal mengajar aktif.');
       return;
     }
 
@@ -252,7 +254,7 @@ export default function AturUlangJadwalParent() {
   if (authLoading || isPageLoading) {
     return (
       <div className="min-h-[70vh] flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-[#00B4D8] border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-3 border-[#00B4D8] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -275,48 +277,47 @@ export default function AturUlangJadwalParent() {
     : null;
 
   return (
-    <div className="min-h-[85vh] py-10 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[#E0FBFC]/50 via-[#F8F9FA] to-white">
+    <div className="min-h-[85vh] py-10 px-4 sm:px-6 lg:px-8 bg-[#F3F4F6] dark:bg-slate-950">
       <div className="max-w-4xl mx-auto space-y-6">
         <RescheduleHeader notification={notification} />
 
-        {/* KARTU TOKEN & STATUS KESEMPATAN RESCHEDULE (1 KALI PER BULAN) */}
+        {/* Status Token Bulanan Atur Ulang (1x per 30 hari) */}
         <div
-          className={`rounded-2xl border p-5 shadow-xs transition-all ${
+          className={`rounded-xl border p-5 shadow-xs transition-all ${
             canReschedule
-              ? 'border-emerald-200 bg-emerald-50/80 text-emerald-950'
-              : 'border-amber-200 bg-amber-50/80 text-amber-950'
+              ? 'border-emerald-200/80 bg-emerald-50/80 text-emerald-950 dark:bg-emerald-950/20 dark:border-emerald-800'
+              : 'border-amber-200/80 bg-amber-50/80 text-amber-950 dark:bg-amber-950/20 dark:border-amber-800'
           }`}
         >
           <div className="flex items-start gap-3.5">
-            <span className="text-2xl">{canReschedule ? '✨' : '⏳'}</span>
+            {canReschedule ? (
+              <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+            ) : (
+              <Clock className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+            )}
             <div className="space-y-1.5 flex-1">
               <div className="flex items-center justify-between gap-2 flex-wrap">
                 <h3 className="font-heading font-bold text-sm sm:text-base">
                   {canReschedule
-                    ? 'Token Kesempatan Atur Ulang: 1/1 Tersedia'
-                    : 'Kesempatan Atur Ulang Bulan Ini Sudah Digunakan'}
+                    ? 'Token Atur Ulang Jadwal: 1/1 Tersedia'
+                    : 'Token Atur Ulang Bulan Ini Telah Digunakan'}
                 </h3>
-                <span
-                  className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${
-                    canReschedule
-                      ? 'bg-emerald-200 text-emerald-900'
-                      : 'bg-amber-200 text-amber-900'
-                  }`}
+                <Badge
+                  variant={canReschedule ? 'success' : 'coral'}
+                  size="sm"
+                  className={!canReschedule ? 'bg-amber-100 text-amber-900 border-amber-300' : ''}
                 >
-                  {canReschedule ? 'Tersedia' : '0 Kesempatan Tersisa'}
-                </span>
+                  {canReschedule ? 'Dapat Mengubah Jadwal' : 'Terkunci'}
+                </Badge>
               </div>
               <p className="text-xs sm:text-sm leading-relaxed opacity-90">
                 {canReschedule ? (
                   <>
-                    Pelatih memiliki kuota <strong>1 kali atur ulang jadwal per 1 bulan</strong> yang
-                    akan otomatis ter-reset setelah 1 bulan. Tentukan perubahan ketersediaan kolam dan sesi mengajar Anda di bawah ini.
+                    Pelatih memiliki hak penyesuaian <strong>1 kali per 30 hari</strong>. Sesi yang telah memiliki murid aktif akan terkunci otomatis dan tidak dapat dihapus.
                   </>
                 ) : (
                   <>
-                    Jadwal terakhir diperbarui pada tanggal <strong>{lastRescheduledFormatted}</strong>.
-                    Kesempatan atur ulang berikutnya akan otomatis terbuka pada tanggal{' '}
-                    <strong>{nextAvailableFormatted}</strong>.
+                    Jadwal terakhir diperbarui pada <strong>{lastRescheduledFormatted}</strong>. Kesempatan atur ulang berikutnya akan terbuka kembali pada <strong>{nextAvailableFormatted}</strong>.
                   </>
                 )}
               </p>
@@ -324,17 +325,17 @@ export default function AturUlangJadwalParent() {
           </div>
         </div>
 
-        {/* FORMULIR DAFTAR ULANG JADWAL (TAMPILAN & INPUT SAMA SEPERTI PENDAFTARAN AWAL) */}
-        <Card variant="dashboard" className="p-6 sm:p-8 bg-white shadow-sm border border-slate-200/80 rounded-3xl">
+        {/* Formulir Pembaruan Jadwal Mengajar */}
+        <Card variant="dashboard" className="p-6 sm:p-8 bg-white shadow-xs border border-gray-200/90 rounded-xl dark:bg-slate-900 dark:border-slate-800">
           <form onSubmit={handleSubmit} className="space-y-7">
-            {/* 1. Pilih Kolam yang Anda Sanggupi */}
+            {/* 1. Pilih Kolam */}
             <div>
               <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5">
-                <label className="block text-sm font-semibold text-[#1D3557]">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500">
                   1. Pilih Kolam yang Anda Sanggupi *
                 </label>
-                <span className="text-xs text-[#0077B6] font-medium">
-                  Boleh lebih dari satu kolam
+                <span className="text-[11px] text-[#0077B6] font-medium">
+                  Boleh memilih lebih dari satu kolam
                 </span>
               </div>
 
@@ -346,20 +347,20 @@ export default function AturUlangJadwalParent() {
               />
             </div>
 
-            {/* 2. Centang Jadwal Mengajar */}
+            {/* 2. Matriks Jadwal Mengajar dengan Locked Slots */}
             <div>
               <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5">
-                <label className="block text-sm font-semibold text-[#1D3557]">
-                  2. Centang Jadwal Mengajar *
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500">
+                  2. Matriks Ketersediaan Jadwal Mengajar *
                 </label>
-                <span className="text-xs font-semibold text-[#0077B6] bg-blue-50 px-2.5 py-1 rounded-full border border-blue-200">
-                  {selectedSlots.length} jadwal dipilih (Minimal 1 sesi)
+                <span className="text-xs font-semibold text-[#0077B6] bg-[#E0FBFC] px-2.5 py-1 rounded-full border border-[#00B4D8]/30">
+                  {selectedSlots.length} sesi dipilih (Minimal 1 sesi)
                 </span>
               </div>
 
               {selectedPools.length === 0 ? (
-                <p className="text-xs text-slate-500 italic bg-slate-50 p-4 rounded-xl border border-slate-200">
-                  Pilih minimal satu kolam untuk menampilkan sesi hari dan jam.
+                <p className="text-xs text-slate-400 italic bg-slate-50 p-4 rounded-xl border border-slate-200/60 dark:bg-slate-800 dark:border-slate-700">
+                  Pilih minimal satu kolam untuk menampilkan tabel sesi ketersediaan mengajar.
                 </p>
               ) : (
                 <ScheduleMatrixTable
@@ -367,42 +368,48 @@ export default function AturUlangJadwalParent() {
                   sessionMap={sessionMap}
                   selectedSlots={selectedSlots}
                   onToggleSlot={handleToggleSlot}
+                  lockedSlots={Array.from(activeStudentSlots)}
                 />
               )}
             </div>
 
             {errorMsg && (
-              <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-xs font-semibold text-[#FF6F59] leading-relaxed">
-                {errorMsg}
+              <div className="p-4 rounded-xl bg-rose-50 border border-rose-200/80 text-xs font-medium text-rose-700 flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
+                <span>{errorMsg}</span>
               </div>
             )}
 
-            <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-100">
+            <div className="pt-3 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-100 dark:border-slate-800">
               <Button
                 type="button"
                 variant="outline"
                 size="md"
-                isFullRounded={true}
+                isFullRounded={false}
                 onClick={() => router.push('/profile')}
                 disabled={isSubmitting}
-                className="w-full sm:w-auto"
+                className="w-full sm:w-auto flex items-center justify-center gap-2"
               >
-                ← Batal & Kembali ke Profil
+                <ArrowLeft className="w-4 h-4" />
+                <span>Batal &amp; Kembali</span>
               </Button>
 
               <Button
                 type="submit"
                 variant="primary"
                 size="md"
-                isFullRounded={true}
+                isFullRounded={false}
                 disabled={isSubmitting || !canReschedule || selectedSlots.length < 1}
-                className="w-full sm:w-auto shadow-sm"
+                className="w-full sm:w-auto font-semibold flex items-center justify-center gap-2 shadow-xs"
               >
-                {isSubmitting
-                  ? 'Menyimpan Jadwal…'
-                  : !canReschedule
-                    ? 'Kesempatan Reschedule Habis'
-                    : '💾 Simpan Perubahan Jadwal'}
+                <Save className="w-4 h-4" />
+                <span>
+                  {isSubmitting
+                    ? 'Menyimpan Jadwal...'
+                    : !canReschedule
+                      ? 'Kesempatan Reschedule Habis'
+                      : 'Simpan Perubahan Jadwal'}
+                </span>
               </Button>
             </div>
           </form>

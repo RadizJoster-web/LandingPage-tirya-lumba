@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StudentRegistrationSnapshot } from '@/types';
 import { formatDateId, dayNameFromDate } from '@/lib/utils';
+import { Badge } from '@/components/ui/Badge';
+import { Calendar, Clock, MapPin, ChevronDown, CheckCircle2 } from 'lucide-react';
 
 interface StudentScheduleCardProps {
   snapshot: StudentRegistrationSnapshot;
@@ -9,6 +11,8 @@ interface StudentScheduleCardProps {
 export const StudentScheduleCard: React.FC<StudentScheduleCardProps> = ({
   snapshot,
 }) => {
+  const [isChecklistOpen, setIsChecklistOpen] = useState(false);
+
   const dateStr = snapshot.firstMeetDate || '';
   const dayName = dateStr ? dayNameFromDate(dateStr) : 'Hari Latihan';
   const formattedDate = dateStr ? formatDateId(dateStr) : '-';
@@ -19,189 +23,114 @@ export const StudentScheduleCard: React.FC<StudentScheduleCardProps> = ({
       : `Kolam Renang ${snapshot.locationLabel}`
     : 'Kolam Mitra Tirya Lumba';
 
+  const activeSessions = snapshot.activeSessions ?? 0;
+
   return (
-    <section className="relative overflow-hidden rounded-3xl border-2 border-[#00B4D8]/30 bg-gradient-to-br from-[#E0FBFC]/90 via-white to-white p-6 shadow-md shadow-[#0077B6]/5 sm:p-8">
-      {/* Header Seksi Jadwal Murid */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-3">
-          <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[#0077B6] text-xl text-white shadow-sm">
-            🗓️
-          </div>
-          <div>
-            <h2 className="font-heading text-lg font-extrabold text-[#1D3557] sm:text-xl">
-              Jadwal & Pengingat Latihan Murid
-            </h2>
-            <p className="text-xs text-slate-500">
-              Pengingat jadwal latihan renang resmi Anda bersama pelatih
-            </p>
-          </div>
+    <section className="rounded-xl border border-gray-200/90 bg-white p-6 sm:p-7 shadow-xs dark:bg-slate-900 dark:border-slate-800 space-y-6">
+      {/* Top Header Row with Hero Metric for Active Sessions */}
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-5 pb-6 border-b border-slate-100 dark:border-slate-800">
+        <div>
+          <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 block mb-1">
+            Jadwal Latihan Kesiswaan
+          </span>
+          <h2 className="font-heading text-xl sm:text-2xl font-bold text-[#1D3557] dark:text-slate-100">
+            Jadwal &amp; Sesi Aktif
+          </h2>
+          <p className="mt-1 text-xs text-slate-500">
+            Konfirmasi jadwal pertemuan resmi Anda bersama instruktur
+          </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
-          <span
-            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold ${
-              (snapshot.activeSessions ?? 0) > 0
-                ? 'bg-sky-100 text-[#0077B6] border border-sky-300'
-                : 'bg-rose-100 text-rose-800 border border-rose-300'
-            }`}
-          >
-            <span>🏊</span> Sisa: {snapshot.activeSessions ?? 0} Pertemuan
+        {/* Hero Metric: Large Bold Active Sessions */}
+        <div className="flex sm:flex-col items-center sm:items-end justify-between p-4 rounded-xl bg-slate-50 border border-slate-100 sm:min-w-[160px] dark:bg-slate-800/60 dark:border-slate-700">
+          <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+            Sisa Pertemuan
           </span>
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            Jadwal Terjadwal
-          </span>
+          <div className="flex items-baseline gap-1 mt-1">
+            <span className="font-heading font-extrabold text-3xl sm:text-4xl text-[#0077B6] tabular-nums">
+              {activeSessions}
+            </span>
+            <span className="text-xs font-semibold text-slate-500">Sesi</span>
+          </div>
         </div>
       </div>
 
-      {/* Grid Card Jadwal: Hari & Jam Primary */}
-      <div className="mt-6 grid gap-5 lg:grid-cols-3">
-        {/* Kolom Kiri: Kartu Jadwal Pertemuan */}
-        <div className="lg:col-span-2 flex flex-col justify-between rounded-2xl border border-slate-200/90 bg-white p-5 shadow-xs transition-all hover:border-[#00B4D8]/50 hover:shadow-md">
-          <div>
-            {/* Header Hari (Primary) */}
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <div className="flex items-center gap-2">
-                <span className="grid h-8 w-8 place-items-center rounded-lg bg-[#0077B6]/10 text-base">
-                  📅
-                </span>
-                <div>
-                  <h3 className="font-heading text-lg font-extrabold text-[#1D3557]">
-                    {dayName}
-                  </h3>
-                  <p className="text-xs text-slate-500">{formattedDate}</p>
-                </div>
-              </div>
-              <span className="rounded-full bg-[#E0FBFC] px-3 py-1 text-xs font-extrabold text-[#0077B6]">
-                {sessionName}
-              </span>
-            </div>
-
-            {/* Rincian Sesi & Lokasi */}
-            <div className="mt-4 space-y-3">
-              <div className="rounded-xl border border-slate-100 bg-[#F8F9FA] p-4 space-y-3">
-                {/* Jam Sesi */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-[#0077B6]">⏰</span>
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                      Waktu Latihan
-                    </span>
-                  </div>
-                  <span className="font-heading text-sm font-extrabold text-[#1D3557]">
-                    {sessionName}
-                  </span>
-                </div>
-
-                {/* Lokasi Kolam */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-[#0077B6]">📍</span>
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                      Lokasi Kolam
-                    </span>
-                  </div>
-                  <span className="font-heading text-sm font-bold text-[#1D3557] truncate max-w-[200px] sm:max-w-none text-right">
-                    {poolName}
-                  </span>
-                </div>
-
-                {/* Pelatih Pendamping */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-[#0077B6]">🏊‍♂️</span>
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                      Pelatih
-                    </span>
-                  </div>
-                  <span className="font-heading text-sm font-bold text-[#0077B6]">
-                    {snapshot.instructorName || 'Pelatih Tirya Lumba'}
-                  </span>
-                </div>
-
-                {/* Paket Kelas */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-[#0077B6]">🏷️</span>
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                      Paket Kelas
-                    </span>
-                  </div>
-                  <span className="text-xs font-bold text-slate-700 bg-white px-2 py-0.5 rounded-md border border-slate-200">
-                    {snapshot.packageType || 'Reguler'}
-                  </span>
-                </div>
-
-                {/* Sisa Pertemuan Aktif */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-[#0077B6]">🎫</span>
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                      Sisa Pertemuan
-                    </span>
-                  </div>
-                  <span
-                    className={`text-xs font-extrabold px-2.5 py-0.5 rounded-md border ${
-                      (snapshot.activeSessions ?? 0) > 0
-                        ? 'bg-sky-50 text-[#0077B6] border-sky-200'
-                        : 'bg-rose-50 text-rose-700 border-rose-200'
-                    }`}
-                  >
-                    {snapshot.activeSessions ?? 0} Sesi Latihan
-                  </span>
-                </div>
-              </div>
-            </div>
+      {/* Primary Training Info Grid: Day, Time, Pool Location */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="p-4 rounded-xl bg-[#F8F9FA] border border-slate-100 space-y-1.5 dark:bg-slate-800/40 dark:border-slate-800">
+          <div className="flex items-center gap-2 text-slate-400 text-xs uppercase font-semibold tracking-wider">
+            <Calendar className="w-4 h-4 text-[#0077B6]" />
+            <span>Hari Latihan</span>
           </div>
-
-          <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
-            <span>Status Pertemuan</span>
-            <span className="text-[#0077B6] font-semibold">Pertemuan Pertama Terjadwal</span>
-          </div>
+          <p className="font-heading font-bold text-base text-[#1D3557] dark:text-slate-100">
+            {dayName}
+          </p>
+          <p className="text-xs text-slate-500 truncate">{formattedDate}</p>
         </div>
 
-        {/* Kolom Kanan: Kartu Tips & Pengingat Latihan */}
-        <div className="flex flex-col justify-between rounded-2xl border border-amber-200/80 bg-amber-50/50 p-5 shadow-xs">
-          <div>
-            <div className="flex items-center gap-2 border-b border-amber-200/60 pb-3">
-              <span className="text-base">💡</span>
-              <h4 className="font-heading text-sm font-bold text-amber-900">
-                Panduan & Pengingat
-              </h4>
-            </div>
-
-            <ul className="mt-3.5 space-y-2.5 text-xs text-amber-950/80 leading-relaxed">
-              <li className="flex items-start gap-2">
-                <span className="text-[#0077B6] font-bold">1.</span>
-                <span>
-                  Harap hadir <strong>15 menit lebih awal</strong> untuk pemanasan dan absensi.
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-[#0077B6] font-bold">2.</span>
-                <span>
-                  Wajib mengenakan <strong>pakaian renang</strong> yang sesuai dan membawa kacamata renang.
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-[#0077B6] font-bold">3.</span>
-                <span>
-                  Jika berhalangan hadir, hubungi admin atau pelatih minimal <strong>24 jam</strong> sebelum sesi.
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-[#0077B6] font-bold">4.</span>
-                <span>
-                  Tunjukkan halaman profil ini kepada pengawas/pelatih di lokasi kolam saat tiba.
-                </span>
-              </li>
-            </ul>
+        <div className="p-4 rounded-xl bg-[#F8F9FA] border border-slate-100 space-y-1.5 dark:bg-slate-800/40 dark:border-slate-800">
+          <div className="flex items-center gap-2 text-slate-400 text-xs uppercase font-semibold tracking-wider">
+            <Clock className="w-4 h-4 text-[#0077B6]" />
+            <span>Jam Sesi</span>
           </div>
-
-          <div className="mt-4 pt-3 border-t border-amber-200/60 text-[11px] text-amber-800 font-medium">
-            🏊‍♂️ Selamat berlatih dan tetap utamakan keselamatan air!
-          </div>
+          <p className="font-heading font-bold text-base text-[#1D3557] dark:text-slate-100">
+            {sessionName}
+          </p>
+          <p className="text-xs text-slate-500">Sesuai reservasi resmi</p>
         </div>
+
+        <div className="p-4 rounded-xl bg-[#F8F9FA] border border-slate-100 space-y-1.5 dark:bg-slate-800/40 dark:border-slate-800">
+          <div className="flex items-center gap-2 text-slate-400 text-xs uppercase font-semibold tracking-wider">
+            <MapPin className="w-4 h-4 text-[#0077B6]" />
+            <span>Lokasi Kolam</span>
+          </div>
+          <p className="font-heading font-bold text-base text-[#1D3557] dark:text-slate-100 truncate">
+            {poolName}
+          </p>
+          <Badge variant="azure" size="sm">
+            {snapshot.packageType || 'Reguler'}
+          </Badge>
+        </div>
+      </div>
+
+      {/* Collapsible Clean Preparation Checklist */}
+      <div className="rounded-xl border border-slate-200/80 bg-slate-50/50 overflow-hidden dark:bg-slate-900/40 dark:border-slate-800">
+        <button
+          type="button"
+          onClick={() => setIsChecklistOpen(!isChecklistOpen)}
+          className="w-full px-4 py-3 flex items-center justify-between text-left font-semibold text-xs text-[#1D3557] hover:bg-slate-100/60 transition-colors dark:text-slate-200 dark:hover:bg-slate-800/60"
+        >
+          <span className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-[#0077B6]" />
+            Panduan &amp; Persiapan Kehadiran Latihan
+          </span>
+          <ChevronDown
+            className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${
+              isChecklistOpen ? 'rotate-180' : ''
+            }`}
+          />
+        </button>
+
+        {isChecklistOpen && (
+          <div className="px-4 pb-4 pt-2 border-t border-slate-100 text-xs text-slate-600 space-y-2 dark:border-slate-800 dark:text-slate-300 animate-fade-in">
+            <div className="flex items-start gap-2">
+              <span className="font-bold text-[#0077B6]">&gt;</span>
+              <span>Hadir minimal <strong>15 menit lebih awal</strong> sebelum jam sesi untuk pemanasan otot dan absensi.</span>
+            </div>
+            <div className="flex items-start gap-2">
+              <span className="font-bold text-[#0077B6]">&gt;</span>
+              <span>Wajib mengenakan <strong>pakaian renang standar</strong> dan membawa kacamata renang pribadi.</span>
+            </div>
+            <div className="flex items-start gap-2">
+              <span className="font-bold text-[#0077B6]">&gt;</span>
+              <span>Jika berhalangan hadir, harap berikan konfirmasi minimal <strong>24 jam</strong> sebelumnya ke admin atau instruktur.</span>
+            </div>
+            <div className="flex items-start gap-2">
+              <span className="font-bold text-[#0077B6]">&gt;</span>
+              <span>Tunjukkan kartu / status di profil ini kepada pengawas kolam saat registrasi kehadiran.</span>
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );

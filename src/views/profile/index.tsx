@@ -23,31 +23,29 @@ export default function ProfileParent() {
   // Loading akun awal
   if (isLoading || !user) {
     return (
-      <div className="min-h-[70vh] flex flex-col items-center justify-center gap-3">
-        <div className="w-9 h-9 border-4 border-[#00B4D8] border-t-transparent rounded-full animate-spin" />
-        <p className="text-sm font-medium text-slate-500">Memuat profil...</p>
+      <div className="min-h-[75vh] flex flex-col items-center justify-center gap-3">
+        <div className="w-8 h-8 border-3 border-[#00B4D8] border-t-transparent rounded-full animate-spin" />
+        <p className="text-xs font-medium text-slate-400">Memuat profil pengguna...</p>
       </div>
     );
   }
 
   const name = user.fullName || user.email;
 
-  // Akun admin/pengelola kolam memakai dasbor terpisah, bukan halaman landing ini.
+  // Akun admin/pengelola kolam
   if (user.role === 'ADMIN' || user.role === 'POOL_MANAGER') {
     return (
-      <main className="min-h-[75vh] bg-gradient-to-b from-[#E0FBFC]/60 via-[#F8F9FA] to-white px-4 py-16 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-xl rounded-3xl bg-white/85 p-8 text-center ring-1 ring-slate-100">
+      <main className="min-h-[85vh] bg-[#F3F4F6] px-4 py-16 sm:px-6 lg:px-8 dark:bg-slate-950">
+        <div className="mx-auto max-w-lg rounded-xl bg-white p-8 text-center border border-gray-200/90 shadow-xs dark:bg-slate-900 dark:border-slate-800">
           <Avatar name={name} src={user.profilePictureUrl} size="lg" className="mx-auto" />
-          <h1 className="mt-4 font-heading text-2xl font-extrabold text-[#1D3557]">
-            Akun Manajemen
+          <h1 className="mt-4 font-heading text-xl font-bold text-[#1D3557] dark:text-slate-100">
+            Akun Manajemen Sistem
           </h1>
-          <p className="mt-2 text-sm text-slate-600">
-            Akun <span className="font-semibold">{user.email}</span> terdaftar sebagai pengelola
-            sistem. Silakan gunakan aplikasi dasbor admin untuk mengelola data kolam, pelatih,
-            dan pendaftaran.
+          <p className="mt-2 text-xs sm:text-sm text-slate-500 leading-relaxed">
+            Akun <span className="font-semibold text-[#1D3557] dark:text-slate-200">{user.email}</span> memiliki hak akses pengelola. Silakan gunakan dasbor aplikasi internal untuk mengelola master kolam, pelatih, dan verifikasi pendaftaran.
           </p>
           <Link href="/" className="mt-6 inline-block">
-            <Button variant="outline" size="md" isFullRounded={true}>
+            <Button variant="outline" size="md" isFullRounded={false}>
               Kembali ke Beranda
             </Button>
           </Link>
@@ -59,9 +57,9 @@ export default function ProfileParent() {
   // Jika data registrasi dari server masih dalam proses pengambilan awal
   if (isRegistrationLoading && !registration) {
     return (
-      <div className="min-h-[70vh] flex flex-col items-center justify-center gap-3">
-        <div className="w-9 h-9 border-4 border-amber-500 border-t-transparent rounded-full animate-spin" />
-        <p className="text-sm font-medium text-slate-600">
+      <div className="min-h-[75vh] flex flex-col items-center justify-center gap-3">
+        <div className="w-8 h-8 border-3 border-[#00B4D8] border-t-transparent rounded-full animate-spin" />
+        <p className="text-xs font-medium text-slate-500">
           Memeriksa status pendaftaran Anda dari server...
         </p>
       </div>
@@ -73,7 +71,7 @@ export default function ProfileParent() {
     return <RegistrationStatus snapshot={registration} email={user.email} />;
   }
 
-  // 2. Jika akun pelatih aktif yang sudah disetujui (mis. data seed/legacy tanpa tabel registrasi)
+  // 2. Jika akun pelatih aktif yang sudah disetujui (seed/legacy)
   if (user.role === 'INSTRUCTOR') {
     const instructorFallback: InstructorRegistrationSnapshot = {
       kind: 'instructor',
@@ -96,7 +94,6 @@ export default function ProfileParent() {
     return <RegistrationStatus snapshot={instructorFallback} email={user.email} />;
   }
 
-  // 3. Akun baru (role USER) yang belum pernah mendaftar sebagai murid maupun guru:
-  // Tampilkan layar pemilihan pendaftaran (EmptyProfile) tanpa data palsu seperti ukuran baju / pembayaran.
+  // 3. Akun baru (role USER) yang belum pernah mendaftar
   return <EmptyProfile name={name} email={user.email} photoUrl={user.profilePictureUrl} />;
 }

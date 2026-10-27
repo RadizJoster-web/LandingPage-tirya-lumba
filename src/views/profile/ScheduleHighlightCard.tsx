@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { InstructorScheduleInput } from '@/types';
+import { Calendar, Clock, MapPin, Users, Settings } from 'lucide-react';
 
 interface ScheduleHighlightCardProps {
   schedules?: InstructorScheduleInput[];
@@ -24,7 +25,6 @@ export const ScheduleHighlightCard: React.FC<ScheduleHighlightCardProps> = ({
   schedules = [],
   scheduleLabels = [],
 }) => {
-  // 1. Normalisasi data jadwal dari schedules atau scheduleLabels
   const normalizedItems: NormalizedScheduleItem[] = React.useMemo(() => {
     if (schedules && schedules.length > 0) {
       return schedules.map((s) => {
@@ -45,9 +45,7 @@ export const ScheduleHighlightCard: React.FC<ScheduleHighlightCardProps> = ({
       });
     }
 
-    // Fallback: parse string label seperti "Permata — Sabtu, sesi 1 (09:00 - 10:00 WIB)"
     return scheduleLabels.map((label) => {
-      // Format perkiraan: "NamaKolam — Hari, Sesi (Jam)"
       const [poolPart, rest] = label.split('—').map((t) => t.trim());
       const locationName = poolPart || 'Kolam Renang';
       let dayOfWeek = 'Sabtu';
@@ -74,12 +72,10 @@ export const ScheduleHighlightCard: React.FC<ScheduleHighlightCardProps> = ({
     });
   }, [schedules, scheduleLabels]);
 
-  // 2. Kelompokkan per hari (1 Card = 1 Hari)
   const groupedByDay = React.useMemo(() => {
     const map = new Map<string, NormalizedScheduleItem[]>();
 
     for (const item of normalizedItems) {
-      // Normalisasi nama hari huruf kapital (mis. "sabtu" -> "Sabtu")
       const dayKey =
         item.dayOfWeek.charAt(0).toUpperCase() + item.dayOfWeek.slice(1).toLowerCase();
 
@@ -89,7 +85,6 @@ export const ScheduleHighlightCard: React.FC<ScheduleHighlightCardProps> = ({
       map.get(dayKey)!.push(item);
     }
 
-    // Urutkan kartu hari berdasarkan urutan kalender Senin -> Minggu
     const sortedDays = Array.from(map.keys()).sort((a, b) => {
       const idxA = DAYS_ORDER.indexOf(a);
       const idxB = DAYS_ORDER.indexOf(b);
@@ -99,132 +94,94 @@ export const ScheduleHighlightCard: React.FC<ScheduleHighlightCardProps> = ({
       return idxA - idxB;
     });
 
-    return sortedDays.map((day) => {
-      const items = map.get(day)!;
-      // Urutkan sesi dalam hari berdasarkan jam atau nama sesi
-      items.sort((a, b) => {
-        if (a.startTime && b.startTime) {
-          return a.startTime.localeCompare(b.startTime);
-        }
-        return a.sessionName.localeCompare(b.sessionName);
-      });
-      return {
-        dayOfWeek: day,
-        items,
-      };
-    });
+    return sortedDays.map((day) => ({
+      day,
+      items: map.get(day)!,
+    }));
   }, [normalizedItems]);
 
-  const totalSesi = normalizedItems.length;
-
   return (
-    <section className="relative overflow-hidden rounded-3xl border-2 border-[#00B4D8]/30 bg-gradient-to-br from-[#E0FBFC]/90 via-white to-white p-6 shadow-md shadow-[#0077B6]/5 sm:p-8">
-      {/* Header Utama Seksi Jadwal */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-3">
-          <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[#0077B6] text-xl text-white shadow-sm">
-            🗓️
-          </div>
-          <div>
-            <h2 className="font-heading text-lg font-extrabold text-[#1D3557] sm:text-xl">
-              Jadwal Ketersediaan Mengajar
-            </h2>
-            <p className="text-xs text-slate-500">
-              {totalSesi > 0
-                ? `${totalSesi} sesi mengajar terdaftar di ${groupedByDay.length} hari`
-                : 'Belum ada jadwal mengajar yang terdaftar'}
-            </p>
-          </div>
+    <section className="rounded-xl border border-gray-200/90 bg-white p-6 sm:p-7 shadow-xs dark:bg-slate-900 dark:border-slate-800 space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+        <div>
+          <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 block mb-0.5">
+            Jadwal Mengajar Instruktur
+          </span>
+          <h2 className="font-heading text-lg sm:text-xl font-bold text-[#1D3557] dark:text-slate-100">
+            Jadwal &amp; Sesi Mengajar Aktif
+          </h2>
+          <p className="mt-0.5 text-xs text-slate-500">
+            Total {normalizedItems.length} sesi ketersediaan mengajar terdaftar di sistem
+          </p>
         </div>
 
-        <Link href="/guru/atur-ulang-jadwal" className="self-start sm:self-auto">
+        <Link href="/guru/atur-ulang-jadwal" className="shrink-0">
           <Button
             variant="outline"
             size="sm"
-            isFullRounded={true}
-            className="border-[#0077B6] text-[#0077B6] hover:bg-[#E0FBFC]"
+            isFullRounded={false}
+            className="flex items-center gap-1.5 border-slate-300 text-[#0077B6] hover:bg-[#E0FBFC]/50"
           >
-            ✏️ Atur Ulang Jadwal
+            <Settings className="w-3.5 h-3.5" />
+            <span>Atur Ulang Jadwal</span>
           </Button>
         </Link>
       </div>
 
-      {/* Grid Card: 1 Card untuk 1 Hari */}
-      {groupedByDay.length > 0 ? (
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
-          {groupedByDay.map((group) => (
+      {groupedByDay.length === 0 ? (
+        <div className="text-center py-8 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+          <Calendar className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+          <p className="text-xs font-semibold text-slate-600">
+            Belum ada jadwal mengajar yang terdaftar
+          </p>
+        </div>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {groupedByDay.map(({ day, items }) => (
             <div
-              key={group.dayOfWeek}
-              className="flex flex-col justify-between rounded-2xl border border-slate-200/90 bg-white p-5 shadow-xs transition-all hover:border-[#00B4D8]/50 hover:shadow-md"
+              key={day}
+              className="rounded-xl border border-slate-200/80 bg-slate-50/50 p-4 space-y-3 dark:bg-slate-800/40 dark:border-slate-800"
             >
-              {/* Header Kartu Hari (Primary) */}
-              <div>
-                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                  <div className="flex items-center gap-2">
-                    <span className="grid h-7 w-7 place-items-center rounded-lg bg-[#0077B6]/10 text-sm">
-                      📅
-                    </span>
-                    <h3 className="font-heading text-lg font-extrabold text-[#1D3557]">
-                      {group.dayOfWeek}
-                    </h3>
-                  </div>
-                  <span className="rounded-full bg-[#E0FBFC] px-2.5 py-0.5 text-xs font-bold text-[#0077B6]">
-                    {group.items.length} Sesi
-                  </span>
-                </div>
-
-                {/* Daftar Sesi dalam Hari Tersebut */}
-                <div className="mt-3.5 space-y-3">
-                  {group.items.map((item, idx) => (
-                    <div
-                      key={idx}
-                      className="group rounded-xl border border-slate-100 bg-[#F8F9FA] p-3.5 transition-colors hover:border-[#00B4D8]/40 hover:bg-[#E0FBFC]/20"
-                    >
-                      {/* Hari & Jam Jadi Primary */}
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-xs text-[#0077B6]">⏰</span>
-                          <span className="font-heading text-sm font-extrabold text-[#1D3557]">
-                            {item.timeRange || (item.startTime && item.endTime ? `${item.startTime} - ${item.endTime} WIB` : item.sessionName)}
-                          </span>
-                        </div>
-                        <span className="rounded-md border border-slate-200 bg-white px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-slate-700 shadow-2xs">
-                          {item.sessionName}
-                        </span>
-                      </div>
-
-                      {/* Disusul dengan Lokasi Mengajar & Total Murid */}
-                      <div className="mt-2.5 flex items-center justify-between gap-2 border-t border-slate-200/60 pt-2 text-xs">
-                        <div className="flex items-center gap-1.5 text-slate-600 truncate min-w-0">
-                          <span className="text-slate-400">📍</span>
-                          <span className="truncate font-medium">
-                            {item.locationName.toLowerCase().startsWith('kolam')
-                              ? item.locationName
-                              : `Kolam Renang ${item.locationName}`}
-                          </span>
-                        </div>
-
-                        <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[#E0FBFC] px-2.5 py-0.5 text-[11px] font-bold text-[#0077B6] ring-1 ring-[#0077B6]/20">
-                          <span>👥</span>
-                          <span>{item.totalStudents ?? 0} Murid</span>
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+              <div className="flex items-center justify-between pb-2 border-b border-slate-200/60 dark:border-slate-700">
+                <span className="font-heading font-bold text-sm text-[#0077B6] dark:text-sky-300">
+                  {day}
+                </span>
+                <span className="text-[11px] font-semibold text-slate-400">
+                  {items.length} Sesi
+                </span>
               </div>
 
-              {/* Catatan Kaki Kartu Hari */}
-              <div className="mt-4 pt-3 border-t border-slate-100/80 flex items-center justify-between text-[11px] text-slate-400">
-                <span>Siap menerima murid</span>
-                <span className="text-emerald-600 font-semibold">● Aktif</span>
+              <div className="space-y-2">
+                {items.map((slot, idx) => (
+                  <div
+                    key={idx}
+                    className="p-3 bg-white rounded-lg border border-slate-200/60 shadow-2xs space-y-1.5 dark:bg-slate-900 dark:border-slate-800"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-xs text-[#1D3557] dark:text-slate-200">
+                        {slot.sessionName}
+                      </span>
+                      {/* Crisp numeric pill badge for totalStudents */}
+                      <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+                        <Users className="w-3 h-3" />
+                        <span>{slot.totalStudents ?? 0} Murid</span>
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
+                      <Clock className="w-3 h-3 text-[#0077B6]" />
+                      <span>{slot.timeRange || `${slot.startTime}–${slot.endTime}`}</span>
+                    </div>
+
+                    <div className="flex items-center gap-1.5 text-[11px] text-slate-500 font-medium truncate">
+                      <MapPin className="w-3 h-3 text-[#0077B6]" />
+                      <span className="truncate">{slot.locationName}</span>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           ))}
-        </div>
-      ) : (
-        <div className="mt-5 rounded-2xl border border-dashed border-slate-200 bg-white/70 p-6 text-center text-xs text-slate-400">
-          Tidak ada data jadwal mengajar yang terdaftar. Silakan atur jadwal melalui tombol di atas.
         </div>
       )}
     </section>

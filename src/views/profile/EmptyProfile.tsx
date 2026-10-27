@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { BlurredDashboard } from './BlurredDashboard';
 import { ProfileHeader } from './ProfileHeader';
+import { Badge } from '@/components/ui/Badge';
+import { ArrowRight } from 'lucide-react';
 
 interface EmptyProfileProps {
   name: string;
@@ -10,44 +12,56 @@ interface EmptyProfileProps {
   photoUrl?: string | null;
 }
 
-/** Akun sudah login tetapi belum punya pendaftaran murid/pelatih. */
 export const EmptyProfile: React.FC<EmptyProfileProps> = ({ name, email, photoUrl }) => {
   return (
-    <main className="min-h-[80vh] bg-gradient-to-b from-[#E0FBFC]/70 via-[#F8F9FA] to-white px-4 py-12 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-3xl space-y-5">
+    <main className="min-h-[85vh] bg-[#F3F4F6] px-4 py-10 sm:px-6 lg:px-8 dark:bg-slate-950">
+      <div className="mx-auto max-w-4xl space-y-6">
         <ProfileHeader
           name={name}
           email={email}
           photoUrl={photoUrl}
-          eyebrow="Akun Terdaftar"
+          eyebrow="Akun Pengguna"
         >
-          <span className="w-fit rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur">
-            Belum ada pendaftaran
-          </span>
+          <Badge variant="neutral" size="sm">
+            Belum Terdaftar
+          </Badge>
         </ProfileHeader>
 
-        <section className="rounded-3xl bg-white/85 p-6 ring-1 ring-slate-100 sm:p-8">
-          <h2 className="font-heading text-lg font-extrabold text-[#1D3557]">
-            Buka dasbor Anda
-          </h2>
-          <p className="mt-1 text-sm text-slate-600">
-            Pilih jalur pendaftaran di bawah ini. Dasbor murid atau pelatih akan aktif
-            setelah admin memverifikasi pendaftaran Anda.
-          </p>
-
-          <div className="mt-5">
-            <BlurredDashboard />
+        <section className="rounded-xl bg-white p-6 sm:p-8 border border-gray-200/90 shadow-xs dark:bg-slate-900 dark:border-slate-800 space-y-5">
+          <div>
+            <h2 className="font-heading text-lg font-bold text-[#1D3557] dark:text-slate-100">
+              Mulai Pendaftaran Anda
+            </h2>
+            <p className="mt-1 text-xs sm:text-sm text-slate-500">
+              Pilih jalur pendaftaran di bawah ini. Dasbor kesiswaan atau kepelatihan Anda akan aktif setelah diverifikasi oleh tim admin PT Tirya Lumba.
+            </p>
           </div>
 
-          <div className="mt-6 grid gap-3 sm:grid-cols-2">
+          <div className="mt-4">
+            <BlurredDashboard message="Dasbor jadwal dan presensi aktif setelah verifikasi admin" />
+          </div>
+
+          <div className="pt-3 grid gap-3 sm:grid-cols-2">
             <Link href="/daftar/murid" className="block">
-              <Button variant="primary" size="md" isFullRounded={true} className="w-full">
-                Daftar Sebagai Murid
+              <Button
+                variant="primary"
+                size="md"
+                isFullRounded={false}
+                className="w-full flex items-center justify-center gap-2 font-semibold"
+              >
+                <span>Daftar Sebagai Murid</span>
+                <ArrowRight className="w-4 h-4" />
               </Button>
             </Link>
             <Link href="/daftar/guru" className="block">
-              <Button variant="outline" size="md" isFullRounded={true} className="w-full">
-                Daftar Sebagai Pelatih
+              <Button
+                variant="outline"
+                size="md"
+                isFullRounded={false}
+                className="w-full flex items-center justify-center gap-2 font-semibold"
+              >
+                <span>Daftar Sebagai Pelatih</span>
+                <ArrowRight className="w-4 h-4" />
               </Button>
             </Link>
           </div>
