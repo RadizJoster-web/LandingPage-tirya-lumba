@@ -1,5 +1,5 @@
 import React from 'react';
-import { formatDateId, formatRupiah } from '@/lib/utils';
+import { formatDateId, formatRupiah, formatSessionWithTime } from '@/lib/utils';
 import { Badge } from '@/components/ui/Badge';
 import { Receipt } from 'lucide-react';
 
@@ -63,7 +63,7 @@ export const CourseReceipt: React.FC<CourseReceiptProps> = ({
           <span className="text-slate-500">Pertemuan Pertama</span>
           <span className="font-semibold text-[#1D3557] text-right dark:text-slate-200">
             {firstMeetDate ? formatDateId(firstMeetDate) : '–'}
-            {sessionName ? ` • ${sessionName}` : ''}
+            {sessionName ? ` • ${formatSessionWithTime(sessionName)}` : ''}
           </span>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { StudentRegistrationSnapshot } from '@/types';
-import { formatDateId, dayNameFromDate } from '@/lib/utils';
+import { formatDateId, dayNameFromDate, formatSessionWithTime, getSessionTime } from '@/lib/utils';
 import { Badge } from '@/components/ui/Badge';
 import { Calendar, Clock, MapPin, ChevronDown, CheckCircle2 } from 'lucide-react';
 
@@ -17,6 +17,19 @@ export const StudentScheduleCard: React.FC<StudentScheduleCardProps> = ({
   const dayName = dateStr ? dayNameFromDate(dateStr) : 'Hari Latihan';
   const formattedDate = dateStr ? formatDateId(dateStr) : '-';
   const sessionName = snapshot.firstMeetSession || 'Sesi Latihan';
+  const formattedSession = formatSessionWithTime(
+    sessionName,
+    snapshot.timeRange,
+    snapshot.startTime,
+    snapshot.endTime,
+  );
+  const sessionTimeStr = getSessionTime(
+    sessionName,
+    snapshot.startTime,
+    snapshot.endTime,
+    snapshot.timeRange,
+  );
+
   const poolName = snapshot.locationLabel
     ? snapshot.locationLabel.toLowerCase().startsWith('kolam')
       ? snapshot.locationLabel
@@ -74,9 +87,9 @@ export const StudentScheduleCard: React.FC<StudentScheduleCardProps> = ({
             <span>Jam Sesi</span>
           </div>
           <p className="font-heading font-bold text-base text-[#1D3557] dark:text-slate-100">
-            {sessionName}
+            {formattedSession}
           </p>
-          <p className="text-xs text-slate-500">Sesuai reservasi resmi</p>
+          <p className="text-xs text-slate-500">Pukul {sessionTimeStr} WIB</p>
         </div>
 
         <div className="p-4 rounded-xl bg-[#F8F9FA] border border-slate-100 space-y-1.5 dark:bg-slate-800/40 dark:border-slate-800">

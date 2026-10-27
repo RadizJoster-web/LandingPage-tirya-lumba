@@ -72,6 +72,9 @@ export interface StudentRegistrationSnapshot extends StudentRegistrationPayload 
   photoFileName?: string;
   uploadNotice?: string;
   rejectionReason?: string | null;
+  startTime?: string;
+  endTime?: string;
+  timeRange?: string;
 }
 
 export interface InstructorRegistrationSnapshot extends InstructorRegistrationPayload {

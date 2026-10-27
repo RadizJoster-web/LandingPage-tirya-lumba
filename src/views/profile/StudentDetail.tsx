@@ -1,6 +1,6 @@
 import React from 'react';
 import { StudentRegistrationSnapshot } from '@/types';
-import { formatRupiah } from '@/lib/utils';
+import { formatRupiah, formatSessionWithTime } from '@/lib/utils';
 import { DetailField } from './DetailField';
 
 const PAYMENT_LABEL: Record<string, string> = {
@@ -28,6 +28,15 @@ export const StudentDetail: React.FC<{ snapshot: StudentRegistrationSnapshot }> 
         <DetailField
           label="Paket Kursus"
           value={snapshot.packageType || 'Reguler'}
+        />
+        <DetailField
+          label="Jadwal & Sesi Latihan"
+          value={formatSessionWithTime(
+            snapshot.firstMeetSession,
+            snapshot.timeRange,
+            snapshot.startTime,
+            snapshot.endTime,
+          )}
         />
         <DetailField
           label="Sekolah / Kantor"

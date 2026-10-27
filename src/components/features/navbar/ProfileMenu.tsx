@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { AuthUser, RegistrationSnapshot } from '@/types';
 import { Avatar } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
-import { User, LogOut, FileText, ArrowRight } from 'lucide-react';
+import { User, LogOut, ArrowRight } from 'lucide-react';
 
 export const ROLE_LABEL: Record<string, string> = {
   STUDENT: 'Murid',
@@ -70,7 +70,7 @@ export const ProfileMenu: React.FC<ProfileMenuProps> = ({
           <ArrowRight className="w-3 h-3 text-slate-400" />
         </Link>
 
-        {!registration ? (
+        {!registration && (
           <Link
             href="/daftar"
             role="menuitem"
@@ -79,19 +79,6 @@ export const ProfileMenu: React.FC<ProfileMenuProps> = ({
           >
             <span>Daftar Sekarang</span>
             <ArrowRight className="w-3.5 h-3.5 text-white" />
-          </Link>
-        ) : (
-          <Link
-            href="/profile"
-            role="menuitem"
-            onClick={onNavigate}
-            className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-[#1D3557] hover:bg-[#E0FBFC]/50 transition-colors dark:text-slate-200 dark:hover:bg-slate-800"
-          >
-            <span className="flex items-center gap-2">
-              <FileText className="w-3.5 h-3.5 text-[#0077B6]" />
-              Status Pendaftaran
-            </span>
-            <ArrowRight className="w-3 h-3 text-slate-400" />
           </Link>
         )}
 
