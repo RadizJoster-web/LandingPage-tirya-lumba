@@ -15,9 +15,9 @@ export const MuridWizardLayout: React.FC<MuridWizardLayoutProps> = ({
   children,
 }) => {
   return (
-    <div className="min-h-[80vh] py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[#E0FBFC]/40 via-white to-[#F8F9FA]">
+    <div className="min-h-[85vh] py-12 lg:py-16 px-4 sm:px-6 lg:px-8 bg-[#F8F9FA] dark:bg-slate-950">
       <div className="max-w-2xl mx-auto">
-        <Card variant="form" className="p-6 sm:p-8">
+        <Card variant="form" className="p-6 sm:p-9">
           <MuridHeader />
           <StepIndicator step={step} errorMsg={errorMsg} />
           {children}

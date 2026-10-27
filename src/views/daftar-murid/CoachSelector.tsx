@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { AvailableInstructor } from '@/types';
 import { mediaUrl } from '@/lib/utils';
 import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
+import { Modal } from '@/components/ui/Modal';
+import { Check, Info, Award, Briefcase, BookOpen } from 'lucide-react';
 
 interface CoachSelectorProps {
   sessionReady: boolean;
@@ -11,7 +14,6 @@ interface CoachSelectorProps {
   setCoachId: (id: string) => void;
 }
 
-/** Daftar guru aktif dari GET /api/instructor/available, lengkap dengan sisa kapasitas kelas dan tombol modal detail. */
 export const CoachSelector: React.FC<CoachSelectorProps> = ({
   sessionReady,
   availableCoaches,
@@ -21,215 +23,198 @@ export const CoachSelector: React.FC<CoachSelectorProps> = ({
 }) => {
   const [activeCoachDetail, setActiveCoachDetail] = useState<AvailableInstructor | null>(null);
 
-  // Tutup modal jika tombol Escape ditekan
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setActiveCoachDetail(null);
-    };
-    if (activeCoachDetail) {
-      window.addEventListener('keydown', handleKeyDown);
-    }
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [activeCoachDetail]);
-
   const modalAvatar = activeCoachDetail
     ? mediaUrl(activeCoachDetail.profilePictureUrl)
     : null;
 
   return (
     <div>
-      <label className="block text-sm font-semibold text-[#1D3557] mb-2">
-        Pilih Guru / Pelatih Renang Tersedia *
-      </label>
+      <div className="flex items-center justify-between mb-2">
+        <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500">
+          Pilih Guru / Pelatih Renang *
+        </label>
+        {sessionReady && !isLoading && availableCoaches.length > 0 && (
+          <span className="text-[11px] text-slate-400">
+            {availableCoaches.length} pelatih tersedia
+          </span>
+        )}
+      </div>
 
       {!sessionReady ? (
-        <p className="text-xs text-slate-500 italic bg-slate-50 p-3 rounded-lg border border-slate-200">
-          Silakan tentukan kolam, tanggal, dan sesi pertemuan terlebih dahulu untuk memfilter pelatih yang bertugas.
+        <p className="text-xs text-slate-400 italic bg-slate-50 p-3.5 rounded-xl border border-slate-200/60 dark:bg-slate-900 dark:border-slate-800">
+          Tentukan kolam, tanggal, dan sesi jam latihan terlebih dahulu untuk memfilter pelatih yang bertugas.
         </p>
       ) : isLoading ? (
-        <p className="text-xs text-slate-500 bg-slate-50 p-3 rounded-lg border border-slate-200">
-          Memuat pelatih tersedia…
-        </p>
+        <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/60 flex items-center gap-2.5 text-xs text-slate-500">
+          <span className="w-4 h-4 border-2 border-[#00B4D8] border-t-transparent rounded-full animate-spin" />
+          <span>Memeriksa ketersediaan kuota pelatih...</span>
+        </div>
       ) : availableCoaches.length === 0 ? (
-        <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs font-semibold text-amber-800">
-          ⚠️ Belum ada guru yang tersedia di kolam ini pada sesi tersebut. Silakan pilih sesi atau kolam lain.
+        <div className="p-4 bg-amber-50 border border-amber-200/80 rounded-xl text-xs font-medium text-amber-800">
+          Belum ada pelatih yang tersedia pada sesi dan lokasi ini (kuota penuh atau jadwal terisi). Silakan pilih sesi atau kolam lain.
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-72 overflow-y-auto p-1">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-80 overflow-y-auto p-0.5">
           {availableCoaches.map((coach) => {
             const avatar = mediaUrl(coach.profilePictureUrl);
             const remaining = Math.max(0, coach.maxCapacity - coach.currentStudentCount);
             const selected = coachId === coach.instructorId;
+            const initial = coach.fullName.trim().charAt(0).toUpperCase() || 'P';
 
             return (
               <div
                 key={coach.instructorId}
                 onClick={() => setCoachId(coach.instructorId)}
-                className={`flex items-center justify-between gap-3 p-3 border rounded-xl cursor-pointer transition-all ${
+                className={`flex items-center justify-between gap-3 p-3.5 border-2 rounded-xl cursor-pointer transition-all duration-200 ${
                   selected
-                    ? 'bg-[#E0FBFC] border-[#00B4D8] ring-1 ring-[#00B4D8]'
-                    : 'bg-white border-gray-200 hover:border-[#00B4D8]'
+                    ? 'bg-[#E0FBFC]/30 border-[#00B4D8] shadow-xs'
+                    : 'bg-white border-gray-200 hover:border-[#00B4D8]/50 dark:bg-slate-900 dark:border-slate-800'
                 }`}
               >
                 <div className="flex items-center gap-3 min-w-0 flex-1">
-                  <input
-                    type="radio"
-                    name="coach"
-                    className="sr-only"
-                    checked={selected}
-                    onChange={() => setCoachId(coach.instructorId)}
-                  />
                   {avatar ? (
-                    // eslint-disable-next-line @next/next/no-img-element -- URL dinamis dari server.
+                    // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={avatar}
-                      alt={`Foto ${coach.fullName}`}
+                      alt={coach.fullName}
                       className="w-11 h-11 rounded-full object-cover shrink-0 border border-slate-200"
                     />
                   ) : (
-                    <span className="w-11 h-11 rounded-full bg-[#E0FBFC] text-[#0077B6] flex items-center justify-center text-xl shrink-0">
-                      🏊‍♂️
-                    </span>
+                    <div className="w-11 h-11 rounded-full bg-[#0077B6] text-white flex items-center justify-center text-sm font-bold shrink-0">
+                      {initial}
+                    </div>
                   )}
+
                   <div className="min-w-0 flex-1">
-                    <span className="block text-sm font-bold text-[#1D3557] truncate">
+                    <p className="font-heading font-bold text-sm text-[#1D3557] truncate dark:text-slate-100">
                       {coach.fullName}
-                    </span>
-                    <span className="block text-[11px] text-slate-500 truncate">
-                      {coach.license || 'Pelatih Tirya Lumba'}
-                      {coach.experience ? ` • ${coach.experience}` : ''}
-                    </span>
-                    <span
-                      className={`block text-[11px] font-semibold ${
-                        remaining > 0 ? 'text-emerald-600' : 'text-[#FF6F59]'
-                      }`}
-                    >
-                      {remaining > 0
-                        ? `Sisa ${remaining} dari ${coach.maxCapacity} kuota`
-                        : 'Kuota kelas penuh'}
-                    </span>
+                    </p>
+                    <p className="text-[11px] text-slate-400 truncate">
+                      {coach.license || 'Pelatih Berlisensi'}
+                    </p>
+                    <div className="mt-1 flex items-center gap-1.5">
+                      <span
+                        className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                          remaining > 0
+                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60'
+                            : 'bg-rose-50 text-rose-700 border border-rose-200/60'
+                        }`}
+                      >
+                        {remaining > 0 ? `Sisa ${remaining} Kuota` : 'Penuh'}
+                      </span>
+                    </div>
                   </div>
                 </div>
 
-                {/* Tombol Info Pop-up */}
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setActiveCoachDetail(coach);
-                  }}
-                  className="shrink-0 p-2 text-slate-400 hover:text-[#0077B6] hover:bg-slate-100 rounded-lg transition-colors border border-transparent hover:border-slate-200"
-                  title="Lihat Detail Profil Pelatih"
-                  aria-label={`Detail pelatih ${coach.fullName}`}
-                >
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                </button>
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setActiveCoachDetail(coach);
+                    }}
+                    className="p-1.5 text-slate-400 hover:text-[#0077B6] hover:bg-slate-100 rounded-lg transition-colors dark:hover:bg-slate-800"
+                    title="Lihat Detail Profil Pelatih"
+                    aria-label={`Detail pelatih ${coach.fullName}`}
+                  >
+                    <Info className="w-4 h-4" />
+                  </button>
+
+                  <div
+                    className={`w-5 h-5 rounded-full border flex items-center justify-center transition-colors ${
+                      selected
+                        ? 'bg-[#00B4D8] border-[#00B4D8] text-white'
+                        : 'border-slate-300'
+                    }`}
+                  >
+                    {selected && <Check className="w-3 h-3 stroke-[3]" />}
+                  </div>
+                </div>
               </div>
             );
           })}
         </div>
       )}
 
-      {/* Pop-up Detail Pelatih (Tanpa Informasi Pribadi: No Phone, No Email, No Address) */}
-      {activeCoachDetail && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fade-in"
-          onClick={() => setActiveCoachDetail(null)}
-        >
-          <div
-            className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative border border-slate-100 animate-scale-up"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Tombol X Tutup */}
-            <button
-              type="button"
-              onClick={() => setActiveCoachDetail(null)}
-              className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
-              aria-label="Tutup popup"
-            >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-
-            {/* Header Profil */}
-            <div className="flex items-center gap-4 border-b border-slate-100 pb-4">
+      {/* Detail Profil Pelatih Modal */}
+      <Modal
+        isOpen={Boolean(activeCoachDetail)}
+        onClose={() => setActiveCoachDetail(null)}
+        title="Detail Profil Instruktur"
+        description="Kualifikasi profesional dan sertifikasi kepelatihan resmi"
+      >
+        {activeCoachDetail && (
+          <div className="space-y-5">
+            <div className="flex items-center gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
               {modalAvatar ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={modalAvatar}
-                  alt={`Foto ${activeCoachDetail.fullName}`}
-                  className="w-16 h-16 rounded-full object-cover border-2 border-[#00B4D8] shadow-sm shrink-0"
+                  alt={activeCoachDetail.fullName}
+                  className="w-14 h-14 rounded-full object-cover border border-slate-200 shrink-0"
                 />
               ) : (
-                <div className="w-16 h-16 rounded-full bg-[#E0FBFC] text-[#0077B6] flex items-center justify-center text-3xl shrink-0 border-2 border-[#00B4D8]">
-                  🏊‍♂️
+                <div className="w-14 h-14 rounded-full bg-[#0077B6] text-white flex items-center justify-center text-lg font-bold shrink-0">
+                  {activeCoachDetail.fullName.trim().charAt(0).toUpperCase() || 'P'}
                 </div>
               )}
               <div className="min-w-0">
-                <h3 className="font-heading text-lg font-bold text-[#1D3557] truncate">
+                <h4 className="font-heading font-bold text-base text-[#1D3557] dark:text-slate-100 truncate">
                   {activeCoachDetail.fullName}
-                </h3>
-                <p className="text-xs font-semibold text-[#0077B6]">
-                  {activeCoachDetail.license || 'Pelatih Berlisensi Resmi'}
+                </h4>
+                <p className="text-xs text-[#0077B6] font-medium mt-0.5">
+                  {activeCoachDetail.license || 'Pelatih Berlisensi PRSI'}
                 </p>
-                <div className="mt-1 flex items-center gap-1.5 text-xs text-slate-500">
-                  <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
+                <div className="mt-1 flex items-center gap-1.5 text-[11px] text-slate-500">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
                   <span>
-                    Sisa {Math.max(0, activeCoachDetail.maxCapacity - activeCoachDetail.currentStudentCount)} dari{' '}
-                    {activeCoachDetail.maxCapacity} kuota sesi
+                    Kapasitas: {activeCoachDetail.currentStudentCount} / {activeCoachDetail.maxCapacity} murid aktif
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Detail Informasi Profesional (Hanya Pengalaman, Lisensi, & Bio) */}
-            <div className="py-4 space-y-3.5 text-sm">
-              <div>
-                <span className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">
-                  Lisensi & Sertifikasi
-                </span>
-                <p className="text-slate-700 bg-slate-50 p-2.5 rounded-lg border border-slate-200 text-xs sm:text-sm font-medium">
-                  {activeCoachDetail.license || 'Sertifikasi Pelatih Renang Tirya Lumba'}
+            <div className="space-y-3.5 text-xs sm:text-sm">
+              <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 dark:bg-slate-800/60 dark:border-slate-700/60">
+                <div className="flex items-center gap-1.5 text-slate-500 mb-1 font-semibold uppercase text-[10px] tracking-wider">
+                  <Award className="w-3.5 h-3.5 text-[#0077B6]" />
+                  <span>Lisensi &amp; Sertifikasi</span>
+                </div>
+                <p className="font-medium text-[#1D3557] dark:text-slate-200">
+                  {activeCoachDetail.license || 'Sertifikasi Pelatih Renang Standar Tirya Lumba'}
                 </p>
               </div>
 
-              <div>
-                <span className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">
-                  Pengalaman Mengajar
-                </span>
-                <p className="text-slate-700 bg-slate-50 p-2.5 rounded-lg border border-slate-200 text-xs sm:text-sm">
-                  {activeCoachDetail.experience || 'Berpengalaman dalam membimbing teknik renang berbagai usia.'}
+              <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 dark:bg-slate-800/60 dark:border-slate-700/60">
+                <div className="flex items-center gap-1.5 text-slate-500 mb-1 font-semibold uppercase text-[10px] tracking-wider">
+                  <Briefcase className="w-3.5 h-3.5 text-[#0077B6]" />
+                  <span>Pengalaman Mengajar</span>
+                </div>
+                <p className="text-slate-700 dark:text-slate-300">
+                  {activeCoachDetail.experience || 'Berpengalaman mendampingi teknik renang pemula hingga perenang berprestasi.'}
                 </p>
               </div>
 
-              <div>
-                <span className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">
-                  Tentang Pelatih
-                </span>
-                <p className="text-slate-600 bg-slate-50 p-2.5 rounded-lg border border-slate-200 text-xs sm:text-sm leading-relaxed whitespace-pre-line">
-                  {activeCoachDetail.shortBio ||
-                    'Pelatih aktif Tirya Lumba yang berdedikasi mengajarkan keterampilan renang mulai dari pemula hingga mahir dengan mengutamakan kenyamanan, teknik pernapasan yang tepat, dan keselamatan di dalam air.'}
-                </p>
-              </div>
+              {activeCoachDetail.shortBio && (
+                <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 dark:bg-slate-800/60 dark:border-slate-700/60">
+                  <div className="flex items-center gap-1.5 text-slate-500 mb-1 font-semibold uppercase text-[10px] tracking-wider">
+                    <BookOpen className="w-3.5 h-3.5 text-[#0077B6]" />
+                    <span>Biografi &amp; Filosofi</span>
+                  </div>
+                  <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-xs">
+                    {activeCoachDetail.shortBio}
+                  </p>
+                </div>
+              )}
             </div>
 
-            {/* Tombol Aksi */}
-            <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100">
+            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100 dark:border-slate-800">
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
+                isFullRounded={false}
                 onClick={() => setActiveCoachDetail(null)}
               >
                 Tutup
@@ -238,6 +223,7 @@ export const CoachSelector: React.FC<CoachSelectorProps> = ({
                 type="button"
                 variant="primary"
                 size="sm"
+                isFullRounded={false}
                 onClick={() => {
                   setCoachId(activeCoachDetail.instructorId);
                   setActiveCoachDetail(null);
@@ -247,8 +233,8 @@ export const CoachSelector: React.FC<CoachSelectorProps> = ({
               </Button>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </Modal>
     </div>
   );
 };

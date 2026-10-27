@@ -1,11 +1,16 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { MuridStep3Props } from './types';
 import { PaymentMethod } from '@/types';
 import { Button } from '@/components/ui/Button';
 import { PaymentDetails } from './PaymentDetails';
 import { CourseReceipt } from './CourseReceipt';
+import { ArrowLeft, ArrowRight, UploadCloud, CheckCircle2, QrCode, CreditCard, Banknote } from 'lucide-react';
 
-const PAYMENT_OPTIONS: PaymentMethod[] = ['QRIS', 'Transfer Bank', 'Cash'];
+const PAYMENT_OPTIONS: Array<{ method: PaymentMethod; label: string; icon: React.ReactNode }> = [
+  { method: 'QRIS', label: 'QRIS Digital', icon: <QrCode className="w-4 h-4" /> },
+  { method: 'Transfer Bank', label: 'Transfer Bank', icon: <CreditCard className="w-4 h-4" /> },
+  { method: 'Cash', label: 'Tunai di Kolam', icon: <Banknote className="w-4 h-4" /> },
+];
 
 export const StepPembayaran: React.FC<MuridStep3Props> = ({
   name,
@@ -24,13 +29,32 @@ export const StepPembayaran: React.FC<MuridStep3Props> = ({
   onSubmit,
   onBack,
 }) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+
   const needsProofLabel =
     paymentMethod === 'Cash'
-      ? 'Unggah Foto Dokumentasi Pembayaran Tunai * (JPG/PNG maks 5 MB)'
-      : 'Unggah Bukti Pembayaran * (JPG/PNG maks 5 MB)';
+      ? 'Unggah Foto Dokumentasi Penyerahan Tunai *'
+      : 'Unggah Bukti Transfer / Pembayaran *';
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0] ?? null;
+    if (file) onPaymentProofChange(file);
+  };
 
   return (
-    <form onSubmit={onSubmit} className="space-y-6">
+    <form onSubmit={onSubmit} className="space-y-6 animate-fade-in">
       <CourseReceipt
         name={name}
         locationName={locationName}
@@ -41,76 +65,111 @@ export const StepPembayaran: React.FC<MuridStep3Props> = ({
         packagePrice={packagePrice}
       />
 
+      {/* Modern Tabbed / Radio Cards for Payment Method */}
       <div>
-        <label className="block text-sm font-semibold text-[#1D3557] mb-2">
-          Metode Pembayaran *
+        <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">
+          Pilih Metode Pembayaran *
         </label>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-          {PAYMENT_OPTIONS.map((method) => (
-            <label
-              key={method}
-              className={`flex items-center justify-center py-2.5 px-3 border rounded-xl text-sm font-bold cursor-pointer transition-all text-center ${
-                paymentMethod === method
-                  ? 'bg-[#00B4D8] text-white border-[#00B4D8] shadow-xs'
-                  : 'bg-white text-slate-700 border-gray-200 hover:border-[#00B4D8]'
-              }`}
-            >
-              <input
-                type="radio"
-                name="paymentMethod"
-                className="sr-only"
-                checked={paymentMethod === method}
-                onChange={() => setPaymentMethod(method)}
-              />
-              {method}
-            </label>
-          ))}
+          {PAYMENT_OPTIONS.map(({ method, label, icon }) => {
+            const isSelected = paymentMethod === method;
+            return (
+              <button
+                key={method}
+                type="button"
+                onClick={() => setPaymentMethod(method)}
+                className={`flex items-center justify-center gap-2 py-3 px-3.5 border-2 rounded-xl text-xs font-bold transition-all text-center ${
+                  isSelected
+                    ? 'bg-[#E0FBFC] text-[#0077B6] border-[#00B4D8] shadow-xs'
+                    : 'bg-white text-slate-600 border-gray-200 hover:border-slate-300 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-300'
+                }`}
+              >
+                {icon}
+                <span>{label}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
       <PaymentDetails method={paymentMethod} />
 
+      {/* Modern File Dropzone for Payment Proof */}
       <div>
-        <label className="block text-sm font-semibold text-[#1D3557] mb-1.5">
-          {needsProofLabel}
+        <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
+          {needsProofLabel} (JPG / PNG maks 5 MB)
         </label>
-        <input
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          onChange={(e) => onPaymentProofChange(e.target.files?.[0] ?? null)}
-          className="w-full text-sm text-slate-600 border border-gray-300 rounded-lg px-3 py-2 bg-white file:mr-3 file:px-3 file:py-1.5 file:rounded-full file:border-0 file:bg-[#E0FBFC] file:text-[#0077B6] file:font-semibold file:cursor-pointer"
-        />
-        {paymentProofName && (
-          <p className="text-xs text-emerald-600 font-semibold mt-1.5">
-            ✓ {paymentProofName}
-          </p>
-        )}
+        <div
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          onClick={() => fileInputRef.current?.click()}
+          className={`border-2 border-dashed rounded-xl p-5 text-center cursor-pointer transition-all duration-200 ${
+            isDragging
+              ? 'border-[#00B4D8] bg-[#E0FBFC]/30'
+              : paymentProofName
+                ? 'border-emerald-300 bg-emerald-50/50 dark:bg-emerald-950/20 dark:border-emerald-800'
+                : 'border-slate-200 hover:border-[#00B4D8] bg-slate-50/50 hover:bg-[#E0FBFC]/10 dark:border-slate-800 dark:bg-slate-900'
+          }`}
+        >
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            onChange={(e) => onPaymentProofChange(e.target.files?.[0] ?? null)}
+            className="hidden"
+          />
+          {paymentProofName ? (
+            <div className="flex flex-col items-center justify-center gap-1.5">
+              <CheckCircle2 className="w-6 h-6 text-emerald-600" />
+              <p className="text-xs font-bold text-emerald-900 dark:text-emerald-300">
+                {paymentProofName}
+              </p>
+              <p className="text-[11px] text-slate-400">Klik untuk mengganti bukti pembayaran</p>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center gap-1.5 text-slate-500">
+              <UploadCloud className="w-7 h-7 text-[#0077B6]" />
+              <p className="text-xs font-semibold text-[#1D3557] dark:text-slate-200">
+                Tarik &amp; lepas file struk ke sini, atau <span className="text-[#0077B6] underline">pilih file</span>
+              </p>
+              <p className="text-[11px] text-slate-400">
+                Foto struk transfer ATM, tangkapan layar m-banking, atau foto serah terima tunai
+              </p>
+            </div>
+          )}
+        </div>
       </div>
 
       {errorMsg && (
-        <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-xs font-semibold text-[#FF6F59]">
+        <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200/80 text-xs font-medium text-rose-700">
           {errorMsg}
         </div>
       )}
 
-      <div className="flex items-center justify-between gap-3 pt-2">
+      <div className="flex items-center justify-between gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
         <Button
           type="button"
           variant="outline"
           size="md"
+          isFullRounded={false}
           onClick={onBack}
           disabled={isSubmitting}
+          className="flex items-center gap-2"
         >
-          ← Kembali
+          <ArrowLeft className="w-4 h-4" />
+          <span>Kembali</span>
         </Button>
         <Button
           type="submit"
           variant="primary"
           size="md"
-          className="flex-1 sm:flex-none"
+          isFullRounded={false}
+          className="font-semibold flex items-center gap-2 shadow-sm hover:shadow-md"
           isLoading={isSubmitting}
         >
-          Kirim Pendaftaran
+          <span>Konfirmasi &amp; Bayar</span>
+          <ArrowRight className="w-4 h-4" />
         </Button>
       </div>
     </form>
