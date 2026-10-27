@@ -9,8 +9,8 @@
   --color-dashboard-base: #F3F4F6;
   --color-text-dark: #1D3557;
 
-  --font-heading: var(--font-heading), "Plus Jakarta Sans", sans-serif;
-  --font-body: var(--font-body), "Inter", sans-serif;
+  --font-heading: var(--font-heading), "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-body: var(--font-body), "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 :root {
@@ -21,6 +21,20 @@
   --neutral-light: #F8F9FA;
   --dashboard-base: #F3F4F6;
   --text-dark: #1D3557;
+  --surface-card: #FFFFFF;
+  --surface-border: #E2E8F0;
+}
+
+.dark {
+  --primary-blue: #00B4D8;
+  --cyan-aqua: #48CAE4;
+  --light-azure: #1C2541;
+  --accent-coral: #FF6F59;
+  --neutral-light: #0B132B;
+  --dashboard-base: #1C2541;
+  --text-dark: #F8F9FA;
+  --surface-card: #1C2541;
+  --surface-border: #2D3748;
 }
 
 html {
@@ -39,7 +53,7 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading), "Plus Jakarta Sans", sans-serif;
 }
 
-/* Animasi masuk/keluar ringan untuk perpindahan langkah form dan pesan status. */
+/* Fluid micro-interaction keyframes */
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -60,15 +74,46 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
+@keyframes scaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 .animate-fade-in-up {
-  animation: fadeInUp 0.35s ease-out both;
+  animation: fadeInUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.3s ease-out both;
+  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-/* Marquee brand: dua salinan daftar berjalan tanpa henti, berhenti saat hover. */
+.animate-scale-up {
+  animation: scaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Subtle Aurora / Mesh pulse */
+@keyframes subtlePulse {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.65;
+    transform: scale(1.05);
+  }
+}
+
+.animate-subtle-pulse {
+  animation: subtlePulse 8s ease-in-out infinite;
+}
+
+/* Marquee brand */
 @keyframes marquee {
   from {
     transform: translateX(0);
@@ -82,10 +127,12 @@ h1, h2, h3, h4, h5, h6 {
   animation: marquee 32s linear infinite;
 }
 
-/* Hormati preferensi pengguna yang menonaktifkan animasi. */
+/* Respect user preferences */
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-in-up,
   .animate-fade-in,
+  .animate-scale-up,
+  .animate-subtle-pulse,
   .animate-marquee {
     animation: none;
   }

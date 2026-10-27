@@ -17,7 +17,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="block text-sm font-semibold text-[#1D3557] mb-1.5"
+            className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5"
           >
             {label}
           </label>
@@ -27,7 +27,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             id={inputId}
             ref={ref}
             className={cn(
-              'w-full px-3.5 py-2.5 bg-white text-[#1D3557] text-sm sm:text-base border border-gray-300 rounded-lg shadow-xs transition-all duration-300 ease-in-out placeholder:text-gray-400 focus:outline-none focus:border-[#00B4D8] focus:ring-2 focus:ring-[#00B4D8]/20 disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed',
+              'w-full px-3.5 py-2.5 bg-white text-[#1D3557] text-sm sm:text-base border border-gray-200 rounded-lg shadow-xs transition-all duration-200 ease-in-out placeholder:text-slate-400 focus:outline-none focus:border-[#00B4D8] focus:ring-2 focus:ring-[#00B4D8]/20 disabled:bg-slate-50 disabled:text-slate-400 disabled:cursor-not-allowed dark:bg-slate-900 dark:border-slate-800 dark:text-slate-100',
               rightElement ? 'pr-11' : undefined,
               error && 'border-[#FF6F59] focus:border-[#FF6F59] focus:ring-[#FF6F59]/20',
               className
@@ -35,13 +35,13 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             {...props}
           />
           {rightElement && (
-            <div className="absolute right-3 flex items-center">
+            <div className="absolute right-3 flex items-center text-slate-400 hover:text-slate-600">
               {rightElement}
             </div>
           )}
         </div>
         {helperText && !error && (
-          <p className="mt-1 text-xs text-gray-500">{helperText}</p>
+          <p className="mt-1 text-xs text-slate-400">{helperText}</p>
         )}
         {error && <p className="mt-1 text-xs text-[#FF6F59] font-medium">{error}</p>}
       </div>
