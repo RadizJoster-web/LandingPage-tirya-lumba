@@ -4,20 +4,28 @@ import { RescheduleStatusData } from '../types';
 
 export async function fetchMasterData(): Promise<{ areas: Area[]; locations: Location[] }> {
   const [a, l] = await Promise.all([
-    request<Area[]>('/areas', { method: 'GET' }),
-    request<Location[]>('/locations', { method: 'GET' }),
+    request<Area[]>('/areas', { method: 'GET', revalidate: 3600, tags: ['areas'] }),
+    request<Location[]>('/locations', { method: 'GET', revalidate: 3600, tags: ['locations'] }),
   ]);
   return { areas: a.data, locations: l.data };
 }
 
 export async function fetchSessions(locationId: string, dayOfWeek: string): Promise<SessionSlot[]> {
   const query = new URLSearchParams({ locationId, dayOfWeek });
-  const res = await request<SessionSlot[]>(`/sessions?${query}`, { method: 'GET' });
+  const res = await request<SessionSlot[]>(`/sessions?${query}`, {
+    method: 'GET',
+    revalidate: 3600,
+    tags: ['sessions'],
+  });
   return res.data;
 }
 
 export async function fetchRescheduleStatus(): Promise<RescheduleStatusData> {
-  const res = await request<RescheduleStatusData>('/instructors/reschedule/status', { method: 'GET' });
+  // Tier 2: Real-time high-contention status token pelatih (Wajib no-store)
+  const res = await request<RescheduleStatusData>('/instructors/reschedule/status', {
+    method: 'GET',
+    cache: 'no-store',
+  });
   return res.data;
 }
 

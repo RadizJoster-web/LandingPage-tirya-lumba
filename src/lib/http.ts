@@ -21,15 +21,18 @@ type RequestOptions = Omit<RequestInit, 'body'> & {
   body?: unknown;
   revalidate?: number;
   tag?: string;
+  tags?: string[];
 };
 
 export async function request<T>(
   path: string,
   options: RequestOptions = {},
 ): Promise<ApiResponse<T>> {
-  const { body, revalidate, tag, headers, ...init } = options;
+  const { body, revalidate, tag, tags, headers, ...init } = options;
   const isForm = body instanceof FormData;
   const token = getToken();
+
+  const nextTags = tags && tags.length > 0 ? tags : tag ? [tag] : undefined;
 
   const res = await fetch(`${API_BASE_URL}${path}`, {
     ...init,
@@ -43,8 +46,13 @@ export async function request<T>(
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...headers,
     },
-    ...(revalidate !== undefined
-      ? { next: { revalidate, ...(tag ? { tags: [tag] } : {}) } }
+    ...(revalidate !== undefined || nextTags !== undefined
+      ? {
+          next: {
+            ...(revalidate !== undefined ? { revalidate } : {}),
+            ...(nextTags ? { tags: nextTags } : {}),
+          },
+        }
       : {}),
   });
 

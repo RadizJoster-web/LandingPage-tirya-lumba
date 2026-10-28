@@ -15,12 +15,12 @@ export async function fetchMasterData(): Promise<{
     request<Area[]>('/areas', {
       method: 'GET',
       revalidate: 3600,
-      tag: 'areas',
+      tags: ['areas'],
     }),
     request<Location[]>('/locations', {
       method: 'GET',
       revalidate: 3600,
-      tag: 'locations',
+      tags: ['locations'],
     }),
   ]);
   return { areas: a.data, locations: l.data };
@@ -33,6 +33,8 @@ export async function fetchSessions(
   const query = new URLSearchParams({ locationId, dayOfWeek });
   const res = await request<SessionSlot[]>(`/sessions?${query}`, {
     method: 'GET',
+    revalidate: 3600,
+    tags: ['sessions'],
   });
   return res.data;
 }

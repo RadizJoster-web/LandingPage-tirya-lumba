@@ -23,9 +23,9 @@ async function fetchProgramCatalog(): Promise<{
   totalAreas: number;
 }> {
   const [pkgs, locs, areas] = await Promise.all([
-    request<LessonPackage[]>('/packages', { method: 'GET', revalidate: 3600, tag: 'packages' }),
-    request<Location[]>('/locations', { method: 'GET', revalidate: 3600, tag: 'locations' }),
-    request<Area[]>('/areas', { method: 'GET', revalidate: 3600, tag: 'areas' }),
+    request<LessonPackage[]>('/packages', { method: 'GET', revalidate: 3600, tags: ['packages'] }),
+    request<Location[]>('/locations', { method: 'GET', revalidate: 3600, tags: ['locations'] }),
+    request<Area[]>('/areas', { method: 'GET', revalidate: 3600, tags: ['areas'] }),
   ]);
 
   const locationById = new Map(locs.data.map((loc: Location) => [loc.id, loc]));
@@ -63,7 +63,7 @@ async function fetchPublicStats(): Promise<{
     totalInstructors: number;
     totalPools: number;
     totalAreas: number;
-  }>('/stats', { method: 'GET', revalidate: 3600, tag: 'stats' });
+  }>('/stats', { method: 'GET', revalidate: 3600, tags: ['stats'] });
   return res.data;
 }
 

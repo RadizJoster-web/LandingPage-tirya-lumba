@@ -1,9 +1,8 @@
-// Penyimpanan sesi di browser: JWT + profil user + snapshot pendaftaran terakhir.
-import { AuthUser, RegistrationSnapshot } from '@/types';
+// Penyimpanan sesi autentikasi murni: JWT + profil user dasar (Tanpa caching data registrasi/API).
+import { AuthUser } from '@/types';
 
 const TOKEN_KEY = 'tirya_access_token';
 const USER_KEY = 'tirya_auth_user';
-const REGISTRATION_KEY = 'tirya_last_registration';
 const SYNC_EVENT = 'tirya_auth_sync';
 /** Penanda sesi untuk proxy.ts; bukan kredensial, token asli tetap JWT server. */
 const SESSION_COOKIE = 'tirya_session';
@@ -39,6 +38,8 @@ export function saveSession(user: AuthUser, token: string) {
   if (!isBrowser()) return;
   localStorage.setItem(TOKEN_KEY, token);
   localStorage.setItem(USER_KEY, JSON.stringify(user));
+  // Bersihkan data cache pendaftaran lama jika tersisa di browser
+  localStorage.removeItem('tirya_last_registration');
   writeSessionCookie(SESSION_MAX_AGE);
   window.dispatchEvent(new Event(SYNC_EVENT));
 }
@@ -56,19 +57,9 @@ export function clearSession() {
   if (!isBrowser()) return;
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(USER_KEY);
-  localStorage.removeItem(REGISTRATION_KEY);
+  localStorage.removeItem('tirya_last_registration');
   writeSessionCookie(0);
   window.dispatchEvent(new Event(SYNC_EVENT));
-}
-
-export function saveRegistration(snapshot: RegistrationSnapshot) {
-  if (!isBrowser()) return;
-  localStorage.setItem(REGISTRATION_KEY, JSON.stringify(snapshot));
-  window.dispatchEvent(new Event(SYNC_EVENT));
-}
-
-export function getRegistration(): RegistrationSnapshot | null {
-  return readJson<RegistrationSnapshot>(REGISTRATION_KEY);
 }
 
 export function subscribe(callback: () => void) {
@@ -81,15 +72,9 @@ export function subscribe(callback: () => void) {
   };
 }
 
-/**
- * Snapshot untuk useSyncExternalStore: gabungan JSON user dan pendaftaran.
- * Pemisahnya karakter kontrol (\u001F) yang tidak pernah muncul mentah di JSON.
- */
-const SNAPSHOT_SEPARATOR = '\u001F';
-
 export function getSnapshot(): string | null {
   if (!isBrowser()) return null;
-  return `${localStorage.getItem(USER_KEY) ?? ''}${SNAPSHOT_SEPARATOR}${localStorage.getItem(REGISTRATION_KEY) ?? ''}`;
+  return localStorage.getItem(USER_KEY);
 }
 
 export function getServerSnapshot(): string | null {
@@ -98,21 +83,11 @@ export function getServerSnapshot(): string | null {
 
 export function readSnapshot(raw: string | null): {
   user: AuthUser | null;
-  registration: RegistrationSnapshot | null;
 } {
-  if (raw === null) return { user: null, registration: null };
-  const [userRaw, registrationRaw] = raw.split(SNAPSHOT_SEPARATOR);
-  return {
-    user: parseJson<AuthUser>(userRaw),
-    registration: parseJson<RegistrationSnapshot>(registrationRaw),
-  };
-}
-
-function parseJson<T>(raw: string | undefined): T | null {
-  if (!raw) return null;
+  if (!raw) return { user: null };
   try {
-    return JSON.parse(raw) as T;
+    return { user: JSON.parse(raw) as AuthUser };
   } catch {
-    return null;
+    return { user: null };
   }
 }

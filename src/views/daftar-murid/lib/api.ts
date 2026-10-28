@@ -14,17 +14,17 @@ export async function fetchMaster() {
     request<Area[]>('/areas', {
       method: 'GET',
       revalidate: 3600,
-      tag: 'areas',
+      tags: ['areas'],
     }),
     request<Location[]>('/locations', {
       method: 'GET',
       revalidate: 3600,
-      tag: 'locations',
+      tags: ['locations'],
     }),
     request<LessonPackage[]>('/packages', {
       method: 'GET',
       revalidate: 3600,
-      tag: 'packages',
+      tags: ['packages'],
     }),
   ]);
   return {
@@ -36,7 +36,11 @@ export async function fetchMaster() {
 
 export async function fetchSessions(locationId: string, dayOfWeek: string) {
   const q = new URLSearchParams({ locationId, dayOfWeek });
-  const res = await request<SessionSlot[]>(`/sessions?${q}`, { method: 'GET' });
+  const res = await request<SessionSlot[]>(`/sessions?${q}`, {
+    method: 'GET',
+    revalidate: 3600,
+    tags: ['sessions'],
+  });
   return res.data ?? [];
 }
 
@@ -52,9 +56,10 @@ export async function fetchInstructors(p: {
     sessionName: p.sessionName,
     ...(p.packageType ? { packageType: p.packageType } : {}),
   });
+  // Tier 2: Real-time high-contention data (Wajib no-store)
   const res = await request<AvailableInstructor[]>(
     `/instructor/available?${q}`,
-    { method: 'GET' },
+    { method: 'GET', cache: 'no-store' },
   );
   return res.data ?? [];
 }

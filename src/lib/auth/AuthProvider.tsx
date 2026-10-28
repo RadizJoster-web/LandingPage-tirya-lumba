@@ -14,7 +14,6 @@ import {
   getServerSnapshot,
   getSnapshot,
   readSnapshot,
-  saveRegistration,
   saveSession,
   subscribe,
   updateUser,
@@ -31,17 +30,16 @@ export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const snapshot = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-  const { user, registration: storedRegistration } = useMemo(
+  const { user } = useMemo(
     () => readSnapshot(snapshot),
     [snapshot],
   );
 
-  // State live untuk menyimpan respons registrasi langsung dari API
+  // State live untuk menyimpan respons registrasi murni dari API (tanpa cache localStorage)
   const [liveRegistration, setLiveRegistration] = useState<RegistrationSnapshot | null>(null);
   const [isRegistrationLoading, setIsRegistrationLoading] = useState<boolean>(false);
 
-  // Prioritaskan data live API, lalu fallback ke session store
-  const registration = liveRegistration || storedRegistration;
+  const registration = liveRegistration;
 
   const refreshRegistration = useCallback(async () => {
     setIsRegistrationLoading(true);
@@ -49,10 +47,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const serverReg = await fetchMyRegistration();
       if (serverReg) {
         setLiveRegistration(serverReg);
-        saveRegistration(serverReg);
         if (serverReg.profilePictureUrl) {
           updateUser({ profilePictureUrl: serverReg.profilePictureUrl });
         }
+      } else {
+        setLiveRegistration(null);
       }
       return serverReg;
     } finally {
@@ -107,7 +106,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const persistRegistration = useCallback(
     (next: RegistrationSnapshot) => {
       setLiveRegistration(next);
-      saveRegistration(next);
       if (next.profilePictureUrl) {
         updateUser({ profilePictureUrl: next.profilePictureUrl });
       }
