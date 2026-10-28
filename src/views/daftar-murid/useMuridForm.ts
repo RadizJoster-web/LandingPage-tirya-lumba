@@ -1,12 +1,12 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   AuthUser,
-  PaymentMethod,
-  ShirtSize,
   StudentRegistrationSnapshot,
 } from '@/types';
 import { calculateAge } from '@/lib/utils';
 import { useMuridData } from './useMuridData';
+import { useBiodataState } from './lib/useBiodataState';
+import { useClassSelectionState } from './lib/useClassSelectionState';
 
 export function useMuridForm(
   userEmail: string,
@@ -17,177 +17,72 @@ export function useMuridForm(
   const [errorMsg, setErrorMsg] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Step 1
-  const [name, setName] = useState(initialSnapshot?.fullName || currentUser?.fullName || '');
-  const [birthPlace, setBirthPlace] = useState(initialSnapshot?.birthPlace || '');
-  const [birthDate, setBirthDate] = useState(initialSnapshot?.birthDate || '');
-  const [gender, setGender] = useState<'Laki-Laki' | 'Perempuan'>(
-    (initialSnapshot?.gender as 'Laki-Laki' | 'Perempuan') || 'Laki-Laki',
-  );
-  const [address, setAddress] = useState(initialSnapshot?.address || '');
-  const [phone, setPhone] = useState(initialSnapshot?.phone || currentUser?.phone || '');
-  const [schoolOrOffice, setSchoolOrOffice] = useState(initialSnapshot?.schoolOrOffice || '');
-  const [shirtSize, setShirtSize] = useState<ShirtSize>(initialSnapshot?.tshirtSize || 'M');
-
-  // Step 2 - Dikosongkan untuk pemilihan baru saat daftar ulang / revisi
-  const [areaId, setAreaId] = useState('');
-  const [locationId, setLocationId] = useState('');
-  const [packageId, setPackageId] = useState('');
-  const [firstMeetDate, setFirstMeetDate] = useState('');
-  const [sessionName, setSessionName] = useState('');
-  const [instructorId, setInstructorId] = useState('');
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
-
-  // Step 3 - Dikosongkan untuk pembayaran baru
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('Transfer Bank');
-  const [paymentProofFile, setPaymentProofFile] = useState<File | null>(null);
-
-  // Flag apakah data dari snapshot sudah di-sinkronkan saat pertama kali
-  const initializedRef = useRef(false);
-
-  useEffect(() => {
-    if (initializedRef.current) return;
-    if (initialSnapshot) {
-      // Step 1: Terisi penuh dari data pendaftaran / profil sebelumnya
-      if (initialSnapshot.fullName) setName(initialSnapshot.fullName);
-      if (initialSnapshot.phone) setPhone(initialSnapshot.phone);
-      if (initialSnapshot.birthPlace) setBirthPlace(initialSnapshot.birthPlace);
-      if (initialSnapshot.birthDate) setBirthDate(initialSnapshot.birthDate);
-      if (initialSnapshot.gender) {
-        setGender(initialSnapshot.gender as 'Laki-Laki' | 'Perempuan');
-      }
-      if (initialSnapshot.address) setAddress(initialSnapshot.address);
-      if (initialSnapshot.schoolOrOffice) setSchoolOrOffice(initialSnapshot.schoolOrOffice);
-      if (initialSnapshot.tshirtSize) setShirtSize(initialSnapshot.tshirtSize);
-
-      // Step 2 & 3 sengaja dikosongkan agar murid bebas memilih kolam, paket, jadwal,
-      // dan pembayaran baru saat daftar ulang atau setelah pendaftaran ditolak.
-      initializedRef.current = true;
-    } else if (currentUser) {
-      if (currentUser.fullName && !name) setName(currentUser.fullName);
-      if (currentUser.phone && !phone) setPhone(currentUser.phone);
-    }
-  }, [initialSnapshot, currentUser, name, phone]);
+  const bio = useBiodataState(initialSnapshot, currentUser);
+  const sel = useClassSelectionState(setErrorMsg);
 
   // Data fetching hook
   const data = useMuridData({
-    locationId,
-    firstMeetDate,
-    sessionName,
-    packageId,
+    locationId: sel.locationId,
+    firstMeetDate: sel.firstMeetDate,
+    sessionName: sel.sessionName,
+    packageId: sel.packageId,
     onError: setErrorMsg,
   });
 
-  // Otomatis sinkronkan areaId jika locationId sudah ada dari data snapshot registrasi sebelumnya
   useEffect(() => {
-    if (locationId && !areaId && data.locations.length > 0) {
-      const matchedLoc = data.locations.find((l) => l.id === locationId);
+    if (sel.locationId && !sel.areaId && data.locations.length > 0) {
+      const matchedLoc = data.locations.find((l) => l.id === sel.locationId);
       if (matchedLoc?.areaId) {
-        setAreaId(matchedLoc.areaId);
+        sel.setAreaId(matchedLoc.areaId);
       }
     }
-  }, [locationId, areaId, data.locations]);
+  }, [sel.locationId, sel.areaId, data.locations, sel]);
 
-  const currentAge = useMemo(() => calculateAge(birthDate), [birthDate]);
+  const currentAge = useMemo(() => calculateAge(bio.birthDate), [bio.birthDate]);
 
   const areaLocations = useMemo(
-    () => data.locations.filter((loc) => !areaId || loc.areaId === areaId),
-    [data.locations, areaId],
+    () => data.locations.filter((loc) => !sel.areaId || loc.areaId === sel.areaId),
+    [data.locations, sel.areaId],
   );
 
   const locationPackages = useMemo(
     () =>
       data.packages.filter(
-        (pkg) => (pkg.locationId ?? pkg.location?.id) === locationId,
+        (pkg) => (pkg.locationId ?? pkg.location?.id) === sel.locationId,
       ),
-    [data.packages, locationId],
+    [data.packages, sel.locationId],
   );
 
   const selectedLocation = useMemo(
-    () => data.locations.find((l) => l.id === locationId),
-    [data.locations, locationId],
+    () => data.locations.find((l) => l.id === sel.locationId),
+    [data.locations, sel.locationId],
   );
 
   const selectedPackage = useMemo(
-    () => data.packages.find((p) => p.id === packageId),
-    [data.packages, packageId],
+    () => data.packages.find((p) => p.id === sel.packageId),
+    [data.packages, sel.packageId],
   );
 
   const selectedInstructor = useMemo(
-    () => data.instructors.find((i) => i.instructorId === instructorId),
-    [data.instructors, instructorId],
+    () => data.instructors.find((i) => i.instructorId === sel.instructorId),
+    [data.instructors, sel.instructorId],
   );
 
-  const coursePrice =
-    selectedPackage?.price ?? selectedLocation?.regularPrice ?? 0;
+  const coursePrice = selectedPackage?.price ?? selectedLocation?.regularPrice ?? 0;
   const adminFee = coursePrice > 0 ? 5000 : 0;
   const grandTotal = coursePrice + adminFee;
-
-  const onSelectArea = (id: string) => {
-    setAreaId(id);
-    setLocationId('');
-    setPackageId('');
-    setSessionName('');
-    setInstructorId('');
-  };
-
-  const onSelectLocation = (id: string) => {
-    setLocationId(id);
-    setPackageId('');
-    setSessionName('');
-    setInstructorId('');
-  };
-
-  /** Validasi onChange tanggal pertemuan pertama: jika sebelum hari ini, kosongkan input & tampilkan error */
-  const onSelectFirstMeetDate = (val: string) => {
-    if (!val) {
-      setFirstMeetDate('');
-      setSessionName('');
-      setInstructorId('');
-      return;
-    }
-
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
-    const todayStr = `${yyyy}-${mm}-${dd}`;
-
-    if (val < todayStr) {
-      setErrorMsg('Tanggal rencana pertemuan pertama tidak boleh sebelum hari ini.');
-      setFirstMeetDate('');
-      setSessionName('');
-      setInstructorId('');
-      return;
-    }
-
-    setErrorMsg('');
-    setFirstMeetDate(val);
-    setSessionName('');
-    setInstructorId('');
-  };
 
   const handleNextStep1 = (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
-    if (
-      !name ||
-      !birthPlace ||
-      !birthDate ||
-      !address ||
-      !phone ||
-      !schoolOrOffice
-    ) {
-      setErrorMsg(
-        'Mohon lengkapi seluruh kolom biodata bertanda bintang (*).',
-      );
+    if (!bio.name || !bio.birthPlace || !bio.birthDate || !bio.address || !bio.phone || !bio.schoolOrOffice) {
+      setErrorMsg('Mohon lengkapi seluruh kolom biodata bertanda bintang (*).');
       return;
     }
     setStep(2);
   };
 
   return {
-    // Wizard step & submission
     step,
     setStep,
     errorMsg,
@@ -195,53 +90,10 @@ export function useMuridForm(
     isSubmitting,
     setIsSubmitting,
     userEmail,
-
-    // Step 1 values & handlers
-    name,
-    setName,
-    birthPlace,
-    setBirthPlace,
-    birthDate,
-    setBirthDate,
+    ...bio,
     currentAge,
-    gender,
-    setGender,
-    address,
-    setAddress,
-    phone,
-    setPhone,
-    schoolOrOffice,
-    setSchoolOrOffice,
-    shirtSize,
-    setShirtSize,
     handleNextStep1,
-
-    // Step 2 values & handlers
-    areaId,
-    setAreaId,
-    onSelectArea,
-    locationId,
-    setLocationId,
-    onSelectLocation,
-    packageId,
-    setPackageId,
-    firstMeetDate,
-    setFirstMeetDate: onSelectFirstMeetDate,
-    onSelectFirstMeetDate,
-    sessionName,
-    setSessionName,
-    instructorId,
-    setInstructorId,
-    photoFile,
-    setPhotoFile,
-
-    // Step 3 values & handlers
-    paymentMethod,
-    setPaymentMethod,
-    paymentProofFile,
-    setPaymentProofFile,
-
-    // Master & dynamic data
+    ...sel,
     areas: data.areas,
     locations: data.locations,
     packages: data.packages,
@@ -250,8 +102,6 @@ export function useMuridForm(
     sessionLoading: data.sessionLoading,
     instructors: data.instructors,
     instructorLoading: data.instructorLoading,
-
-    // Derived values
     areaLocations,
     locationPackages,
     selectedLocation,
@@ -262,3 +112,6 @@ export function useMuridForm(
     grandTotal,
   };
 }
+
+export type UseMuridFormReturn = ReturnType<typeof useMuridForm>;
+

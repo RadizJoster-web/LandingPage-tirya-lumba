@@ -8,8 +8,7 @@ import React, {
   useEffect,
   useState,
 } from 'react';
-import { LoginResult, RegistrationSnapshot } from '@/types';
-import { request } from '@/lib/http';
+import { RegistrationSnapshot } from '@/types';
 import {
   clearSession,
   getServerSnapshot,
@@ -21,48 +20,12 @@ import {
   updateUser,
 } from '@/services/session-store';
 import { AuthContextType } from './types';
-
-async function registerAccount(input: {
-  fullName: string;
-  email: string;
-  password: string;
-}): Promise<string> {
-  const res = await request<string>('/auth/register', {
-    method: 'POST',
-    body: input,
-  });
-  return res.data;
-}
-
-async function verifyOtpRequest(input: {
-  email: string;
-  otpCode: string;
-}): Promise<void> {
-  await request<unknown>('/auth/verify-otp', { method: 'POST', body: input });
-}
-
-async function loginAccount(input: {
-  email: string;
-  password: string;
-}): Promise<LoginResult> {
-  const res = await request<LoginResult>('/auth/login', {
-    method: 'POST',
-    body: input,
-  });
-  return res.data;
-}
-
-async function fetchMyRegistration(): Promise<RegistrationSnapshot | null> {
-  try {
-    const res = await request<RegistrationSnapshot | null>('/register/me', {
-      method: 'GET',
-    });
-    return res.data ?? null;
-  } catch (err) {
-    console.warn('[AuthProvider] Gagal mengambil snapshot registrasi dari server:', err);
-    return null;
-  }
-}
+import {
+  registerAccount,
+  verifyOtpRequest,
+  loginAccount,
+  fetchMyRegistration,
+} from './authApi';
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { request, toErrorMessage } from '@/lib/http';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { Eye, EyeOff, CheckCircle2, AlertCircle } from 'lucide-react';
+import { useForgotPassword } from './lib/useForgotPassword';
 
 interface LoginFormProps {
   email: string;
@@ -24,37 +24,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   onSubmit,
 }) => {
   const [showPassword, setShowPassword] = useState(false);
-  const [forgotStatus, setForgotStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-  const [forgotMessage, setForgotMessage] = useState('');
-
-  const handleForgotPassword = async () => {
-    setForgotMessage('');
-    const cleanEmail = email.trim();
-    if (!cleanEmail || !/^\S+@\S+\.\S+$/.test(cleanEmail)) {
-      setForgotStatus('error');
-      setForgotMessage(
-        'Masukkan alamat email Anda pada kolom di atas terlebih dahulu untuk menerima tautan reset kata sandi.',
-      );
-      return;
-    }
-
-    setForgotStatus('loading');
-    try {
-      const res = await request<{ message?: string }>('/auth/forgot-password', {
-        method: 'POST',
-        body: { email: cleanEmail },
-      });
-      setForgotStatus('success');
-      setForgotMessage(
-        res.data?.message ||
-          res.message ||
-          `Tautan reset kata sandi telah dikirim ke ${cleanEmail}. Silakan periksa kotak masuk atau spam email Anda.`,
-      );
-    } catch (err) {
-      setForgotStatus('error');
-      setForgotMessage(toErrorMessage(err));
-    }
-  };
+  const { forgotStatus, forgotMessage, resetForgotStatus, handleForgotPassword } =
+    useForgotPassword(email);
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
@@ -65,10 +36,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         value={email}
         onChange={(e) => {
           setEmail(e.target.value);
-          if (forgotStatus !== 'idle') {
-            setForgotStatus('idle');
-            setForgotMessage('');
-          }
+          resetForgotStatus();
         }}
         autoComplete="email"
         required
@@ -103,17 +71,12 @@ export const LoginForm: React.FC<LoginFormProps> = ({
               title={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
               aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
             >
-              {showPassword ? (
-                <EyeOff className="w-4 h-4" />
-              ) : (
-                <Eye className="w-4 h-4" />
-              )}
+              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
           }
         />
       </div>
 
-      {/* Inline alert for instant forgot password */}
       {forgotStatus === 'success' && (
         <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200/80 text-xs text-emerald-800 animate-fade-in flex items-start gap-2.5">
           <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />

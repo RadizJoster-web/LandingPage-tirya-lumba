@@ -5,9 +5,9 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { request, toErrorMessage } from '@/lib/http';
 import { Card } from '@/components/ui/Card';
-import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
-import { CheckCircle2, AlertCircle, ArrowLeft } from 'lucide-react';
+import { CheckCircle2 } from 'lucide-react';
+import { ForgotPasswordForm } from './ForgotPasswordForm';
 
 function ForgotPasswordContent() {
   const searchParams = useSearchParams();
@@ -64,7 +64,8 @@ function ForgotPasswordContent() {
             Lupa Kata Sandi?
           </h1>
           <p className="text-slate-500 text-xs sm:text-sm mt-1.5 leading-relaxed">
-            Masukkan alamat email akun Anda. Kami akan mengirimkan tautan untuk mengatur ulang kata sandi.
+            Masukkan alamat email akun Anda. Kami akan mengirimkan tautan untuk
+            mengatur ulang kata sandi.
           </p>
         </div>
 
@@ -89,47 +90,13 @@ function ForgotPasswordContent() {
             </div>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <Input
-                label="Alamat Email Terdaftar"
-                type="email"
-                placeholder="nama@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                autoComplete="email"
-                required
-              />
-            </div>
-
-            {error && (
-              <div className="p-3 rounded-lg bg-rose-50 border border-rose-200/80 text-xs font-medium text-rose-700 flex items-start gap-2">
-                <AlertCircle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
-                <span>{error}</span>
-              </div>
-            )}
-
-            <Button
-              type="submit"
-              variant="primary"
-              size="md"
-              isFullRounded={false}
-              className="w-full mt-2 font-semibold"
-              isLoading={isLoading}
-            >
-              Kirim Tautan Reset
-            </Button>
-
-            <div className="text-center pt-2">
-              <Link
-                href="/login"
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-[#0077B6] transition-colors"
-              >
-                <ArrowLeft className="w-3.5 h-3.5" />
-                Kembali ke Halaman Masuk
-              </Link>
-            </div>
-          </form>
+          <ForgotPasswordForm
+            email={email}
+            setEmail={setEmail}
+            error={error}
+            isLoading={isLoading}
+            onSubmit={handleSubmit}
+          />
         )}
       </Card>
     </div>

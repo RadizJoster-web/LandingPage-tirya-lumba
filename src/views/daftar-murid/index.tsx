@@ -3,49 +3,10 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
-import {
-  RegistrationResult,
-  StudentRegistrationPayload,
-} from '@/types';
-import { request, toErrorMessage } from '@/lib/http';
 import { MuridWizardLayout } from './MuridWizardLayout';
 import { MuridFormSteps } from './MuridFormSteps';
 import { useMuridForm } from './useMuridForm';
-import {
-  buildStudentPayload,
-  createStudentSnapshot,
-} from './registrationHelper';
-
-async function uploadStudentPhoto(file: File) {
-  const form = new FormData();
-  form.append('profilePicture', file);
-  const res = await request<{ profilePictureUrl?: string }>(
-    '/upload-file/student/profile',
-    { method: 'POST', body: form },
-  );
-  const url = res.data?.profilePictureUrl ?? '';
-  return { url, urlReported: Boolean(url) };
-}
-
-async function uploadPaymentProof(file: File) {
-  const form = new FormData();
-  form.append('paymentProof', file);
-  form.append('profilePicture', file);
-  const res = await request<{ paymentProofUrl?: string; profilePictureUrl?: string }>(
-    '/upload-file/student/payment',
-    { method: 'POST', body: form },
-  );
-  const url = res.data?.paymentProofUrl ?? res.data?.profilePictureUrl ?? '';
-  return { url, urlReported: Boolean(url) };
-}
-
-async function submitStudent(payload: StudentRegistrationPayload) {
-  const res = await request<RegistrationResult>('/register/student', {
-    method: 'POST',
-    body: payload,
-  });
-  return res.data;
-}
+import { useMuridSubmit } from './lib/useMuridSubmit';
 
 export default function DaftarMuridParent() {
   const router = useRouter();
@@ -63,10 +24,18 @@ export default function DaftarMuridParent() {
   const [photoUrl, setPhotoUrl] = useState(
     studentSnapshot?.profilePictureUrl ?? user?.profilePictureUrl ?? '',
   );
-  // Step 3 bukti bayar selalu dikosongkan agar pengguna mengunggah bukti baru
   const [paymentProofUrl, setPaymentProofUrl] = useState('');
 
   const form = useMuridForm(user?.email ?? '', studentSnapshot, user);
+
+  const { handleNextStep1, handleNextStep2, handleSubmit } = useMuridSubmit({
+    form,
+    photoUrl,
+    setPhotoUrl,
+    paymentProofUrl,
+    persistRegistration,
+    refreshRegistration,
+  });
 
   useEffect(() => {
     if (!authLoading && !user) router.push('/login');
@@ -77,99 +46,6 @@ export default function DaftarMuridParent() {
       setPhotoUrl(studentSnapshot.profilePictureUrl);
     }
   }, [studentSnapshot, photoUrl]);
-
-  const handleNextStep1 = async (e: React.FormEvent) => {
-    e.preventDefault();
-    form.setErrorMsg('');
-
-    if (
-      !form.name ||
-      !form.birthPlace ||
-      !form.birthDate ||
-      !form.address ||
-      !form.phone ||
-      !form.schoolOrOffice
-    ) {
-      form.setErrorMsg('Mohon lengkapi seluruh kolom biodata bertanda bintang (*).');
-      return;
-    }
-
-    const hasPhoto = Boolean(form.photoFile || photoUrl);
-    if (!hasPhoto) {
-      form.setErrorMsg('Silakan unggah pas foto profil 4x6 murid terlebih dahulu.');
-      return;
-    }
-
-    form.setIsSubmitting(true);
-    try {
-      if (form.photoFile) {
-        const photo = await uploadStudentPhoto(form.photoFile);
-        setPhotoUrl(photo.url);
-      }
-      form.setStep(2);
-    } catch (err) {
-      form.setErrorMsg(`Gagal mengunggah foto profil 4x6: ${toErrorMessage(err)}`);
-    } finally {
-      form.setIsSubmitting(false);
-    }
-  };
-
-  const handleNextStep2 = (e: React.FormEvent) => {
-    e.preventDefault();
-    form.setErrorMsg('');
-
-    if (
-      !form.locationId ||
-      !form.packageId ||
-      !form.firstMeetDate ||
-      !form.sessionName ||
-      !form.instructorId
-    ) {
-      form.setErrorMsg(
-        'Pastikan kolam renang, paket, tanggal mulai, jam sesi, dan pelatih sudah dipilih.',
-      );
-      return;
-    }
-
-    form.setStep(3);
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    form.setErrorMsg('');
-
-    const hasPaymentProof = Boolean(form.paymentProofFile || paymentProofUrl);
-    if (!hasPaymentProof) {
-      form.setErrorMsg('Bukti pembayaran wajib diunggah.');
-      return;
-    }
-
-    form.setIsSubmitting(true);
-    try {
-      let finalProofUrl = paymentProofUrl;
-      let reported = Boolean(paymentProofUrl);
-
-      if (form.paymentProofFile) {
-        const proof = await uploadPaymentProof(form.paymentProofFile);
-        finalProofUrl = proof.url;
-        reported = proof.urlReported;
-      }
-
-      const payload = buildStudentPayload(form, photoUrl, finalProofUrl);
-      const res = await submitStudent(payload);
-
-      persistRegistration(
-        createStudentSnapshot(form, payload, res, reported),
-      );
-      await refreshRegistration();
-
-      router.push('/profile');
-    } catch (err) {
-      form.setErrorMsg(`Gagal memproses pendaftaran murid: ${toErrorMessage(err)}`);
-    } finally {
-      form.setIsSubmitting(false);
-    }
-  };
 
   if (authLoading || !user) {
     return (

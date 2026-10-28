@@ -7,57 +7,10 @@ import {
   SessionSlot,
 } from '@/types';
 import { dayNameFromDate } from '@/lib/utils';
-import { request, toErrorMessage } from '@/lib/http';
+import { toErrorMessage } from '@/lib/http';
+import { fetchMaster, fetchSessions, fetchInstructors } from './lib/api';
 
-export async function fetchMaster() {
-  const [a, l, p] = await Promise.all([
-    request<Area[]>('/areas', {
-      method: 'GET',
-      revalidate: 3600,
-      tag: 'areas',
-    }),
-    request<Location[]>('/locations', {
-      method: 'GET',
-      revalidate: 3600,
-      tag: 'locations',
-    }),
-    request<LessonPackage[]>('/packages', {
-      method: 'GET',
-      revalidate: 3600,
-      tag: 'packages',
-    }),
-  ]);
-  return {
-    areas: a.data ?? [],
-    locations: l.data ?? [],
-    packages: p.data ?? [],
-  };
-}
-
-export async function fetchSessions(locationId: string, dayOfWeek: string) {
-  const q = new URLSearchParams({ locationId, dayOfWeek });
-  const res = await request<SessionSlot[]>(`/sessions?${q}`, { method: 'GET' });
-  return res.data ?? [];
-}
-
-export async function fetchInstructors(p: {
-  locationId: string;
-  dayOfWeek: string;
-  sessionName: string;
-  packageType?: 'REGULER' | 'PRIVAT';
-}) {
-  const q = new URLSearchParams({
-    locationId: p.locationId,
-    dayOfWeek: p.dayOfWeek,
-    sessionName: p.sessionName,
-    ...(p.packageType ? { packageType: p.packageType } : {}),
-  });
-  const res = await request<AvailableInstructor[]>(
-    `/instructor/available?${q}`,
-    { method: 'GET' },
-  );
-  return res.data ?? [];
-}
+export { fetchMaster, fetchSessions, fetchInstructors };
 
 interface UseMuridDataParams {
   locationId: string;
@@ -111,7 +64,7 @@ export function useMuridData({
     return () => {
       active = false;
     };
-  }, []); // Run once on mount!
+  }, []);
 
   const dayOfWeek = dayNameFromDate(firstMeetDate);
   const sessionKey =

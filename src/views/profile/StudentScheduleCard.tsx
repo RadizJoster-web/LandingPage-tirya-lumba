@@ -40,7 +40,6 @@ export const StudentScheduleCard: React.FC<StudentScheduleCardProps> = ({
 
   return (
     <section className="rounded-xl border border-gray-200/90 bg-white p-6 sm:p-7 shadow-xs dark:bg-slate-900 dark:border-slate-800 space-y-6">
-      {/* Top Header Row with Hero Metric for Active Sessions */}
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-5 pb-6 border-b border-slate-100 dark:border-slate-800">
         <div>
           <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 block mb-1">
@@ -54,7 +53,6 @@ export const StudentScheduleCard: React.FC<StudentScheduleCardProps> = ({
           </p>
         </div>
 
-        {/* Hero Metric: Large Bold Active Sessions */}
         <div className="flex sm:flex-col items-center sm:items-end justify-between p-4 rounded-xl bg-slate-50 border border-slate-100 sm:min-w-[160px] dark:bg-slate-800/60 dark:border-slate-700">
           <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
             Sisa Pertemuan
@@ -68,7 +66,6 @@ export const StudentScheduleCard: React.FC<StudentScheduleCardProps> = ({
         </div>
       </div>
 
-      {/* Primary Training Info Grid: Day, Time, Pool Location */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="p-4 rounded-xl bg-[#F8F9FA] border border-slate-100 space-y-1.5 dark:bg-slate-800/40 dark:border-slate-800">
           <div className="flex items-center gap-2 text-slate-400 text-xs uppercase font-semibold tracking-wider">
@@ -106,7 +103,6 @@ export const StudentScheduleCard: React.FC<StudentScheduleCardProps> = ({
         </div>
       </div>
 
-      {/* Collapsible Clean Preparation Checklist */}
       <div className="rounded-xl border border-slate-200/80 bg-slate-50/50 overflow-hidden dark:bg-slate-900/40 dark:border-slate-800">
         <button
           type="button"

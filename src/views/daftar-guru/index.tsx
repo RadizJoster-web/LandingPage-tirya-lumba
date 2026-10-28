@@ -4,14 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 import { DAYS_ID } from '@/lib/constants';
-import {
-  Area,
-  InstructorRegistrationPayload,
-  Location,
-  RegistrationResult,
-  SessionSlot,
-} from '@/types';
-import { ApiError, request, toErrorMessage } from '@/lib/http';
+import { Area, Location, SessionSlot } from '@/types';
+import { toErrorMessage } from '@/lib/http';
 import { GuruWizardLayout } from './GuruWizardLayout';
 import { GuruFormSteps } from './GuruFormSteps';
 import { useGuruForm } from './useGuruForm';
@@ -20,85 +14,20 @@ import {
   buildInstructorPayload,
   buildInstructorSnapshot,
 } from './lib/buildInstructorSnapshot';
-
-async function fetchMasterData(): Promise<{
-  areas: Area[];
-  locations: Location[];
-}> {
-  const [a, l] = await Promise.all([
-    request<Area[]>('/areas', {
-      method: 'GET',
-      revalidate: 3600,
-      tag: 'areas',
-    }),
-    request<Location[]>('/locations', {
-      method: 'GET',
-      revalidate: 3600,
-      tag: 'locations',
-    }),
-  ]);
-  return { areas: a.data, locations: l.data };
-}
-
-async function fetchSessions(
-  locationId: string,
-  dayOfWeek: string,
-): Promise<SessionSlot[]> {
-  const query = new URLSearchParams({ locationId, dayOfWeek });
-  const res = await request<SessionSlot[]>(`/sessions?${query}`, {
-    method: 'GET',
-  });
-  return res.data;
-}
-
-async function uploadCv(file: File): Promise<string> {
-  const form = new FormData();
-  form.append('cv', file);
-
-  const res = await request<{ cvUrl?: string }>('/upload-file/instructor/cv', {
-    method: 'POST',
-    body: form,
-  });
-
-  if (!res.data?.cvUrl)
-    throw new ApiError('Server tidak mengembalikan URL CV.', 200);
-  
-  return res.data.cvUrl;
-}
-
-async function uploadProfilePicture(file: File): Promise<string> {
-  const form = new FormData();
-  form.append('profilePicture', file);
-
-  const res = await request<{ profilePictureUrl?: string }>(
-    '/upload-file/instructor/profile',
-    { method: 'POST', body: form },
-  );
-
-  if (!res.data?.profilePictureUrl)
-    throw new ApiError('Server tidak mengembalikan URL foto profil.', 200);
-
-  return res.data.profilePictureUrl;
-}
-
-async function submitInstructor(
-  payload: InstructorRegistrationPayload,
-): Promise<RegistrationResult> {
-  const res = await request<RegistrationResult>('/register/instructor', {
-    method: 'POST',
-    body: payload,
-  });
-  return res.data;
-}
+import {
+  fetchMasterData,
+  fetchSessions,
+  uploadCv,
+  uploadProfilePicture,
+  submitInstructor,
+} from './lib/api';
 
 export default function DaftarGuruParent() {
   const router = useRouter();
   const { user, isLoading: authLoading, persistRegistration } = useAuth();
   const [areas, setAreas] = useState<Area[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
-  const [sessionMap, setSessionMap] = useState<Record<string, SessionSlot[]>>(
-    {},
-  );
+  const [sessionMap, setSessionMap] = useState<Record<string, SessionSlot[]>>({});
   const form = useGuruForm(locations);
 
   const { isCvUploading, isPhotoUploading, handleCvChange, handlePhotoChange } =

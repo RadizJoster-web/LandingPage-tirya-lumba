@@ -81,7 +81,6 @@ export const PoolPackagePicker: React.FC<PoolPackagePickerProps> = ({
         </Select>
       </div>
 
-      {/* Interactive Radio Cards for Package Selection */}
       <div>
         <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">
           Pilihan Paket Kursus Renang *
