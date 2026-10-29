@@ -50,7 +50,7 @@ export const CoachDetailModal: React.FC<CoachDetailModalProps> = ({
             <div className="mt-1 flex items-center gap-1.5 text-[11px] text-slate-500">
               <span className="w-2 h-2 rounded-full bg-emerald-500" />
               <span>
-                Kapasitas: {coach.currentStudentCount} / {coach.maxCapacity} murid aktif
+                Kapasitas: {coach.currentStudentCount ?? coach.currentSlots ?? 0} / {coach.maxCapacity ?? 5} murid aktif
               </span>
             </div>
           </div>

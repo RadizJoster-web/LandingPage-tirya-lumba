@@ -1,13 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidateTag } from 'next/cache';
+import crypto from 'crypto';
 
 export async function POST(request: NextRequest) {
-  const secret = process.env.REVALIDATE_SECRET || 'tirya-lumba-revalidate-secret-key';
-  const providedSecret =
-    request.headers.get('x-revalidate-secret') ||
-    request.nextUrl.searchParams.get('secret');
+  const secret = process.env.REVALIDATE_SECRET;
+  if (!secret) {
+    return NextResponse.json(
+      { success: false, message: 'Server configuration error: secret is not configured.' },
+      { status: 500 },
+    );
+  }
 
-  if (!providedSecret || providedSecret !== secret) {
+  const providedSecret = request.headers.get('x-revalidate-secret');
+
+  if (!providedSecret) {
+    return NextResponse.json(
+      { success: false, message: 'Invalid or missing revalidation secret.' },
+      { status: 401 },
+    );
+  }
+
+  const bufProvided = Buffer.from(providedSecret);
+  const bufExpected = Buffer.from(secret);
+
+  // Timing-safe comparison
+  const isValid =
+    bufProvided.length === bufExpected.length &&
+    crypto.timingSafeEqual(bufProvided, bufExpected);
+
+  if (!isValid) {
     return NextResponse.json(
       { success: false, message: 'Invalid or missing revalidation secret.' },
       { status: 401 },

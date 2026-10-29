@@ -48,15 +48,18 @@ export const CoachSelector: React.FC<CoachSelectorProps> = ({
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-80 overflow-y-auto p-0.5">
-          {availableCoaches.map((coach) => (
-            <CoachCard
-              key={coach.instructorId}
-              coach={coach}
-              selected={coachId === coach.instructorId}
-              onSelect={setCoachId}
-              onDetail={setActiveCoachDetail}
-            />
-          ))}
+          {availableCoaches.map((coach) => {
+            const id = coach.instructorId || coach.id || '';
+            return (
+              <CoachCard
+                key={id}
+                coach={coach}
+                selected={coachId === id}
+                onSelect={setCoachId}
+                onDetail={setActiveCoachDetail}
+              />
+            );
+          })}
         </div>
       )}
 

@@ -18,16 +18,27 @@ export const CoachCard: React.FC<CoachCardProps> = ({
   onDetail,
 }) => {
   const avatar = mediaUrl(coach.profilePictureUrl);
-  const remaining = Math.max(0, coach.maxCapacity - coach.currentStudentCount);
+  const coachId = coach.instructorId || coach.id || '';
+  const currentCount = coach.currentStudentCount ?? coach.currentSlots ?? 0;
+  const maxCap = coach.maxCapacity ?? 5;
+  const remaining =
+    typeof coach.remainingSlots === 'number'
+      ? coach.remainingSlots
+      : Math.max(0, maxCap - currentCount);
+  const isFull = remaining <= 0;
   const initial = coach.fullName.trim().charAt(0).toUpperCase() || 'P';
 
   return (
     <div
-      onClick={() => onSelect(coach.instructorId)}
-      className={`flex items-center justify-between gap-3 p-3.5 border-2 rounded-xl cursor-pointer transition-all duration-200 ${
-        selected
-          ? 'bg-[#E0FBFC]/30 border-[#00B4D8] shadow-xs'
-          : 'bg-white border-gray-200 hover:border-[#00B4D8]/50 dark:bg-slate-900 dark:border-slate-800'
+      onClick={() => {
+        if (!isFull) onSelect(coachId);
+      }}
+      className={`flex items-center justify-between gap-3 p-3.5 border-2 rounded-xl transition-all duration-200 ${
+        isFull
+          ? 'opacity-60 cursor-not-allowed bg-slate-50 border-gray-200 dark:bg-slate-900 dark:border-slate-800'
+          : selected
+          ? 'bg-[#E0FBFC]/30 border-[#00B4D8] shadow-xs cursor-pointer'
+          : 'bg-white border-gray-200 hover:border-[#00B4D8]/50 cursor-pointer dark:bg-slate-900 dark:border-slate-800'
       }`}
     >
       <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -62,7 +73,7 @@ export const CoachCard: React.FC<CoachCardProps> = ({
               {remaining > 0 ? `Sisa ${remaining} slot` : 'Penuh'}
             </span>
             <span className="text-[10px] text-slate-400">
-              ({coach.currentStudentCount}/{coach.maxCapacity})
+              ({currentCount}/{maxCap})
             </span>
           </div>
         </div>

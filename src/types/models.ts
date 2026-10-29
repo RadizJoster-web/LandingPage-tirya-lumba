@@ -77,6 +77,7 @@ export interface SessionSlot {
 }
 
 export interface AvailableInstructor {
+  id?: string;
   instructorId: string;
   fullName: string;
   profilePictureUrl?: string | null;
@@ -85,6 +86,8 @@ export interface AvailableInstructor {
   shortBio?: string | null;
   currentStudentCount: number;
   maxCapacity: number;
+  currentSlots?: number;
+  remainingSlots?: number;
 }
 
 export interface ProgramCatalogItem {
