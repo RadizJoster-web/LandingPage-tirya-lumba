@@ -1,8 +1,18 @@
 import React, { useState } from 'react';
 import { StudentRegistrationSnapshot } from '@/types';
-import { formatDateId, dayNameFromDate, formatSessionWithTime, getSessionTime } from '@/lib/utils';
+import {
+  formatDateId,
+  dayNameFromDate,
+  getSessionTime,
+} from '@/lib/utils';
 import { Badge } from '@/components/ui/Badge';
-import { Calendar, Clock, MapPin, ChevronDown, CheckCircle2 } from 'lucide-react';
+import {
+  Calendar,
+  Clock,
+  MapPin,
+  ChevronDown,
+  CheckCircle2,
+} from 'lucide-react';
 
 interface StudentScheduleCardProps {
   snapshot: StudentRegistrationSnapshot;
@@ -17,12 +27,6 @@ export const StudentScheduleCard: React.FC<StudentScheduleCardProps> = ({
   const dayName = dateStr ? dayNameFromDate(dateStr) : 'Hari Latihan';
   const formattedDate = dateStr ? formatDateId(dateStr) : '-';
   const sessionName = snapshot.firstMeetSession || 'Sesi Latihan';
-  const formattedSession = formatSessionWithTime(
-    sessionName,
-    snapshot.timeRange,
-    snapshot.startTime,
-    snapshot.endTime,
-  );
   const sessionTimeStr = getSessionTime(
     sessionName,
     snapshot.startTime,
@@ -84,7 +88,7 @@ export const StudentScheduleCard: React.FC<StudentScheduleCardProps> = ({
             <span>Jam Sesi</span>
           </div>
           <p className="font-heading font-bold text-base text-[#1D3557] dark:text-slate-100">
-            {formattedSession}
+            {sessionName}
           </p>
           <p className="text-xs text-slate-500">Pukul {sessionTimeStr} WIB</p>
         </div>
@@ -124,19 +128,31 @@ export const StudentScheduleCard: React.FC<StudentScheduleCardProps> = ({
           <div className="px-4 pb-4 pt-2 border-t border-slate-100 text-xs text-slate-600 space-y-2 dark:border-slate-800 dark:text-slate-300 animate-fade-in">
             <div className="flex items-start gap-2">
               <span className="font-bold text-[#0077B6]">&gt;</span>
-              <span>Hadir minimal <strong>15 menit lebih awal</strong> sebelum jam sesi untuk pemanasan otot dan absensi.</span>
+              <span>
+                Hadir minimal <strong>15 menit lebih awal</strong> sebelum jam
+                sesi untuk pemanasan otot dan absensi.
+              </span>
             </div>
             <div className="flex items-start gap-2">
               <span className="font-bold text-[#0077B6]">&gt;</span>
-              <span>Wajib mengenakan <strong>pakaian renang standar</strong> dan membawa kacamata renang pribadi.</span>
+              <span>
+                Wajib mengenakan <strong>pakaian renang standar</strong> dan
+                membawa kacamata renang pribadi.
+              </span>
             </div>
             <div className="flex items-start gap-2">
               <span className="font-bold text-[#0077B6]">&gt;</span>
-              <span>Jika berhalangan hadir, harap berikan konfirmasi minimal <strong>24 jam</strong> sebelumnya ke admin atau instruktur.</span>
+              <span>
+                Jika berhalangan hadir, harap berikan konfirmasi minimal{' '}
+                <strong>24 jam</strong> sebelumnya ke admin atau instruktur.
+              </span>
             </div>
             <div className="flex items-start gap-2">
               <span className="font-bold text-[#0077B6]">&gt;</span>
-              <span>Tunjukkan kartu / status di profil ini kepada pengawas kolam saat registrasi kehadiran.</span>
+              <span>
+                Tunjukkan kartu / status di profil ini kepada pengawas kolam
+                saat registrasi kehadiran.
+              </span>
             </div>
           </div>
         )}

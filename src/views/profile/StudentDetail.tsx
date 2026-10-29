@@ -9,9 +9,9 @@ const PAYMENT_LABEL: Record<string, string> = {
   QRIS: 'QRIS Digital',
 };
 
-export const StudentDetail: React.FC<{ snapshot: StudentRegistrationSnapshot }> = ({
-  snapshot,
-}) => {
+export const StudentDetail: React.FC<{
+  snapshot: StudentRegistrationSnapshot;
+}> = ({ snapshot }) => {
   return (
     <section className="rounded-xl border border-gray-200/90 bg-white p-6 sm:p-7 shadow-xs dark:bg-slate-900 dark:border-slate-800">
       <div className="mb-5 pb-4 border-b border-slate-100 dark:border-slate-800">
@@ -31,12 +31,7 @@ export const StudentDetail: React.FC<{ snapshot: StudentRegistrationSnapshot }> 
         />
         <DetailField
           label="Jadwal & Sesi Latihan"
-          value={formatSessionWithTime(
-            snapshot.firstMeetSession,
-            snapshot.timeRange,
-            snapshot.startTime,
-            snapshot.endTime,
-          )}
+          value={snapshot.firstMeetSession}
         />
         <DetailField
           label="Sekolah / Kantor"
@@ -46,13 +41,12 @@ export const StudentDetail: React.FC<{ snapshot: StudentRegistrationSnapshot }> 
           label="Ukuran T-Shirt"
           value={snapshot.tshirtSize || '–'}
         />
-        <DetailField
-          label="Alamat Domisili"
-          value={snapshot.address || '–'}
-        />
+        <DetailField label="Alamat Domisili" value={snapshot.address || '–'} />
         <DetailField
           label="Metode Pembayaran"
-          value={PAYMENT_LABEL[snapshot.paymentMethod] ?? snapshot.paymentMethod}
+          value={
+            PAYMENT_LABEL[snapshot.paymentMethod] ?? snapshot.paymentMethod
+          }
         />
         <DetailField
           label="Biaya Paket"
