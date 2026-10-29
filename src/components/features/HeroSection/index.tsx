@@ -18,7 +18,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           <HeroContent totalPartnerPools={totalPartnerPools} />
-          <HeroGraphic totalPartnerPools={totalPartnerPools} />
+          <HeroGraphic />
         </div>
       </div>
     </section>
