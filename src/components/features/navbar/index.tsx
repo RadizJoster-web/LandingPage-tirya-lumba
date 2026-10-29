@@ -8,6 +8,7 @@ import { NavigationList } from './NavigationList';
 import { AuthProfile } from './AuthProfile';
 import { MobileToggle } from './MobileToggle';
 import { MobileMenu } from './MobileMenu';
+import { motion, SMOOTH_EASE } from '@/components/ui/motion';
 
 export const Navbar: React.FC = () => {
   const router = useRouter();
@@ -20,7 +21,12 @@ export const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-white/75 backdrop-blur-md border-b border-slate-200/60 transition-all dark:bg-slate-900/80 dark:border-slate-800">
+    <motion.nav
+      initial={{ y: -16, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.45, ease: SMOOTH_EASE }}
+      className="sticky top-0 z-50 bg-white/75 backdrop-blur-md border-b border-slate-200/60 transition-all dark:bg-slate-900/80 dark:border-slate-800"
+    >
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-[68px]">
           <div className="flex items-center gap-8">
@@ -52,7 +58,7 @@ export const Navbar: React.FC = () => {
         onClose={() => setIsMobileMenuOpen(false)}
         onLogout={handleLogout}
       />
-    </nav>
+    </motion.nav>
   );
 };
 

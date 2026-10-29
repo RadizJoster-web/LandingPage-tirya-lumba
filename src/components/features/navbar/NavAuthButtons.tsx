@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { Avatar } from '@/components/ui/Avatar';
 import { ProfileMenu } from './ProfileMenu';
 import { ChevronDown } from 'lucide-react';
+import { AnimatePresence } from '@/components/ui/motion';
 
 interface NavAuthButtonsProps {
   user: AuthUser | null;
@@ -81,14 +82,16 @@ export const NavAuthButtons: React.FC<NavAuthButtonsProps> = ({
         />
       </button>
 
-      {isOpen && (
-        <ProfileMenu
-          user={user}
-          registration={registration}
-          onNavigate={() => setIsOpen(false)}
-          onLogout={onLogout}
-        />
-      )}
+      <AnimatePresence>
+        {isOpen && (
+          <ProfileMenu
+            user={user}
+            registration={registration}
+            onNavigate={() => setIsOpen(false)}
+            onLogout={onLogout}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };

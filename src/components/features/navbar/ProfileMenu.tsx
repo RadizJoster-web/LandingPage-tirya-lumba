@@ -6,6 +6,7 @@ import { AuthUser, RegistrationSnapshot } from '@/types';
 import { Avatar } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
 import { User, LogOut, ArrowRight } from 'lucide-react';
+import { motion, SMOOTH_EASE } from '@/components/ui/motion';
 
 export const ROLE_LABEL: Record<string, string> = {
   STUDENT: 'Murid',
@@ -30,9 +31,13 @@ export const ProfileMenu: React.FC<ProfileMenuProps> = ({
   const name = user.fullName || user.email;
 
   return (
-    <div
+    <motion.div
       role="menu"
-      className="absolute right-0 mt-2 max-h-[calc(100vh-6rem)] w-72 origin-top-right overflow-y-auto rounded-2xl border border-slate-100 bg-white p-4 shadow-xl shadow-blue-950/5 animate-scale-up dark:bg-slate-900 dark:border-slate-800"
+      initial={{ opacity: 0, scale: 0.95, y: -6 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.95, y: -6 }}
+      transition={{ duration: 0.2, ease: SMOOTH_EASE }}
+      className="absolute right-0 mt-2 max-h-[calc(100vh-6rem)] w-72 origin-top-right overflow-y-auto rounded-2xl border border-slate-100 bg-white p-4 shadow-xl shadow-blue-950/5 dark:bg-slate-900 dark:border-slate-800"
     >
       <div className="flex items-center gap-3">
         <Avatar name={name} src={user.profilePictureUrl} size="md" />
@@ -95,6 +100,6 @@ export const ProfileMenu: React.FC<ProfileMenuProps> = ({
           Keluar dari Akun
         </button>
       </div>
-    </div>
+    </motion.div>
   );
 };

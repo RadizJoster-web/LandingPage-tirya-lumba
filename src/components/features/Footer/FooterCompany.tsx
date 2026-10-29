@@ -3,7 +3,7 @@ import { MapPin, Phone, Mail } from 'lucide-react';
 
 export const FooterCompany: React.FC = () => {
   return (
-    <div className="md:col-span-2 space-y-4">
+    <div className="space-y-4">
       <div className="flex items-center gap-2.5">
         <div className="w-8 h-8 rounded-full bg-[#00B4D8] flex items-center justify-center text-white">
           <svg

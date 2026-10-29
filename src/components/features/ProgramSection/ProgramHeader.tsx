@@ -1,6 +1,9 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
+import { MotionFadeIn, motion } from '@/components/ui/motion';
 
 interface ProgramHeaderProps {
   totalRegulerCount: number;
@@ -11,7 +14,7 @@ export const ProgramHeader: React.FC<ProgramHeaderProps> = ({
 }) => {
   return (
     <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
-      <div>
+      <MotionFadeIn direction="up" distance={20} duration={0.6}>
         <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 block mb-2">
           Katalog Kolam Mitra
         </span>
@@ -23,18 +26,22 @@ export const ProgramHeader: React.FC<ProgramHeaderProps> = ({
             ? `Pilih dari ${totalRegulerCount} kolam renang mitra aktif di Tangerang Raya dengan fasilitas terstandarisasi.`
             : 'Paket kelas renang belum tersedia. Silakan cek kembali dalam beberapa saat.'}
         </p>
-      </div>
+      </MotionFadeIn>
 
-      <Link href="/daftar/murid" className="shrink-0">
-        <Button
-          variant="primary"
-          size="md"
-          isFullRounded={true}
-          className="shadow-sm"
-        >
-          Daftar Sebagai Murid
-        </Button>
-      </Link>
+      <MotionFadeIn direction="up" delay={0.15} distance={15} duration={0.55} className="shrink-0">
+        <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
+          <Link href="/daftar/murid" className="block">
+            <Button
+              variant="primary"
+              size="md"
+              isFullRounded={true}
+              className="shadow-sm hover:shadow-md"
+            >
+              Daftar Sebagai Murid
+            </Button>
+          </Link>
+        </motion.div>
+      </MotionFadeIn>
     </div>
   );
 };

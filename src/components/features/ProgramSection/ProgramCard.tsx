@@ -1,8 +1,11 @@
+'use client';
+
 import React from 'react';
 import { ProgramCatalogItem } from '@/types';
 import { formatRupiah } from '@/lib/utils';
 import { Badge } from '@/components/ui/Badge';
 import { ArrowUpRight } from 'lucide-react';
+import { motion } from '@/components/ui/motion';
 
 interface ProgramCardProps {
   program: ProgramCatalogItem;
@@ -14,7 +17,10 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({ program, privatPrice }
   const displayPrivatPrice = privatPrice ?? (program.price ? Math.round(program.price * 1.6) : null);
 
   return (
-    <article className="group flex h-full flex-col justify-between rounded-2xl bg-white p-6 shadow-lg shadow-blue-950/5 border border-slate-200/60 transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-950/10 dark:bg-slate-900 dark:border-slate-800">
+    <motion.article
+      whileHover={{ y: -6, transition: { duration: 0.25, ease: 'easeOut' } }}
+      className="group flex h-full flex-col justify-between rounded-2xl bg-white p-6 shadow-lg shadow-blue-950/5 border border-slate-200/60 transition-shadow duration-300 ease-in-out hover:shadow-xl hover:shadow-blue-950/10 dark:bg-slate-900 dark:border-slate-800"
+    >
       <div>
         {/* Top Row: Category pill badge + Area name in muted uppercase text */}
         <div className="flex items-center justify-between gap-2">
@@ -71,16 +77,16 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({ program, privatPrice }
             href={program.mapUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-xs font-semibold text-[#0077B6] hover:text-[#00B4D8] transition-colors"
+            className="inline-flex items-center gap-1 text-xs font-semibold text-[#0077B6] hover:text-[#00B4D8] transition-colors group/link"
           >
-            Google Maps
-            <ArrowUpRight className="w-3.5 h-3.5" />
+            <span>Google Maps</span>
+            <ArrowUpRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5" />
           </a>
         ) : (
           <span className="text-xs text-slate-400">Tersedia di lokasi</span>
         )}
       </div>
-    </article>
+    </motion.article>
   );
 };
 

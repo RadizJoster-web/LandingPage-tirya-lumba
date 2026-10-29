@@ -1,6 +1,9 @@
+'use client';
+
 import React from 'react';
 import { ProgramCatalogItem } from '@/types';
 import { ProgramCard } from './ProgramCard';
+import { MotionStagger, MotionStaggerItem } from '@/components/ui/motion';
 
 interface ProgramGridProps {
   programs: ProgramCatalogItem[];
@@ -15,7 +18,7 @@ export const ProgramGrid: React.FC<ProgramGridProps> = ({
 }) => {
   if (programs.length === 0) {
     return (
-      <div className="p-8 bg-white rounded-2xl border border-slate-200 text-sm text-slate-500 text-center">
+      <div className="p-8 bg-white rounded-2xl border border-slate-200 text-sm text-slate-500 text-center dark:bg-slate-900 dark:border-slate-800">
         {allProgramsCount > 0
           ? 'Belum ada paket Reguler yang tersedia saat ini. Silakan periksa kembali beberapa saat lagi.'
           : 'Belum ada paket kelas renang yang tersedia saat ini.'}
@@ -32,14 +35,15 @@ export const ProgramGrid: React.FC<ProgramGridProps> = ({
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <MotionStagger staggerDelay={0.08} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {programs.map((program) => (
-        <ProgramCard
-          key={program.id}
-          program={program}
-          privatPrice={privatMap.get(program.poolName.toLowerCase()) ?? null}
-        />
+        <MotionStaggerItem key={program.id} direction="up" distance={22} duration={0.5}>
+          <ProgramCard
+            program={program}
+            privatPrice={privatMap.get(program.poolName.toLowerCase()) ?? null}
+          />
+        </MotionStaggerItem>
       ))}
-    </div>
+    </MotionStagger>
   );
 };
