@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import { UploadCloud, CheckCircle2 } from 'lucide-react';
 
 interface StudentPhotoUploaderProps {
-  photoFileName: string;
+  photoFileName?: string;
   onPhotoChange: (file: File | null) => void;
 }
 
