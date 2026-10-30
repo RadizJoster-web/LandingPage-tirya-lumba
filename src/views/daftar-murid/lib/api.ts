@@ -38,8 +38,7 @@ export async function fetchSessions(locationId: string, dayOfWeek: string) {
   const q = new URLSearchParams({ locationId, dayOfWeek });
   const res = await request<SessionSlot[]>(`/sessions?${q}`, {
     method: 'GET',
-    revalidate: 3600,
-    tags: ['sessions'],
+    revalidate: 0,
   });
   return res.data ?? [];
 }

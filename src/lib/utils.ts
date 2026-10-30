@@ -24,6 +24,12 @@ export function calculateAge(birthDateString: string): number {
 
 /** Nama hari bahasa Indonesia dari tanggal ISO, dipakai sebagai parameter dayOfWeek. */
 export function dayNameFromDate(dateString: string): string {
+  if (!dateString) return '';
+  const parts = dateString.split('-');
+  if (parts.length === 3) {
+    const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+    return ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'][d.getDay()];
+  }
   const date = new Date(dateString);
   if (Number.isNaN(date.getTime())) return '';
   return ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'][date.getDay()];
@@ -63,9 +69,7 @@ export const DEFAULT_SESSION_HOURS: Record<string, string> = {
   'sesi 3': '13.00 - 14.00',
 };
 
-/**
- * Mengambil rentang jam dari sesi (mis. "09.00 - 10.00").
- */
+/** Mengambil rentang jam dari sesi (mis. "09.00 - 10.00"). */
 export function getSessionTime(
   sessionName?: string,
   startTime?: string,
@@ -80,7 +84,6 @@ export function getSessionTime(
   }
   if (!sessionName) return '09.00 - 10.00';
 
-  // Jika sessionName sudah mengandung format jam (mis. "09:00 - 10:00")
   const timeMatch = sessionName.match(/(\d{1,2}[:.]\d{2}\s*[-–—]\s*\d{1,2}[:.]\d{2})/);
   if (timeMatch) {
     return timeMatch[1].replace(/:/g, '.');
@@ -94,9 +97,7 @@ export function getSessionTime(
   return '09.00 - 10.00';
 }
 
-/**
- * Format teks sesi latihan lengkap dengan jamnya: "Sesi 1 09.00 - 10.00"
- */
+/** Format teks sesi latihan lengkap dengan jamnya: "Sesi 1 09.00 - 10.00" */
 export function formatSessionWithTime(
   sessionName?: string,
   timeRange?: string,
@@ -105,14 +106,11 @@ export function formatSessionWithTime(
 ): string {
   if (!sessionName) return 'Sesi 1 09.00 - 10.00';
 
-  // Jika nama sesi sudah mengandung format jam lengkap, rapikan dan kembalikan langsung
   if (/\d{1,2}[:.]\d{2}/.test(sessionName)) {
     return sessionName.replace(/:/g, '.');
   }
 
   const time = getSessionTime(sessionName, startTime, endTime, timeRange);
-
-  // Rapikan kapitalisasi kata (mis. "sesi 1" -> "Sesi 1")
   const cleanName = sessionName
     .split(' ')
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())

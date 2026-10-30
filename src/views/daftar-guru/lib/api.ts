@@ -23,20 +23,20 @@ export async function fetchMasterData(): Promise<{
       tags: ['locations'],
     }),
   ]);
-  return { areas: a.data, locations: l.data };
+  return { areas: a.data ?? [], locations: l.data ?? [] };
 }
 
 export async function fetchSessions(
   locationId: string,
-  dayOfWeek: string,
+  dayOfWeek?: string,
 ): Promise<SessionSlot[]> {
-  const query = new URLSearchParams({ locationId, dayOfWeek });
+  const query = new URLSearchParams({ locationId });
+  if (dayOfWeek) query.set('dayOfWeek', dayOfWeek);
   const res = await request<SessionSlot[]>(`/sessions?${query}`, {
     method: 'GET',
-    revalidate: 3600,
-    tags: ['sessions'],
+    revalidate: 0,
   });
-  return res.data;
+  return res.data ?? [];
 }
 
 export async function uploadCv(file: File): Promise<string> {

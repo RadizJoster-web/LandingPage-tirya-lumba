@@ -1,9 +1,9 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { GuruStep3Props } from './types';
 import { Button } from '@/components/ui/Button';
-import { ScheduleMatrixTable } from './ScheduleMatrixTable';
-import { PoolSelectionList } from './PoolSelectionList';
 import { ArrowLeft, ArrowRight, AlertCircle } from 'lucide-react';
+import { PoolSelectionList } from './PoolSelectionList';
+import { ScheduleMatrixTable } from './ScheduleMatrixTable';
 
 export const StepKolamJadwal: React.FC<GuruStep3Props> = ({
   areas,
@@ -20,59 +20,40 @@ export const StepKolamJadwal: React.FC<GuruStep3Props> = ({
   onSubmit,
   onBack,
 }) => {
-  const poolsByArea = useMemo(
-    () =>
-      areas.map((area) => ({
-        area,
-        pools: locations.filter((loc) => loc.areaId === area.id),
-      })),
-    [areas, locations],
-  );
-
-  const selectedPools = useMemo(
-    () => locations.filter((loc) => selectedLocationIds.includes(loc.id)),
-    [locations, selectedLocationIds],
+  const selectedPools = locations.filter((loc) =>
+    selectedLocationIds.includes(loc.id),
   );
 
   return (
     <form onSubmit={onSubmit} className="space-y-6 animate-fade-in">
-      <div>
-        <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-          <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500">
-            1. Pilih Kolam Renang Mitra Mengajar *
-          </label>
-          <span className="text-[11px] text-[#0077B6] font-medium">
-            Bisa memilih lebih dari 1 lokasi
-          </span>
-        </div>
+      <PoolSelectionList
+        areas={areas}
+        locations={locations}
+        selectedLocationIds={selectedLocationIds}
+        onToggleLocation={onToggleLocation}
+      />
 
-        <PoolSelectionList
-          poolsByArea={poolsByArea}
-          selectedLocationIds={selectedLocationIds}
-          onToggleLocation={onToggleLocation}
-          hasAreas={areas.length > 0}
-        />
-      </div>
-
-      <div>
-        <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
           <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500">
-            2. Matriks Ketersediaan Hari &amp; Jam Sesi *
+            Matriks Jadwal Sesi Mengajar di Kolam Terpilih *
           </label>
-          <span className="text-xs font-semibold text-[#0077B6] tabular-nums">
-            {slotCount} sesi dipilih
-          </span>
+          {slotCount > 0 && (
+            <span className="text-xs font-bold text-[#0077B6] bg-[#E0FBFC] px-2.5 py-0.5 rounded-full">
+              {slotCount} sesi dipilih
+            </span>
+          )}
         </div>
 
         {selectedPools.length === 0 ? (
-          <p className="text-xs text-slate-400 italic bg-slate-50 p-3.5 rounded-xl border border-slate-200/60 dark:bg-slate-900 dark:border-slate-800">
-            Pilih minimal satu kolam di atas untuk memunculkan tabel matriks hari dan jam mengajar.
+          <p className="p-4 text-xs text-slate-400 italic bg-slate-50 rounded-xl border border-slate-200/80">
+            Pilih minimal satu kolam renang di atas untuk mengatur ketersediaan jadwal mengajar Anda.
           </p>
-        ) : sessionsLoading ? (
-          <p className="text-xs text-slate-400 italic bg-slate-50 p-3.5 rounded-xl border border-slate-200/60 flex items-center gap-2">
-            <span className="w-3.5 h-3.5 border-2 border-[#00B4D8] border-t-transparent rounded-full animate-spin" />
-            Memuat sesi dari server...
-          </p>
+        ) : sessionsLoading && Object.keys(sessionMap).length === 0 ? (
+          <div className="p-5 bg-slate-50 rounded-xl border border-slate-200/80 flex items-center justify-center gap-2 text-xs text-slate-500">
+            <span className="w-4 h-4 border-2 border-[#00B4D8] border-t-transparent rounded-full animate-spin" />
+            <span>Memuat data jadwal sesi kolam...</span>
+          </div>
         ) : (
           <ScheduleMatrixTable
             selectedPools={selectedPools}
@@ -98,9 +79,9 @@ export const StepKolamJadwal: React.FC<GuruStep3Props> = ({
           isFullRounded={false}
           onClick={onBack}
           disabled={isSubmitting}
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 px-3 sm:px-5 shrink-0"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-4 h-4 shrink-0" />
           <span>Kembali</span>
         </Button>
         <Button
@@ -110,10 +91,11 @@ export const StepKolamJadwal: React.FC<GuruStep3Props> = ({
           isFullRounded={false}
           isLoading={isSubmitting}
           disabled={slotCount === 0}
-          className="font-semibold flex items-center gap-2"
+          className="font-semibold flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-5 min-h-[42px] h-auto text-xs sm:text-sm whitespace-nowrap"
         >
-          <span>Kirim Pendaftaran Pelatih</span>
-          <ArrowRight className="w-4 h-4" />
+          <span className="hidden sm:inline">Kirim Pendaftaran Pelatih</span>
+          <span className="sm:hidden">Kirim Pendaftaran</span>
+          <ArrowRight className="w-4 h-4 shrink-0" />
         </Button>
       </div>
     </form>

@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
-import { DAYS_ID } from '@/lib/constants';
 import { Area, Location, SessionSlot } from '@/types';
 import { toErrorMessage } from '@/lib/http';
 import { GuruWizardLayout } from './GuruWizardLayout';
@@ -68,18 +67,17 @@ export default function DaftarGuruParent() {
     let active = true;
     Promise.all(
       pendingIds.map(async (locId) => {
-        const perDay = await Promise.all(
-          DAYS_ID.map((d) => fetchSessions(locId, d).catch(() => [])),
-        );
-        return [locId, perDay.flat()] as const;
+        const slots = await fetchSessions(locId).catch(() => []);
+        return [locId, slots] as const;
       }),
     )
       .then((entries) => {
-        if (active)
+        if (active) {
           setSessionMap((prev) => ({
             ...prev,
             ...Object.fromEntries(entries),
           }));
+        }
       })
       .catch((err) => {
         if (active) form.setErrorMsg(toErrorMessage(err));
