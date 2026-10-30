@@ -15,6 +15,16 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  async rewrites() {
+    const rawApiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+    const backendUrl = rawApiUrl.replace(/\/api\/?$/, '');
+    return [
+      {
+        source: '/api/backend/:path*',
+        destination: `${backendUrl}/api/:path*`,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
