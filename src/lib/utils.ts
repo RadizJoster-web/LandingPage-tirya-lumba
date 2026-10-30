@@ -52,10 +52,17 @@ export function paymentMethodToApi(method: PaymentMethod): PaymentMethodApi {
   return 'CASH';
 }
 
-/** Ubah path relatif dari server (mis. uploads/profiles/foto.jpg) menjadi URL absolut. */
+/** Ubah path relatif dari server (mis. uploads/profiles/foto.jpg atau R2) menjadi URL absolut. */
 export function mediaUrl(path?: string | null): string | null {
   if (!path) return null;
-  if (/^https?:\/\//.test(path)) return path;
+  if (/^https?:\/\//.test(path)) {
+    if (path.includes('.r2.cloudflarestorage.com/')) {
+      const fileKey = path.split('.r2.cloudflarestorage.com/')[1];
+      return `${API_ORIGIN}/api/files/${fileKey}`;
+    }
+    return path;
+  }
+  if (path.startsWith('/api/')) return `${API_ORIGIN}${path}`;
   return `${API_ORIGIN}/${path.replace(/^\/+/, '')}`;
 }
 
