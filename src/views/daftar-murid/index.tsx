@@ -33,6 +33,7 @@ export default function DaftarMuridParent() {
     photoUrl,
     setPhotoUrl,
     paymentProofUrl,
+    setPaymentProofUrl,
     persistRegistration,
     refreshRegistration,
   });

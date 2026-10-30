@@ -12,6 +12,7 @@ interface UseMuridSubmitParams {
   photoUrl: string;
   setPhotoUrl: (url: string) => void;
   paymentProofUrl: string;
+  setPaymentProofUrl?: (url: string) => void;
   persistRegistration: (snapshot: RegistrationSnapshot) => void;
   refreshRegistration: () => Promise<RegistrationSnapshot | null>;
 }
@@ -21,6 +22,7 @@ export function useMuridSubmit({
   photoUrl,
   setPhotoUrl,
   paymentProofUrl,
+  setPaymentProofUrl,
   persistRegistration,
   refreshRegistration,
 }: UseMuridSubmitParams) {
@@ -98,6 +100,8 @@ export function useMuridSubmit({
         const proof = await uploadPaymentProof(form.paymentProofFile);
         finalProofUrl = proof.url;
         reported = proof.urlReported;
+        setPaymentProofUrl?.(proof.url);
+        form.setPaymentProofFile(null);
       }
 
       const payload = buildStudentPayload(form, photoUrl, finalProofUrl);
