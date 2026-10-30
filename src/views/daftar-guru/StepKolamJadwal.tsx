@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { GuruStep3Props } from './types';
 import { Button } from '@/components/ui/Button';
 import { ArrowLeft, ArrowRight, AlertCircle } from 'lucide-react';
@@ -20,17 +20,27 @@ export const StepKolamJadwal: React.FC<GuruStep3Props> = ({
   onSubmit,
   onBack,
 }) => {
-  const selectedPools = locations.filter((loc) =>
-    selectedLocationIds.includes(loc.id),
+  const poolsByArea = useMemo(
+    () =>
+      areas.map((area) => ({
+        area,
+        pools: locations.filter((loc) => loc.areaId === area.id),
+      })),
+    [areas, locations],
+  );
+
+  const selectedPools = useMemo(
+    () => locations.filter((loc) => selectedLocationIds.includes(loc.id)),
+    [locations, selectedLocationIds],
   );
 
   return (
     <form onSubmit={onSubmit} className="space-y-6 animate-fade-in">
       <PoolSelectionList
-        areas={areas}
-        locations={locations}
+        poolsByArea={poolsByArea}
         selectedLocationIds={selectedLocationIds}
         onToggleLocation={onToggleLocation}
+        hasAreas={areas.length > 0}
       />
 
       <div className="space-y-3">
@@ -65,17 +75,16 @@ export const StepKolamJadwal: React.FC<GuruStep3Props> = ({
       </div>
 
       {errorMsg && (
-        <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200/80 text-xs font-medium text-rose-700 flex items-start gap-2">
-          <AlertCircle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
+        <div className="flex items-center gap-2 p-3 text-xs text-rose-700 bg-rose-50 border border-rose-200 rounded-xl">
+          <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
           <span>{errorMsg}</span>
         </div>
       )}
 
-      <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-3 dark:border-slate-800">
+      <div className="flex justify-between items-center pt-2 gap-3">
         <Button
           type="button"
           variant="outline"
-          size="md"
           isFullRounded={false}
           onClick={onBack}
           disabled={isSubmitting}
@@ -87,7 +96,6 @@ export const StepKolamJadwal: React.FC<GuruStep3Props> = ({
         <Button
           type="submit"
           variant="primary"
-          size="md"
           isFullRounded={false}
           isLoading={isSubmitting}
           disabled={slotCount === 0}
