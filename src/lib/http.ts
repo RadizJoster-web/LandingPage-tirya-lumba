@@ -60,7 +60,10 @@ export async function request<T>(
 
   if (!res.ok || !json || json.success === false) {
     let fallbackMessage = `Permintaan ke server gagal (HTTP ${res.status}).`;
-    if (res.status === 404) {
+    if (res.status === 413) {
+      fallbackMessage =
+        'Ukuran berkas terlalu besar (HTTP 413 Content Too Large). Maksimal ukuran berkas yang diperbolehkan adalah 4.5 MB. Mohon kompres atau perkecil ukuran dokumen Anda.';
+    } else if (res.status === 404) {
       fallbackMessage = `Layanan atau rute ${path} tidak ditemukan di server (404 Not Found).`;
     } else if (res.status === 500) {
       fallbackMessage = `Terjadi kendala pada pemrosesan internal server (HTTP 500). Silakan coba lagi.`;

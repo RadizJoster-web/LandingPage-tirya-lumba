@@ -34,7 +34,7 @@ export const PaymentProofUploader: React.FC<PaymentProofUploaderProps> = ({
   return (
     <div>
       <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
-        {label} (JPG / PNG maks 5 MB)
+        {label} (JPG / PNG maks 4.5 MB)
       </label>
       <div
         onDragOver={handleDragOver}
@@ -53,7 +53,11 @@ export const PaymentProofUploader: React.FC<PaymentProofUploaderProps> = ({
           ref={fileInputRef}
           type="file"
           accept="image/jpeg,image/png,image/webp"
-          onChange={(e) => onPaymentProofChange(e.target.files?.[0] ?? null)}
+          onChange={(e) => {
+            const file = e.currentTarget.files?.[0] ?? null;
+            e.currentTarget.value = '';
+            onPaymentProofChange(file);
+          }}
           className="hidden"
         />
         {paymentProofName ? (
@@ -62,16 +66,16 @@ export const PaymentProofUploader: React.FC<PaymentProofUploaderProps> = ({
             <p className="text-xs font-bold text-emerald-900 dark:text-emerald-300">
               {paymentProofName}
             </p>
-            <p className="text-[11px] text-slate-400">Klik untuk mengganti bukti pembayaran</p>
+            <p className="text-[11px] text-slate-400">Klik untuk mengganti bukti transfer</p>
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center gap-1.5 text-slate-500">
             <UploadCloud className="w-7 h-7 text-[#0077B6]" />
             <p className="text-xs font-semibold text-[#1D3557] dark:text-slate-200">
-              Tarik &amp; lepas file struk ke sini, atau <span className="text-[#0077B6] underline">pilih file</span>
+              Tarik &amp; lepas bukti transfer ke sini, atau <span className="text-[#0077B6] underline">pilih file</span>
             </p>
             <p className="text-[11px] text-slate-400">
-              Foto struk transfer ATM, tangkapan layar m-banking, atau foto serah terima tunai
+              Format JPG / PNG / WEBP maksimal 4.5 MB
             </p>
           </div>
         )}

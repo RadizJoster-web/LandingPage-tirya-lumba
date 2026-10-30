@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import { UploadCloud, CheckCircle2 } from 'lucide-react';
 
 interface StudentPhotoUploaderProps {
-  photoFileName?: string;
+  photoFileName: string;
   onPhotoChange: (file: File | null) => void;
 }
 
@@ -32,7 +32,7 @@ export const StudentPhotoUploader: React.FC<StudentPhotoUploaderProps> = ({
   return (
     <div>
       <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
-        Pas Foto Profil Murid (4x6) * (JPG / PNG maks 5 MB)
+        Pas Foto Profil Murid (4x6) * (JPG / PNG maks 4.5 MB)
       </label>
       <div
         onDragOver={handleDragOver}
@@ -51,7 +51,11 @@ export const StudentPhotoUploader: React.FC<StudentPhotoUploaderProps> = ({
           ref={fileInputRef}
           type="file"
           accept="image/jpeg,image/png,image/webp"
-          onChange={(e) => onPhotoChange(e.target.files?.[0] ?? null)}
+          onChange={(e) => {
+            const file = e.currentTarget.files?.[0] ?? null;
+            e.currentTarget.value = '';
+            onPhotoChange(file);
+          }}
           className="hidden"
         />
         {photoFileName ? (
@@ -69,7 +73,7 @@ export const StudentPhotoUploader: React.FC<StudentPhotoUploaderProps> = ({
               Tarik &amp; lepas pas foto ke sini, atau <span className="text-[#0077B6] underline">pilih file</span>
             </p>
             <p className="text-[11px] text-slate-400">
-              Digunakan untuk verifikasi profil kesiswaan dan pengenalan oleh pelatih
+              Foto formal 4x6 berlatar polos (maksimal 4.5 MB)
             </p>
           </div>
         )}

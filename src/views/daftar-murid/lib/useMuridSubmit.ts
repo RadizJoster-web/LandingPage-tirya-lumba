@@ -1,17 +1,11 @@
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toErrorMessage } from '@/lib/http';
 import { UseMuridFormReturn } from '../useMuridForm';
-import {
-  buildStudentPayload,
-  createStudentSnapshot,
-} from '../registrationHelper';
-import {
-  uploadStudentPhoto,
-  uploadPaymentProof,
-  submitStudent,
-} from './api';
+import { buildStudentPayload, createStudentSnapshot } from '../registrationHelper';
+import { uploadStudentPhoto, uploadPaymentProof, submitStudent } from './api';
 import { RegistrationSnapshot } from '@/types';
+
+const MAX_UPLOAD_BYTES = 4.5 * 1024 * 1024;
 
 interface UseMuridSubmitParams {
   form: UseMuridFormReturn;
@@ -36,14 +30,7 @@ export function useMuridSubmit({
     e.preventDefault();
     form.setErrorMsg('');
 
-    if (
-      !form.name ||
-      !form.birthPlace ||
-      !form.birthDate ||
-      !form.address ||
-      !form.phone ||
-      !form.schoolOrOffice
-    ) {
+    if (!form.name || !form.birthPlace || !form.birthDate || !form.address || !form.phone || !form.schoolOrOffice) {
       form.setErrorMsg('Mohon lengkapi seluruh kolom biodata bertanda bintang (*).');
       return;
     }
@@ -51,6 +38,12 @@ export function useMuridSubmit({
     const hasPhoto = Boolean(form.photoFile || photoUrl);
     if (!hasPhoto) {
       form.setErrorMsg('Silakan unggah pas foto profil 4x6 murid terlebih dahulu.');
+      return;
+    }
+
+    if (form.photoFile && form.photoFile.size > MAX_UPLOAD_BYTES) {
+      const sizeMb = (form.photoFile.size / (1024 * 1024)).toFixed(1);
+      form.setErrorMsg(`Ukuran foto profil (${sizeMb} MB) melebihi batas maksimal 4.5 MB.`);
       return;
     }
 
@@ -72,16 +65,8 @@ export function useMuridSubmit({
     e.preventDefault();
     form.setErrorMsg('');
 
-    if (
-      !form.locationId ||
-      !form.packageId ||
-      !form.firstMeetDate ||
-      !form.sessionName ||
-      !form.instructorId
-    ) {
-      form.setErrorMsg(
-        'Pastikan kolam renang, paket, tanggal mulai, jam sesi, dan pelatih sudah dipilih.',
-      );
+    if (!form.locationId || !form.packageId || !form.firstMeetDate || !form.sessionName || !form.instructorId) {
+      form.setErrorMsg('Pastikan kolam renang, paket, tanggal mulai, jam sesi, dan pelatih sudah dipilih.');
       return;
     }
 
@@ -95,6 +80,12 @@ export function useMuridSubmit({
     const hasPaymentProof = Boolean(form.paymentProofFile || paymentProofUrl);
     if (!hasPaymentProof) {
       form.setErrorMsg('Bukti pembayaran wajib diunggah.');
+      return;
+    }
+
+    if (form.paymentProofFile && form.paymentProofFile.size > MAX_UPLOAD_BYTES) {
+      const sizeMb = (form.paymentProofFile.size / (1024 * 1024)).toFixed(1);
+      form.setErrorMsg(`Ukuran bukti transfer (${sizeMb} MB) melebihi batas maksimal 4.5 MB.`);
       return;
     }
 
@@ -112,9 +103,7 @@ export function useMuridSubmit({
       const payload = buildStudentPayload(form, photoUrl, finalProofUrl);
       const res = await submitStudent(payload);
 
-      persistRegistration(
-        createStudentSnapshot(form, payload, res, reported),
-      );
+      persistRegistration(createStudentSnapshot(form, payload, res, reported));
       await refreshRegistration();
 
       router.push('/profile');
