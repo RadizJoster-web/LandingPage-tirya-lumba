@@ -22,22 +22,29 @@ type RequestOptions = Omit<RequestInit, 'body'> & {
   revalidate?: number;
   tag?: string;
   tags?: string[];
+  isPublic?: boolean;
 };
+
+const PUBLIC_PREFIXES = ['/stats', '/areas', '/locations', '/packages', '/sessions'];
 
 export async function request<T>(
   path: string,
   options: RequestOptions = {},
 ): Promise<ApiResponse<T>> {
-  const { body, revalidate, tag, tags, headers, ...init } = options;
+  const { body, revalidate, tag, tags, headers, isPublic, ...init } = options;
   const isForm = body instanceof FormData;
-  const token = getToken();
+  const method = (init.method || 'GET').toUpperCase();
+
+  // Endpoint publik tidak boleh mengirim token/cookie agar Vercel Edge Cache tidak BYPASS
+  const isPublicGet = isPublic ?? (method === 'GET' && PUBLIC_PREFIXES.some((p) => path.startsWith(p)));
+  const token = isPublicGet ? null : getToken();
 
   const nextTags = tags && tags.length > 0 ? tags : tag ? [tag] : undefined;
 
   const res = await fetch(`${API_BASE_URL}${path}`, {
     ...init,
     body: isForm ? body : body !== undefined ? JSON.stringify(body) : undefined,
-    credentials: 'include',
+    credentials: isPublicGet ? 'same-origin' : 'include',
     headers: {
       Accept: 'application/json',
       ...(isForm || body === undefined
@@ -62,7 +69,7 @@ export async function request<T>(
     let fallbackMessage = `Permintaan ke server gagal (HTTP ${res.status}).`;
     if (res.status === 413) {
       fallbackMessage =
-        'Ukuran berkas terlalu besar (HTTP 413 Content Too Large). Maksimal ukuran berkas yang diperbolehkan adalah 4.5 MB. Mohon kompres atau perkecil ukuran dokumen Anda.';
+        'Ukuran berkas terlalu besar (HTTP 413 Content Too Large). Maksimal ukuran berkas yang diperbolehkan adalah 4.5 MB. Mohon kompres atau perkecil dokumen Anda.';
     } else if (res.status === 404) {
       fallbackMessage = `Layanan atau rute ${path} tidak ditemukan di server (404 Not Found).`;
     } else if (res.status === 500) {
