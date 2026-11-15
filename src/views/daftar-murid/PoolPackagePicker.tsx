@@ -1,7 +1,7 @@
 import React from 'react';
 import { Area, LessonPackage, Location } from '@/types';
 import { Select } from '@/components/ui/Select';
-import { formatRupiah, mediaUrl } from '@/lib/utils';
+import { formatRupiah } from '@/lib/utils';
 import { Check } from 'lucide-react';
 
 interface PoolPackagePickerProps {
@@ -79,7 +79,6 @@ export const PoolPackagePicker: React.FC<PoolPackagePickerProps> = ({
               const isSelected = packageId === pkg.id;
               const typeName = pkg.type || 'Reguler';
               const isPrivat = typeName.toLowerCase().includes('privat');
-              const pkgImg = mediaUrl(pkg.imageUrl);
 
               return (
                 <div
@@ -91,23 +90,12 @@ export const PoolPackagePicker: React.FC<PoolPackagePickerProps> = ({
                       : 'border-gray-200 bg-white hover:border-[#00B4D8]/50 dark:bg-slate-900 dark:border-slate-800'
                   }`}
                 >
-                  <div className="flex items-center gap-3">
-                    {pkgImg ? (
-                      <img
-                        src={pkgImg}
-                        alt={typeName}
-                        className="w-12 h-12 rounded-lg object-cover border border-slate-200 shrink-0 shadow-2xs"
-                      />
-                    ) : (
-                      <div className="w-12 h-12 rounded-lg bg-slate-100 border border-dashed border-slate-300 flex items-center justify-center text-slate-400 shrink-0 text-[10px] font-semibold">
-                        Les
-                      </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block truncate">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
                         {isPrivat ? '1-on-1 Intensif' : 'Kelas Kelompok'}
                       </span>
-                      <h4 className="font-heading font-bold text-sm text-[#1D3557] dark:text-slate-100 truncate">
+                      <h4 className="font-heading font-bold text-sm text-[#1D3557] dark:text-slate-100">
                         Paket {typeName}
                       </h4>
                     </div>

@@ -45,6 +45,7 @@ export interface Location {
   name: string;
   category?: string | null;
   mapUrl?: string | null;
+  imageUrl?: string | null;
   areaId?: string;
   areaName?: string;
   regularPrice?: number;
@@ -55,6 +56,7 @@ export interface PackageLocation {
   name: string;
   category?: string | null;
   mapUrl?: string | null;
+  imageUrl?: string | null;
   area?: { id?: string; name: string } | null;
 }
 
@@ -64,7 +66,6 @@ export interface LessonPackage {
   type?: string;
   price: number;
   sessionCount?: number;
-  imageUrl?: string | null;
   location?: PackageLocation | null;
 }
 
