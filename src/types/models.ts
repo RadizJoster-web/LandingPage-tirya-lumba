@@ -64,6 +64,7 @@ export interface LessonPackage {
   type?: string;
   price: number;
   sessionCount?: number;
+  imageUrl?: string | null;
   location?: PackageLocation | null;
 }
 
@@ -98,6 +99,7 @@ export interface ProgramCatalogItem {
   areaName: string | null;
   mapUrl: string | null;
   category: string | null;
+  imageUrl?: string | null;
 }
 
 export type Gender = 'Laki-Laki' | 'Perempuan';

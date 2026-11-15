@@ -1,6 +1,6 @@
 import React from 'react';
 import { ProgramCatalogItem } from '@/types';
-import { formatRupiah } from '@/lib/utils';
+import { formatRupiah, mediaUrl } from '@/lib/utils';
 import { Badge } from '@/components/ui/Badge';
 import { ArrowUpRight } from 'lucide-react';
 
@@ -10,31 +10,46 @@ interface ProgramCardProps {
 }
 
 export const ProgramCard: React.FC<ProgramCardProps> = ({ program, privatPrice }) => {
-  // If privat price isn't explicitly defined in DB for this pool, use a realistic estimate or null
   const displayPrivatPrice = privatPrice ?? (program.price ? Math.round(program.price * 1.6) : null);
+  const cardImage = mediaUrl(program.imageUrl) || '/hero-section-image.jpg';
 
   return (
-    <article className="group flex h-full flex-col justify-between rounded-2xl bg-white p-6 shadow-lg shadow-blue-950/5 border border-slate-200/60 transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-950/10 dark:bg-slate-900 dark:border-slate-800">
+    <article className="group flex h-full flex-col justify-between rounded-2xl bg-white p-5 shadow-lg shadow-blue-950/5 border border-slate-200/60 transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-950/10 dark:bg-slate-900 dark:border-slate-800 overflow-hidden">
       <div>
-        {/* Top Row: Category pill badge + Area name in muted uppercase text */}
-        <div className="flex items-center justify-between gap-2">
-          <Badge variant="azure" size="sm">
-            {program.category || 'Kolam Mitra'}
-          </Badge>
+        {/* Banner Gambar Kolam Renang & Paket */}
+        <div className="relative h-44 w-full rounded-xl overflow-hidden bg-slate-100 mb-4">
+          <img
+            src={cardImage}
+            alt={program.poolName}
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            loading="lazy"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-60" />
+
+          {/* Floating Category Badge */}
+          <div className="absolute top-3 left-3">
+            <Badge variant="azure" size="sm" className="shadow-xs backdrop-blur-xs bg-white/90 text-[#0077B6] font-bold">
+              {program.category || 'Kolam Mitra'}
+            </Badge>
+          </div>
+
+          {/* Floating Area Name */}
           {program.areaName && (
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 truncate">
-              {program.areaName}
-            </span>
+            <div className="absolute bottom-2.5 left-3">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-white drop-shadow-xs">
+                {program.areaName}
+              </span>
+            </div>
           )}
         </div>
 
         {/* Title: Pool Name in bold Plus Jakarta Sans */}
-        <h3 className="mt-4 font-heading text-xl font-bold leading-snug text-[#1D3557] group-hover:text-[#0077B6] transition-colors dark:text-slate-100">
+        <h3 className="font-heading text-lg font-bold leading-snug text-[#1D3557] group-hover:text-[#0077B6] transition-colors dark:text-slate-100 line-clamp-1">
           {program.poolName}
         </h3>
 
         {/* Price Comparison Box: Clean 2-column container comparing Reguler vs Privat */}
-        <div className="bg-[#F8F9FA] rounded-xl p-3.5 my-4 border border-slate-100 grid grid-cols-2 gap-3 dark:bg-slate-800/60 dark:border-slate-700/60">
+        <div className="bg-[#F8F9FA] rounded-xl p-3 my-3.5 border border-slate-100 grid grid-cols-2 gap-3 dark:bg-slate-800/60 dark:border-slate-700/60">
           <div className="space-y-0.5">
             <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-400">
               Kelas Reguler

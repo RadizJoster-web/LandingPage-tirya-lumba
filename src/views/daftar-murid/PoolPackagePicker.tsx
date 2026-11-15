@@ -1,7 +1,7 @@
 import React from 'react';
 import { Area, LessonPackage, Location } from '@/types';
 import { Select } from '@/components/ui/Select';
-import { formatRupiah } from '@/lib/utils';
+import { formatRupiah, mediaUrl } from '@/lib/utils';
 import { Check } from 'lucide-react';
 
 interface PoolPackagePickerProps {
@@ -37,19 +37,11 @@ export const PoolPackagePicker: React.FC<PoolPackagePickerProps> = ({
           value={areaId}
           onChange={(e) => setAreaId(e.target.value)}
           disabled={isLoadingData}
-          helperText={
-            isLoadingData
-              ? 'Memuat data wilayah...'
-              : areas.length === 0
-                ? 'Belum ada wilayah terdaftar.'
-                : undefined
-          }
+          helperText={isLoadingData ? 'Memuat wilayah...' : areas.length === 0 ? 'Belum ada wilayah.' : undefined}
         >
           <option value="">Pilih Wilayah</option>
-          {areas.map((area) => (
-            <option key={area.id} value={area.id}>
-              {area.name}
-            </option>
+          {areas.map((a) => (
+            <option key={a.id} value={a.id}>{a.name}</option>
           ))}
         </Select>
 
@@ -58,25 +50,13 @@ export const PoolPackagePicker: React.FC<PoolPackagePickerProps> = ({
           value={locationId}
           onChange={(e) => onSelectLocation(e.target.value)}
           disabled={!areaId || areaLocations.length === 0}
-          helperText={
-            !areaId
-              ? 'Pilih wilayah terlebih dahulu'
-              : areaLocations.length === 0
-                ? 'Belum ada kolam di wilayah ini.'
-                : undefined
-          }
+          helperText={!areaId ? 'Pilih wilayah dahulu' : areaLocations.length === 0 ? 'Belum ada kolam.' : undefined}
         >
           <option value="">
-            {!areaId
-              ? 'Pilih wilayah dahulu'
-              : areaLocations.length === 0
-                ? 'Tidak ada kolam'
-                : 'Pilih Kolam Renang'}
+            {!areaId ? 'Pilih wilayah dahulu' : areaLocations.length === 0 ? 'Tidak ada kolam' : 'Pilih Kolam Renang'}
           </option>
           {areaLocations.map((loc) => (
-            <option key={loc.id} value={loc.id}>
-              {loc.name}
-            </option>
+            <option key={loc.id} value={loc.id}>{loc.name}</option>
           ))}
         </Select>
       </div>
@@ -99,43 +79,53 @@ export const PoolPackagePicker: React.FC<PoolPackagePickerProps> = ({
               const isSelected = packageId === pkg.id;
               const typeName = pkg.type || 'Reguler';
               const isPrivat = typeName.toLowerCase().includes('privat');
+              const pkgImg = mediaUrl(pkg.imageUrl);
 
               return (
                 <div
                   key={pkg.id}
                   onClick={() => setPackageId(pkg.id)}
-                  className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 flex flex-col justify-between ${
+                  className={`relative p-3.5 rounded-xl border-2 cursor-pointer transition-all duration-200 flex flex-col justify-between ${
                     isSelected
                       ? 'border-[#00B4D8] bg-[#E0FBFC]/30 shadow-xs'
                       : 'border-gray-200 bg-white hover:border-[#00B4D8]/50 dark:bg-slate-900 dark:border-slate-800'
                   }`}
                 >
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  <div className="flex items-center gap-3">
+                    {pkgImg ? (
+                      <img
+                        src={pkgImg}
+                        alt={typeName}
+                        className="w-12 h-12 rounded-lg object-cover border border-slate-200 shrink-0 shadow-2xs"
+                      />
+                    ) : (
+                      <div className="w-12 h-12 rounded-lg bg-slate-100 border border-dashed border-slate-300 flex items-center justify-center text-slate-400 shrink-0 text-[10px] font-semibold">
+                        Les
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block truncate">
                         {isPrivat ? '1-on-1 Intensif' : 'Kelas Kelompok'}
                       </span>
-                      <h4 className="font-heading font-bold text-base text-[#1D3557] dark:text-slate-100">
+                      <h4 className="font-heading font-bold text-sm text-[#1D3557] dark:text-slate-100 truncate">
                         Paket {typeName}
                       </h4>
                     </div>
                     <div
-                      className={`w-5 h-5 rounded-full border flex items-center justify-center transition-colors ${
-                        isSelected
-                          ? 'bg-[#00B4D8] border-[#00B4D8] text-white'
-                          : 'border-slate-300'
+                      className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 ${
+                        isSelected ? 'bg-[#00B4D8] border-[#00B4D8] text-white' : 'border-slate-300'
                       }`}
                     >
                       {isSelected && <Check className="w-3 h-3 stroke-[3]" />}
                     </div>
                   </div>
 
-                  <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-baseline justify-between">
-                    <span className="font-heading font-extrabold text-base text-[#0077B6] tabular-nums">
+                  <div className="mt-2.5 pt-2 border-t border-slate-100 dark:border-slate-800 flex items-baseline justify-between">
+                    <span className="font-heading font-extrabold text-sm text-[#0077B6] tabular-nums">
                       {formatRupiah(pkg.price)}
                     </span>
                     <span className="text-[11px] text-slate-400">
-                      {pkg.sessionCount || 4} Sesi Latihan
+                      {pkg.sessionCount || 4} Sesi
                     </span>
                   </div>
                 </div>

@@ -46,6 +46,7 @@ async function fetchProgramCatalog(): Promise<{
       areaName: pkg.location?.area?.name ?? (areaId ? areaNameById.get(areaId) ?? null : null),
       mapUrl: pkg.location?.mapUrl ?? joined?.mapUrl ?? null,
       category: pkg.location?.category ?? joined?.category ?? null,
+      imageUrl: pkg.imageUrl ?? null,
     };
   });
 
