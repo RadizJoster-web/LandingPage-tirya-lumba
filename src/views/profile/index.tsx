@@ -35,8 +35,8 @@ export default function ProfileParent() {
   // Akun admin/pengelola kolam
   if (user.role === 'ADMIN' || user.role === 'POOL_MANAGER') {
     return (
-      <main className="min-h-[85vh] bg-[#F3F4F6] px-4 py-16 sm:px-6 lg:px-8 dark:bg-slate-950">
-        <div className="mx-auto max-w-lg rounded-xl bg-white p-8 text-center border border-gray-200/90 shadow-xs dark:bg-slate-900 dark:border-slate-800">
+      <main className="min-h-[85vh] bg-[#F8FAFC] px-4 py-16 sm:px-6 lg:px-8 dark:bg-slate-950 flex justify-center items-center">
+        <div className="mx-auto max-w-lg rounded-3xl bg-white p-8 text-center border border-gray-100 shadow-xl dark:bg-slate-900 dark:border-slate-800">
           <Avatar name={name} src={user.profilePictureUrl} size="lg" className="mx-auto" />
           <h1 className="mt-4 font-heading text-xl font-bold text-[#1D3557] dark:text-slate-100">
             Akun Manajemen Sistem
