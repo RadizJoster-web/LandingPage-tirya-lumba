@@ -18,38 +18,27 @@ interface ProfileProgramRowProps {
 export const ProfileProgramRow: React.FC<ProfileProgramRowProps> = ({ snapshot }) => {
   if (!snapshot) {
     return (
-      <div className="py-6 border-b border-gray-100 dark:border-slate-800 flex flex-col sm:flex-row gap-4 sm:gap-8">
-        <div className="sm:w-1/3 space-y-1">
+      <div className="py-6 border-b border-slate-200/60 dark:border-slate-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="space-y-1">
           <div className="flex items-center gap-1.5">
             <Sparkles className="w-4 h-4 text-[#00B4D8]" />
             <h3 className="font-heading text-sm font-bold text-[#1D3557] dark:text-slate-100">
-              Program Kursus
+              Program Kursus Renang
             </h3>
           </div>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-slate-500 dark:text-slate-400">
             Anda belum terdaftar dalam program pelatihan renang aktif.
           </p>
         </div>
-        <div className="sm:w-2/3 flex flex-col sm:flex-row gap-3">
-          <Link href="/daftar/murid" className="flex-1">
+        <div className="shrink-0">
+          <Link href="/daftar">
             <Button
               variant="primary"
-              size="sm"
+              size="md"
               isFullRounded={true}
-              className="w-full flex items-center justify-center gap-1.5 text-xs font-semibold shadow-xs"
+              className="rounded-full px-6 py-2.5 font-semibold text-xs sm:text-sm bg-[#0077B6] hover:bg-[#00B4D8] text-white shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2"
             >
-              <span>Daftar sebagai Murid</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Button>
-          </Link>
-          <Link href="/daftar/guru" className="flex-1">
-            <Button
-              variant="outline"
-              size="sm"
-              isFullRounded={true}
-              className="w-full flex items-center justify-center gap-1.5 text-xs font-semibold border-slate-200 text-[#1D3557] hover:bg-slate-50"
-            >
-              <span>Daftar sebagai Pelatih</span>
+              <span>Pilih Jalur Pendaftaran</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Button>
           </Link>
