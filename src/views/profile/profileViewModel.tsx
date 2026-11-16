@@ -2,6 +2,7 @@ import React from 'react';
 import { Badge } from '@/components/ui/Badge';
 import { RegistrationSnapshot } from '@/types';
 import { StatItem } from './ProfileStatsRow';
+import { formatRupiah, getSessionTime } from '@/lib/utils';
 
 export function getProfileStats(
   userRole: string,
@@ -9,34 +10,73 @@ export function getProfileStats(
 ): StatItem[] {
   if (!snapshot) {
     return [
-      { label: 'Tipe Akun', value: 'Pengguna' },
-      { label: 'Status Pendaftaran', value: 'Belum Terdaftar' },
-      { label: 'Program Kursus', value: '–' },
-      { label: 'Keanggotaan', value: 'Reguler' },
+      { label: 'Status Akun', value: 'Belum Terdaftar' },
+      { label: 'Pilihan Jalur', value: 'Murid / Guru' },
+      { label: 'Cakupan Kolam', value: 'Tangerang Raya' },
     ];
   }
 
   if (snapshot.kind === 'student') {
+    const sessionTime = getSessionTime(
+      snapshot.firstMeetSession,
+      snapshot.startTime,
+      snapshot.endTime,
+      snapshot.timeRange,
+    );
+
     return [
-      { label: 'Tipe Akun', value: 'Murid' },
-      { label: 'Paket Kursus', value: snapshot.packageType || 'Reguler' },
-      { label: 'Sisa Pertemuan', value: `${snapshot.activeSessions ?? 0} Sesi` },
-      { label: 'ID Pendaftaran', value: snapshot.registrationId || '–' },
+      {
+        label: 'Sisa Pertemuan',
+        value: `${snapshot.activeSessions ?? 0} Sesi`,
+        highlight: (snapshot.activeSessions ?? 0) > 0,
+      },
+      {
+        label: 'Paket Kelas',
+        value: snapshot.packageType || 'Reguler',
+      },
+      {
+        label: 'Biaya Kursus',
+        value: snapshot.packagePrice ? formatRupiah(snapshot.packagePrice) : '–',
+      },
+      {
+        label: 'Jam Latihan',
+        value: `${sessionTime} WIB`,
+      },
     ];
   }
 
+  const totalSchedules = snapshot.schedules?.length || 0;
+  const totalStudents = snapshot.schedules?.reduce(
+    (acc, curr) => acc + (curr.totalStudents ?? 0),
+    0,
+  ) ?? 0;
+
   return [
-    { label: 'Tipe Akun', value: 'Pelatih' },
-    { label: 'Lisensi Pelatih', value: snapshot.license ? 'PRSI / Resmi' : 'Standar' },
-    { label: 'Sesi Mengajar', value: `${snapshot.schedules?.length || 0} Sesi` },
-    { label: 'ID Pelatih', value: snapshot.registrationId || '–' },
+    {
+      label: 'Sesi Mengajar',
+      value: `${totalSchedules} Sesi`,
+      highlight: true,
+    },
+    {
+      label: 'Murid Aktif',
+      value: `${totalStudents} Siswa`,
+      highlight: totalStudents > 0,
+    },
+    {
+      label: 'Pengalaman',
+      value: snapshot.experience ? snapshot.experience.split(',')[0].slice(0, 15) : 'Berlisensi',
+    },
+    {
+      label: 'Akreditasi',
+      value: 'PRSI Standar',
+    },
   ];
 }
 
 export function renderStatusBadge(snapshot?: RegistrationSnapshot | null): React.ReactNode {
   if (!snapshot) {
     return (
-      <Badge variant="neutral" size="sm" className="rounded-full px-3 py-1 text-xs">
+      <Badge variant="neutral" size="sm" className="rounded-full px-3 py-1 text-xs font-semibold">
         Belum Terdaftar
       </Badge>
     );
@@ -44,8 +84,12 @@ export function renderStatusBadge(snapshot?: RegistrationSnapshot | null): React
 
   if (snapshot.status === 'PENDING') {
     return (
-      <Badge variant="coral" size="sm" className="bg-amber-50 text-amber-800 border-amber-200 rounded-full px-3 py-1 text-xs">
-        <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+      <Badge
+        variant="coral"
+        size="sm"
+        className="bg-amber-50 text-amber-800 border-amber-200/90 rounded-full px-3 py-1 text-xs font-semibold shadow-2xs"
+      >
+        <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse mr-1" />
         Menunggu Verifikasi
       </Badge>
     );
@@ -53,9 +97,13 @@ export function renderStatusBadge(snapshot?: RegistrationSnapshot | null): React
 
   if (snapshot.status === 'REJECTED') {
     return (
-      <Badge variant="coral" size="sm" className="bg-rose-50 text-rose-700 border-rose-200 rounded-full px-3 py-1 text-xs">
-        <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-        Ditolak
+      <Badge
+        variant="coral"
+        size="sm"
+        className="bg-rose-50 text-rose-700 border-rose-200/90 rounded-full px-3 py-1 text-xs font-semibold shadow-2xs"
+      >
+        <span className="w-1.5 h-1.5 rounded-full bg-rose-500 mr-1" />
+        Pendaftaran Ditolak
       </Badge>
     );
   }
@@ -67,10 +115,14 @@ export function renderStatusBadge(snapshot?: RegistrationSnapshot | null): React
     <Badge
       variant={isZeroSession ? 'coral' : 'success'}
       size="sm"
-      className="rounded-full px-3 py-1 text-xs"
+      className="rounded-full px-3.5 py-1 text-xs font-semibold shadow-2xs"
     >
-      <span className={`w-1.5 h-1.5 rounded-full ${isZeroSession ? 'bg-amber-500' : 'bg-emerald-500'}`} />
-      {isZeroSession ? 'Paket Selesai' : 'Terverifikasi & Aktif'}
+      <span
+        className={`w-1.5 h-1.5 rounded-full mr-1.5 ${
+          isZeroSession ? 'bg-amber-500' : 'bg-emerald-500'
+        }`}
+      />
+      {isZeroSession ? 'Paket Selesai (0 Sesi)' : 'Terverifikasi & Aktif'}
     </Badge>
   );
 }
