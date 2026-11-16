@@ -3,12 +3,8 @@
 import React from 'react';
 import Link from 'next/link';
 import {
-  Check,
-  User as UserIcon,
   MapPin,
-  Clock,
   Award,
-  Briefcase,
   ArrowRight,
   Settings,
   Mail,
@@ -23,7 +19,6 @@ import { ProfilePublicInfoRow } from './ProfilePublicInfoRow';
 import { ProfileProgramRow } from './ProfileProgramRow';
 import { ProfileAttendanceRow } from './ProfileAttendanceRow';
 import { ProfileSupportAndLogoutRow } from './ProfileSupportAndLogoutRow';
-import { getSessionTime } from '@/lib/utils';
 
 interface UnifiedProfileCardProps {
   name: string;
@@ -52,21 +47,11 @@ export const UnifiedProfileCard: React.FC<UnifiedProfileCardProps> = ({
   const activeSessions = isStudent ? (snapshot.activeSessions ?? 0) : 0;
   const status = snapshot?.status ?? 'UNREGISTERED';
 
-  // Tagline based on active role
+  // Tagline based on active role (clean, no duplicate package words)
   const tagline = isStudent
-    ? `Peserta Didik Resmi • Paket ${snapshot.packageType || 'Reguler'} • Tirya Lumba Aquatic`
+    ? 'Peserta Kursus Renang Aktif'
     : isInstructor
-    ? 'Pelatih Renang Profesional • PRSI Accredited • PT Tirya Lumba'
-    : null;
-
-  // Session time helper
-  const sessionHours = isStudent
-    ? getSessionTime(
-        snapshot.firstMeetSession,
-        snapshot.startTime,
-        snapshot.endTime,
-        snapshot.timeRange,
-      )
+    ? 'Pelatih Renang Profesional'
     : null;
 
   // Primary Action Button for active snapshot
@@ -113,11 +98,9 @@ export const UnifiedProfileCard: React.FC<UnifiedProfileCardProps> = ({
               <h1 className="font-heading text-2xl sm:text-3xl font-extrabold text-[#1D3557] tracking-tight dark:text-slate-100">
                 {name}
               </h1>
-              <span
-                className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#00B4D8] text-white shadow-2xs shrink-0"
-                title="Akun Terverifikasi"
-              >
-                <Check className="w-3 h-3 stroke-[3]" />
+              {/* Clean verification label instead of blue checkmark icon */}
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/80 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/80">
+                Akun Terverifikasi
               </span>
               <div>{statusBadge}</div>
             </div>
@@ -128,78 +111,39 @@ export const UnifiedProfileCard: React.FC<UnifiedProfileCardProps> = ({
               </p>
             )}
 
-            {/* Metadata row */}
+            {/* Clean metadata row without redundant schedule or pool duplications */}
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 pt-0.5 text-xs text-slate-500 font-medium dark:text-slate-400">
               <div className="flex items-center gap-1.5">
                 <Mail className="w-3.5 h-3.5 text-[#0077B6]" />
                 <span>{email}</span>
               </div>
-              {isStudent && (
-                <>
-                  <div className="flex items-center gap-1.5">
-                    <UserIcon className="w-3.5 h-3.5 text-[#0077B6]" />
-                    <span>Siswa Aktif</span>
-                  </div>
-                  {snapshot?.locationLabel && (
-                    <div className="flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-[#0077B6]" />
-                      <span>{snapshot.locationLabel}</span>
-                    </div>
-                  )}
-                  {sessionHours && (
-                    <div className="flex items-center gap-1.5">
-                      <Clock className="w-3.5 h-3.5 text-[#0077B6]" />
-                      <span>{sessionHours} WIB</span>
-                    </div>
-                  )}
-                </>
+              {snapshot?.address && (
+                <div className="flex items-center gap-1.5">
+                  <MapPin className="w-3.5 h-3.5 text-[#0077B6]" />
+                  <span>{snapshot.address}</span>
+                </div>
               )}
-              {isInstructor && (
-                <>
-                  <div className="flex items-center gap-1.5">
-                    <Award className="w-3.5 h-3.5 text-[#0077B6]" />
-                    <span>{snapshot.license || 'Lisensi Resmi PRSI'}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Briefcase className="w-3.5 h-3.5 text-[#0077B6]" />
-                    <span>{snapshot.experience || 'Pelatih Berpengalaman'}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <MapPin className="w-3.5 h-3.5 text-[#0077B6]" />
-                    <span>Tangerang Raya</span>
-                  </div>
-                </>
+              {isInstructor && snapshot?.license && (
+                <div className="flex items-center gap-1.5">
+                  <Award className="w-3.5 h-3.5 text-[#0077B6]" />
+                  <span>{snapshot.license}</span>
+                </div>
               )}
             </div>
           </div>
         </div>
 
-        {/* Right-side category chips for active roles */}
-        <div className="flex items-center gap-2 self-start sm:self-center">
-          {isStudent && (
-            <>
-              <Badge variant="azure" size="sm" className="rounded-full px-3 py-1 text-xs font-semibold">
-                {snapshot?.packageType || 'Reguler'}
-              </Badge>
-              <Badge variant="neutral" size="sm" className="rounded-full px-3 py-1 text-xs">
-                Tirya Lumba
-              </Badge>
-            </>
-          )}
-          {isInstructor && (
-            <>
-              <Badge variant="azure" size="sm" className="rounded-full px-3 py-1 text-xs font-semibold">
-                PRSI Certified
-              </Badge>
-              <Badge variant="neutral" size="sm" className="rounded-full px-3 py-1 text-xs">
-                Pelatih Resmi
-              </Badge>
-            </>
-          )}
-        </div>
+        {/* Right-side category chips (only for instructor accreditation if applicable) */}
+        {isInstructor && (
+          <div className="flex items-center gap-2 self-start sm:self-center">
+            <Badge variant="azure" size="sm" className="rounded-full px-3 py-1 text-xs font-semibold">
+              PRSI Certified
+            </Badge>
+          </div>
+        )}
       </div>
 
-      {/* Stats Row - Only shown when registration snapshot exists */}
+      {/* Stats Row - Only shown when registration snapshot exists, no duplicate session hours */}
       {Boolean(snapshot) && stats.length > 0 && (
         <ProfileStatsRow stats={stats} actionButton={primaryActionPill} />
       )}
@@ -213,7 +157,7 @@ export const UnifiedProfileCard: React.FC<UnifiedProfileCardProps> = ({
         waMessage={waMessage}
       />
 
-      {/* Program & Schedule (Clean, Inline, No Popup) */}
+      {/* Program & Schedule (Clean, Inline, Coach profile hidden by default with trigger button) */}
       <ProfileProgramRow snapshot={snapshot} />
 
       {/* Public / Student Personal Information */}

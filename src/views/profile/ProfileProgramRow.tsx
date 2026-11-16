@@ -1,12 +1,22 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { ArrowUpRight, ArrowRight, MapPin, Calendar, Clock, Settings, Sparkles } from 'lucide-react';
+import {
+  ArrowUpRight,
+  ArrowRight,
+  MapPin,
+  Calendar,
+  Settings,
+  Sparkles,
+  User,
+  ChevronRight,
+  ChevronLeft,
+} from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { RegistrationSnapshot } from '@/types';
-import { mediaUrl, formatSessionWithTime, getSessionTime } from '@/lib/utils';
+import { mediaUrl, formatSessionWithTime } from '@/lib/utils';
 import { InstructorProfileWidget } from './InstructorProfileWidget';
 import { normalizeInstructorSchedules, groupSchedulesByDay } from './lib/scheduleHelper';
 import { InstructorDayScheduleCard } from './InstructorDayScheduleCard';
@@ -16,6 +26,8 @@ interface ProfileProgramRowProps {
 }
 
 export const ProfileProgramRow: React.FC<ProfileProgramRowProps> = ({ snapshot }) => {
+  const [showCoach, setShowCoach] = useState(false);
+
   if (!snapshot) {
     return (
       <div className="py-6 border-b border-slate-200/60 dark:border-slate-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -50,38 +62,34 @@ export const ProfileProgramRow: React.FC<ProfileProgramRowProps> = ({ snapshot }
   const isStudent = snapshot.kind === 'student';
 
   if (isStudent) {
-    const sessionHours = getSessionTime(
-      snapshot.firstMeetSession,
-      snapshot.startTime,
-      snapshot.endTime,
-      snapshot.timeRange,
-    );
-    const formattedSession = formatSessionWithTime(
+    const sessionScheduleText = `${formatSessionWithTime(
       snapshot.firstMeetSession,
       snapshot.timeRange,
       snapshot.startTime,
       snapshot.endTime,
-    );
+    )} WIB`;
 
     return (
-      <div className="py-6 border-b border-gray-100 dark:border-slate-800 flex flex-col sm:flex-row gap-4 sm:gap-8">
+      <div className="py-6 border-b border-slate-200/60 dark:border-slate-800/60 flex flex-col sm:flex-row gap-4 sm:gap-8">
         <div className="sm:w-1/3 space-y-1">
           <h3 className="font-heading text-sm font-bold text-[#1D3557] dark:text-slate-100">
-            Program &amp; Jadwal Latihan
+            Jadwal &amp; Program
           </h3>
           <p className="text-xs text-slate-400 leading-relaxed">
-            Rincian paket kursus, lokasi kolam mitra resmi, dan pelatih pembimbing Anda.
+            Informasi kelas pelatihan dan jadwal latihan resmi Anda.
           </p>
         </div>
 
-        <div className="sm:w-2/3 space-y-4">
-          {/* Card: Program & Schedule Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="p-3.5 rounded-2xl bg-white/70 border border-slate-200/70 shadow-2xs backdrop-blur-xs space-y-1 dark:bg-slate-800/60 dark:border-slate-700/60">
-              <span className="block text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
-                Paket Kursus Renang
-              </span>
-              <div className="flex items-center justify-between">
+        <div className="sm:w-2/3">
+          {/* Dynamic grid: 1 column when coach is hidden, 2 columns when coach element appears side-by-side */}
+          <div
+            className={`grid gap-4 items-start transition-all duration-300 ${
+              showCoach ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1'
+            }`}
+          >
+            {/* Unified Schedule Card without redundant repetition */}
+            <div className="p-4 sm:p-5 rounded-2xl bg-white/70 border border-slate-200/70 shadow-2xs backdrop-blur-xs space-y-4 dark:bg-slate-800/60 dark:border-slate-700/60">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-700/60">
                 <span className="font-heading text-sm font-bold text-[#1D3557] dark:text-slate-100">
                   Paket {snapshot.packageType || 'Reguler'}
                 </span>
@@ -89,41 +97,77 @@ export const ProfileProgramRow: React.FC<ProfileProgramRowProps> = ({ snapshot }
                   4 Sesi / Bulan
                 </Badge>
               </div>
-            </div>
 
-            <div className="p-3.5 rounded-2xl bg-white/70 border border-slate-200/70 shadow-2xs backdrop-blur-xs space-y-1 dark:bg-slate-800/60 dark:border-slate-700/60">
-              <span className="block text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
-                Lokasi Kolam Mitra
-              </span>
-              <div className="flex items-center gap-1.5 text-xs font-bold text-[#1D3557] truncate dark:text-slate-100">
-                <MapPin className="w-3.5 h-3.5 text-[#0077B6] shrink-0" />
-                <span className="truncate">{snapshot.locationLabel || 'Kolam Mitra'}</span>
+              <div className="space-y-3 text-xs">
+                {/* Single clean schedule row */}
+                <div className="space-y-1">
+                  <span className="block text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+                    Jadwal Pertemuan Rutin
+                  </span>
+                  <div className="flex items-center gap-2 font-bold text-[#1D3557] dark:text-slate-100">
+                    <Calendar className="w-3.5 h-3.5 text-[#0077B6] shrink-0" />
+                    <span>{sessionScheduleText}</span>
+                  </div>
+                </div>
+
+                {/* Pool Location */}
+                <div className="space-y-1">
+                  <span className="block text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+                    Kolam Renang Latihan
+                  </span>
+                  <div className="flex items-center gap-2 text-xs font-semibold text-slate-700 dark:text-slate-300">
+                    <MapPin className="w-3.5 h-3.5 text-[#0077B6] shrink-0" />
+                    <span>{snapshot.locationLabel || 'Kolam Renang Mitra'}</span>
+                  </div>
+                </div>
+
+                {/* Instructor row with action button */}
+                {snapshot.instructorName && (
+                  <div className="pt-2 border-t border-slate-100 dark:border-slate-700/60 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                    <div className="space-y-0.5">
+                      <span className="block text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+                        Pelatih Pembimbing
+                      </span>
+                      <p className="font-bold text-xs text-[#1D3557] dark:text-slate-100">
+                        {snapshot.instructorName}
+                      </p>
+                    </div>
+
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      isFullRounded={true}
+                      onClick={() => setShowCoach(!showCoach)}
+                      className={`text-xs font-semibold px-3 py-1.5 transition-all flex items-center gap-1.5 self-start sm:self-auto ${
+                        showCoach
+                          ? 'bg-[#0077B6] text-white border-[#0077B6] hover:bg-[#00B4D8]'
+                          : 'border-[#00B4D8]/60 text-[#0077B6] hover:bg-[#E0FBFC]/50'
+                      }`}
+                    >
+                      <User className="w-3.5 h-3.5" />
+                      <span>{showCoach ? 'Tutup Profil' : 'Lihat Profil Pelatih'}</span>
+                      {showCoach ? (
+                        <ChevronLeft className="w-3 h-3" />
+                      ) : (
+                        <ChevronRight className="w-3 h-3" />
+                      )}
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
 
-            <div className="sm:col-span-2 p-3.5 rounded-2xl bg-white/70 border border-slate-200/70 shadow-2xs backdrop-blur-xs space-y-1 dark:bg-slate-800/60 dark:border-slate-700/60">
-              <span className="block text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
-                Jadwal &amp; Jam Sesi Resmi
-              </span>
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-                <div className="flex items-center gap-2 font-bold text-[#1D3557] dark:text-slate-100">
-                  <Calendar className="w-3.5 h-3.5 text-[#0077B6] shrink-0" />
-                  <span>{formattedSession}</span>
-                </div>
-                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-[#0077B6] bg-[#E0FBFC]/60 px-2.5 py-0.5 rounded-full self-start sm:self-auto">
-                  <Clock className="w-3 h-3" />
-                  <span>Pukul {sessionHours} WIB</span>
-                </div>
+            {/* Side element displaying instructor profile when triggered */}
+            {showCoach && snapshot.instructorName && (
+              <div className="w-full">
+                <InstructorProfileWidget
+                  snapshot={snapshot}
+                  onClose={() => setShowCoach(false)}
+                />
               </div>
-            </div>
+            )}
           </div>
-
-          {/* Inline Coach Profile - Completely Inline, No Popup! */}
-          {snapshot.instructorName && (
-            <div className="pt-1">
-              <InstructorProfileWidget snapshot={snapshot} />
-            </div>
-          )}
         </div>
       </div>
     );
@@ -138,13 +182,13 @@ export const ProfileProgramRow: React.FC<ProfileProgramRowProps> = ({ snapshot }
   const groupedDays = groupSchedulesByDay(normalizedSchedules);
 
   return (
-    <div className="py-6 border-b border-gray-100 dark:border-slate-800 flex flex-col sm:flex-row gap-4 sm:gap-8">
+    <div className="py-6 border-b border-slate-200/60 dark:border-slate-800/60 flex flex-col sm:flex-row gap-4 sm:gap-8">
       <div className="sm:w-1/3 space-y-1">
         <h3 className="font-heading text-sm font-bold text-[#1D3557] dark:text-slate-100">
           Kualifikasi &amp; Jadwal Mengajar
         </h3>
         <p className="text-xs text-slate-400 leading-relaxed">
-          Sertifikasi resmi, pengalaman lapangan, dan matriks ketersediaan mengajar mingguan Anda.
+          Sertifikasi resmi dan matriks ketersediaan mengajar mingguan Anda.
         </p>
       </div>
 
@@ -182,7 +226,7 @@ export const ProfileProgramRow: React.FC<ProfileProgramRowProps> = ({ snapshot }
           </div>
         )}
 
-        {/* CV Link (Direct Link, no popup) */}
+        {/* CV Link */}
         {cv && (
           <div className="flex items-center justify-between p-3 rounded-2xl bg-sky-50/50 border border-sky-100 text-xs">
             <span className="font-semibold text-slate-600 dark:text-slate-300">
@@ -200,14 +244,12 @@ export const ProfileProgramRow: React.FC<ProfileProgramRowProps> = ({ snapshot }
           </div>
         )}
 
-        {/* Jadwal Mengajar Guru - Inline Cards */}
+        {/* Jadwal Mengajar Guru */}
         <div className="pt-2 space-y-3">
           <div className="flex items-center justify-between">
-            <div>
-              <h4 className="font-heading text-xs font-bold uppercase tracking-wider text-slate-400">
-                Jadwal Mengajar Aktif ({normalizedSchedules.length} Sesi)
-              </h4>
-            </div>
+            <h4 className="font-heading text-xs font-bold uppercase tracking-wider text-slate-400">
+              Jadwal Mengajar Aktif ({normalizedSchedules.length} Sesi)
+            </h4>
             <Link href="/guru/atur-ulang-jadwal">
               <Button
                 variant="outline"

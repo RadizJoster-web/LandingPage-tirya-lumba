@@ -13,13 +13,6 @@ export function getProfileStats(
   }
 
   if (snapshot.kind === 'student') {
-    const sessionTime = getSessionTime(
-      snapshot.firstMeetSession,
-      snapshot.startTime,
-      snapshot.endTime,
-      snapshot.timeRange,
-    );
-
     return [
       {
         label: 'Sisa Pertemuan',
@@ -27,7 +20,7 @@ export function getProfileStats(
         highlight: (snapshot.activeSessions ?? 0) > 0,
       },
       {
-        label: 'Paket Kelas',
+        label: 'Paket Kursus',
         value: snapshot.packageType || 'Reguler',
       },
       {
@@ -35,8 +28,8 @@ export function getProfileStats(
         value: snapshot.packagePrice ? formatRupiah(snapshot.packagePrice) : '–',
       },
       {
-        label: 'Jam Latihan',
-        value: `${sessionTime} WIB`,
+        label: 'Lokasi Kolam',
+        value: snapshot.locationLabel ? snapshot.locationLabel.split(',')[0].slice(0, 18) : 'Kolam Mitra',
       },
     ];
   }
