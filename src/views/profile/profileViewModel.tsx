@@ -9,11 +9,7 @@ export function getProfileStats(
   snapshot?: RegistrationSnapshot | null,
 ): StatItem[] {
   if (!snapshot) {
-    return [
-      { label: 'Status Akun', value: 'Belum Terdaftar' },
-      { label: 'Pilihan Jalur', value: 'Murid / Guru' },
-      { label: 'Cakupan Kolam', value: 'Tangerang Raya' },
-    ];
+    return [];
   }
 
   if (snapshot.kind === 'student') {

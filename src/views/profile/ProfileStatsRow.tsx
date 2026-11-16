@@ -14,8 +14,10 @@ interface ProfileStatsRowProps {
 }
 
 export const ProfileStatsRow: React.FC<ProfileStatsRowProps> = ({ stats, actionButton }) => {
+  if (!stats || stats.length === 0) return null;
+
   return (
-    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 py-5 px-5 sm:px-6 my-6 rounded-2xl bg-white/70 border border-slate-200/60 shadow-xs backdrop-blur-md dark:bg-slate-900/60 dark:border-slate-800">
+    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 py-5 px-5 sm:px-6 my-4 rounded-2xl bg-white/60 border border-slate-200/60 shadow-xs backdrop-blur-md dark:bg-slate-900/60 dark:border-slate-800">
       {/* Metrics group with clean vertical dividers */}
       <div className="flex flex-wrap sm:flex-nowrap items-center gap-4 sm:gap-6 divide-y sm:divide-y-0 sm:divide-x divide-slate-200/80 dark:divide-slate-800">
         {stats.map((stat, idx) => (
