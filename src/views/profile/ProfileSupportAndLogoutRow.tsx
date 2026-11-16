@@ -1,5 +1,7 @@
+'use client';
+
 import React from 'react';
-import { MessageCircle, LogOut } from 'lucide-react';
+import { MessageCircle, LogOut, HelpCircle, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
 interface ProfileSupportAndLogoutRowProps {
@@ -16,11 +18,14 @@ export const ProfileSupportAndLogoutRow: React.FC<ProfileSupportAndLogoutRowProp
       {/* Support Access Row */}
       <div className="py-6 border-b border-gray-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="sm:w-2/3 space-y-1">
-          <h3 className="text-sm font-bold text-[#1D3557] dark:text-slate-100">
-            Layanan Bantuan &amp; CS
-          </h3>
+          <div className="flex items-center gap-1.5">
+            <HelpCircle className="w-4 h-4 text-[#0077B6]" />
+            <h3 className="font-heading text-sm font-bold text-[#1D3557] dark:text-slate-100">
+              Layanan Bantuan &amp; Customer Care
+            </h3>
+          </div>
           <p className="text-xs text-slate-400 leading-relaxed">
-            Terhubung langsung dengan admin resmi PT Tirya Lumba jika terdapat kendala jadwal atau akun.
+            Butuh penyesuaian jadwal atau bantuan verifikasi akun? Tim kami siap melayani Anda melalui WhatsApp resmi PT Tirya Lumba.
           </p>
         </div>
         <div className="sm:w-1/3 flex sm:justify-end">
@@ -33,8 +38,8 @@ export const ProfileSupportAndLogoutRow: React.FC<ProfileSupportAndLogoutRowProp
             <Button
               variant="outline"
               size="sm"
-              isFullRounded={false}
-              className="w-full sm:w-auto flex items-center justify-center gap-1.5 text-xs text-[#0077B6] border-[#00B4D8]/40 hover:bg-[#E0FBFC]/30"
+              isFullRounded={true}
+              className="w-full sm:w-auto flex items-center justify-center gap-1.5 text-xs font-semibold text-[#0077B6] border-[#00B4D8]/40 hover:bg-[#E0FBFC]/40 px-4 py-2"
             >
               <MessageCircle className="w-3.5 h-3.5" />
               <span>WhatsApp CS</span>
@@ -46,20 +51,23 @@ export const ProfileSupportAndLogoutRow: React.FC<ProfileSupportAndLogoutRowProp
       {/* Logout Row */}
       <div className="py-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="sm:w-2/3 space-y-1">
-          <h3 className="text-sm font-bold text-[#1D3557] dark:text-slate-100">
-            Keluar dari Akun
-          </h3>
+          <div className="flex items-center gap-1.5">
+            <Shield className="w-4 h-4 text-slate-400" />
+            <h3 className="font-heading text-sm font-bold text-[#1D3557] dark:text-slate-100">
+              Keamanan &amp; Sesi Akun
+            </h3>
+          </div>
           <p className="text-xs text-slate-400 leading-relaxed">
-            Keluar dari seluruh sesi aktif aplikasi pada perangkat browser ini.
+            Keluar dari sesi akun aktif pada perangkat ini demi menjaga kerahasiaan data Anda.
           </p>
         </div>
         <div className="sm:w-1/3 flex sm:justify-end">
           <Button
             variant="outline"
             size="sm"
-            isFullRounded={false}
+            isFullRounded={true}
             onClick={onLogout}
-            className="w-full sm:w-auto flex items-center justify-center gap-1.5 text-xs text-rose-600 border-rose-200 hover:bg-rose-50 hover:text-rose-700"
+            className="w-full sm:w-auto flex items-center justify-center gap-1.5 text-xs font-semibold text-rose-600 border-rose-200/90 hover:bg-rose-50 hover:text-rose-700 px-4 py-2"
           >
             <LogOut className="w-3.5 h-3.5" />
             <span>Keluar Akun</span>
