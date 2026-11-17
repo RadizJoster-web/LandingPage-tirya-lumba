@@ -17,7 +17,7 @@ export const TeacherMetricsRow: React.FC<TeacherMetricsRowProps> = ({
     { value: `${scheduleCount}`, label: 'Sesi / minggu' },
     { value: `${activeStudents}`, label: 'Murid aktif' },
     { value: experience || '–', label: 'Pengalaman' },
-    { value: accreditation || 'PRSI Certified', label: 'Akreditasi' },
+    { value: accreditation || '–', label: 'Lisensi' },
   ];
 
   return (

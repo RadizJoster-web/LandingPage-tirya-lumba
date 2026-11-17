@@ -1,11 +1,9 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
 import { Avatar } from '@/components/ui/Avatar';
-import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Check } from 'lucide-react';
 import { ProfileLayout } from './ProfileLayout';
@@ -13,15 +11,11 @@ import { ProfileIdentitySidebar } from './ProfileIdentitySidebar';
 import { GuestContentView } from './GuestContentView';
 import { StudentContentView } from './StudentContentView';
 import { TeacherContentView } from './TeacherContentView';
-import { SAMPLE_STUDENT_SNAPSHOT, SAMPLE_TEACHER_SNAPSHOT } from './profilePrototypeData';
 import { InstructorRegistrationSnapshot, StudentRegistrationSnapshot } from '@/types';
-
-type ProfileCondition = 'auto' | 'guest' | 'student' | 'teacher';
 
 export default function ProfileParent() {
   const router = useRouter();
-  const { user, registration, isLoading, logout } = useAuth();
-  const [activeTab, setActiveTab] = useState<ProfileCondition>('auto');
+  const { user, registration, isLoading, isRegistrationLoading, logout } = useAuth();
 
   useEffect(() => {
     if (!isLoading && !user) router.push('/login');
@@ -45,48 +39,44 @@ export default function ProfileParent() {
           <p className="text-xs text-slate-500 leading-relaxed">
             Akun Anda memiliki akses pengelola. Gunakan dashboard untuk mengelola kolam dan jadwal.
           </p>
-          <Link href="/" className="inline-block pt-2">
-            <Button variant="outline" size="md" isFullRounded={false}>Kembali ke Beranda</Button>
-          </Link>
         </div>
       </main>
     );
   }
 
-  const effectiveCondition = activeTab !== 'auto'
-    ? activeTab
-    : registration?.kind === 'student'
-      ? 'student'
-      : (registration?.kind === 'instructor' || user.role === 'INSTRUCTOR')
-        ? 'teacher'
-        : 'guest';
+  if (isRegistrationLoading && !registration) {
+    return (
+      <div className="min-h-[75vh] flex flex-col items-center justify-center gap-3">
+        <div className="w-8 h-8 border-3 border-[#00B4D8] border-t-transparent rounded-full animate-spin" />
+        <p className="text-xs font-medium text-slate-400">Memeriksa status pendaftaran...</p>
+      </div>
+    );
+  }
 
-  const studentSnapshot = (registration?.kind === 'student' ? registration : SAMPLE_STUDENT_SNAPSHOT) as StudentRegistrationSnapshot;
-  const teacherSnapshot = (registration?.kind === 'instructor' ? registration : SAMPLE_TEACHER_SNAPSHOT) as InstructorRegistrationSnapshot;
+  const isStudent = registration?.kind === 'student';
+  const isTeacher = registration?.kind === 'instructor' || user.role === 'INSTRUCTOR';
 
-  const currentName = effectiveCondition === 'guest'
-    ? (user.fullName || 'Pengguna Baru')
-    : effectiveCondition === 'student'
-      ? (studentSnapshot.fullName || user.fullName || user.email)
-      : (teacherSnapshot.fullName || user.fullName || user.email);
+  const currentName = user.fullName || registration?.fullName || user.email;
 
-  const tagline = effectiveCondition === 'student'
+  const tagline = isStudent
     ? 'Peserta kursus renang aktif'
-    : effectiveCondition === 'teacher'
+    : isTeacher
       ? 'Pelatih renang profesional'
       : 'Akun baru';
 
-  const badges = effectiveCondition === 'student' ? (
+  const badges = isStudent ? (
     <>
       <Badge variant="azure" size="sm" className="text-[10px] gap-1"><Check className="w-3 h-3" /> Akun terverifikasi</Badge>
-      <Badge variant={studentSnapshot.status === 'APPROVED' ? 'success' : 'coral'} size="sm" className="text-[10px]">
-        {studentSnapshot.status === 'APPROVED' ? 'Aktif' : studentSnapshot.status === 'REJECTED' ? 'Ditolak' : 'Menunggu Verifikasi'}
+      <Badge variant={registration.status === 'APPROVED' ? 'success' : 'coral'} size="sm" className="text-[10px]">
+        {registration.status === 'APPROVED' ? 'Aktif' : registration.status === 'REJECTED' ? 'Ditolak' : 'Menunggu Verifikasi'}
       </Badge>
     </>
-  ) : effectiveCondition === 'teacher' ? (
+  ) : isTeacher ? (
     <>
       <Badge variant="azure" size="sm" className="text-[10px] gap-1"><Check className="w-3 h-3" /> Akun terverifikasi</Badge>
-      <Badge variant="azure" size="sm" className="text-[10px]">PRSI Certified</Badge>
+      {registration?.kind === 'instructor' && registration.license ? (
+        <Badge variant="azure" size="sm" className="text-[10px]">{registration.license}</Badge>
+      ) : null}
     </>
   ) : (
     <Badge variant="neutral" size="sm" className="text-[10px]">Belum terdaftar</Badge>
@@ -94,36 +84,13 @@ export default function ProfileParent() {
 
   const waMessage = encodeURIComponent(`Halo Customer Service PT Tirya Lumba, saya *${currentName}* (${user.email}).\nSaya ingin menanyakan perihal akun saya.`);
 
-  const previewBar = (
-    <div className="flex flex-wrap items-center justify-between w-full gap-2">
-      <span className="font-semibold text-slate-500 text-[11px] uppercase tracking-wider">Pratinjau Kondisi Akun</span>
-      <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg">
-        {(['auto', 'guest', 'student', 'teacher'] as const).map((tab) => (
-          <button
-            key={tab}
-            type="button"
-            onClick={() => setActiveTab(tab)}
-            className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all cursor-pointer ${
-              activeTab === tab
-                ? 'bg-white text-[#0077B6] shadow-2xs dark:bg-slate-700 dark:text-slate-100'
-                : 'text-slate-500 hover:text-slate-700 dark:text-slate-400'
-            }`}
-          >
-            {tab === 'auto' ? 'Otomatis' : tab === 'guest' ? 'Sebelum Daftar' : tab === 'student' ? 'Murid' : 'Guru'}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-
   return (
     <ProfileLayout
-      previewBar={previewBar}
       sidebar={
         <ProfileIdentitySidebar
           name={currentName}
           email={user.email}
-          photoUrl={user.profilePictureUrl}
+          photoUrl={user.profilePictureUrl || registration?.profilePictureUrl}
           tagline={tagline}
           badges={badges}
           waMessage={waMessage}
@@ -131,10 +98,34 @@ export default function ProfileParent() {
         />
       }
     >
-      {effectiveCondition === 'student' ? (
-        <StudentContentView snapshot={studentSnapshot} email={user.email} />
-      ) : effectiveCondition === 'teacher' ? (
-        <TeacherContentView snapshot={teacherSnapshot} email={user.email} />
+      {isStudent ? (
+        <StudentContentView snapshot={registration as StudentRegistrationSnapshot} email={user.email} />
+      ) : isTeacher ? (
+        <TeacherContentView
+          snapshot={
+            (registration?.kind === 'instructor'
+              ? registration
+              : {
+                  kind: 'instructor',
+                  fullName: user.fullName || user.email,
+                  phone: user.phone || '',
+                  birthDate: '',
+                  gender: 'Laki-Laki',
+                  address: '',
+                  shortBio: '',
+                  license: '',
+                  experience: '',
+                  schedules: [],
+                  profilePictureUrl: user.profilePictureUrl || '',
+                  cvUrl: '',
+                  registrationId: user.userId,
+                  status: 'APPROVED',
+                  submittedAt: Date.now(),
+                  scheduleLabels: [],
+                }) as InstructorRegistrationSnapshot
+          }
+          email={user.email}
+        />
       ) : (
         <GuestContentView name={currentName} email={user.email} />
       )}

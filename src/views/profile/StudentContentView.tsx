@@ -16,6 +16,11 @@ export const StudentContentView: React.FC<StudentContentViewProps> = ({ snapshot
   const activeSessions = snapshot.activeSessions ?? 0;
   const timeStr = snapshot.timeRange || getSessionTime(snapshot.firstMeetSession, snapshot.startTime, snapshot.endTime);
 
+  const hasPackage = Boolean(snapshot.packageType);
+  const hasPrice = typeof snapshot.packagePrice === 'number' && snapshot.packagePrice > 0;
+  const hasSession = Boolean(snapshot.firstMeetSession);
+  const hasLocation = Boolean(snapshot.locationLabel);
+
   return (
     <div className="space-y-5 flex-1">
       {/* Kartu 1: Program Kursus */}
@@ -27,36 +32,46 @@ export const StudentContentView: React.FC<StudentContentViewProps> = ({ snapshot
         {/* Ringkasan Sesi */}
         <StudentSessionProgress
           activeSessions={activeSessions}
-          totalSessions={snapshot.packagePrice ? 4 : 4}
+          totalSessions={4}
         />
 
         {/* Rincian Label-Nilai */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs pt-1">
-          <div>
-            <span className="block text-[11px] font-medium text-slate-400">Paket Kursus</span>
-            <span className="font-semibold text-[#1D3557] dark:text-slate-200 text-sm mt-0.5 block">
-              Paket {snapshot.packageType || 'Reguler'}
-            </span>
+        {(hasPackage || hasPrice || hasSession || hasLocation) && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs pt-1">
+            {hasPackage && (
+              <div>
+                <span className="block text-[11px] font-medium text-slate-400">Paket Kursus</span>
+                <span className="font-semibold text-[#1D3557] dark:text-slate-200 text-sm mt-0.5 block">
+                  Paket {snapshot.packageType}
+                </span>
+              </div>
+            )}
+            {hasPrice && (
+              <div>
+                <span className="block text-[11px] font-medium text-slate-400">Biaya Kursus</span>
+                <span className="font-semibold text-[#1D3557] dark:text-slate-200 text-sm mt-0.5 block tabular-nums">
+                  {formatRupiah(snapshot.packagePrice)}
+                </span>
+              </div>
+            )}
+            {hasSession && (
+              <div>
+                <span className="block text-[11px] font-medium text-slate-400">Jadwal Rutin</span>
+                <span className="font-semibold text-[#1D3557] dark:text-slate-200 mt-0.5 block">
+                  {snapshot.firstMeetSession} {timeStr ? `(${timeStr})` : ''}
+                </span>
+              </div>
+            )}
+            {hasLocation && (
+              <div>
+                <span className="block text-[11px] font-medium text-slate-400">Kolam Latihan</span>
+                <span className="font-semibold text-[#1D3557] dark:text-slate-200 mt-0.5 block truncate">
+                  {snapshot.locationLabel}
+                </span>
+              </div>
+            )}
           </div>
-          <div>
-            <span className="block text-[11px] font-medium text-slate-400">Biaya Kursus</span>
-            <span className="font-semibold text-[#1D3557] dark:text-slate-200 text-sm mt-0.5 block tabular-nums">
-              {formatRupiah(snapshot.packagePrice)}
-            </span>
-          </div>
-          <div>
-            <span className="block text-[11px] font-medium text-slate-400">Jadwal Rutin</span>
-            <span className="font-semibold text-[#1D3557] dark:text-slate-200 mt-0.5 block">
-              {snapshot.firstMeetSession} {timeStr ? `(${timeStr})` : ''}
-            </span>
-          </div>
-          <div>
-            <span className="block text-[11px] font-medium text-slate-400">Kolam Latihan</span>
-            <span className="font-semibold text-[#1D3557] dark:text-slate-200 mt-0.5 block truncate">
-              {snapshot.locationLabel || 'Kolam Mitra'}
-            </span>
-          </div>
-        </div>
+        )}
 
         {/* Panel Buka/Tutup Profil Pelatih */}
         <StudentCoachPanel snapshot={snapshot} />

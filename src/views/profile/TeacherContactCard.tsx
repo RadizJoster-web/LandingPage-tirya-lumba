@@ -29,18 +29,22 @@ export const TeacherContactCard: React.FC<TeacherContactCardProps> = ({
             {email}
           </span>
         </div>
-        <div>
-          <span className="block text-[11px] font-medium text-slate-400">Nomor WhatsApp</span>
-          <span className="font-semibold text-[#1D3557] dark:text-slate-200 mt-0.5 block">
-            {snapshot.phone || '–'}
-          </span>
-        </div>
-        <div>
-          <span className="block text-[11px] font-medium text-slate-400">Domisili Tempat Tinggal</span>
-          <span className="font-semibold text-[#1D3557] dark:text-slate-200 mt-0.5 block">
-            {snapshot.address || '–'}
-          </span>
-        </div>
+        {snapshot.phone && (
+          <div>
+            <span className="block text-[11px] font-medium text-slate-400">Nomor WhatsApp</span>
+            <span className="font-semibold text-[#1D3557] dark:text-slate-200 mt-0.5 block">
+              {snapshot.phone}
+            </span>
+          </div>
+        )}
+        {snapshot.address && (
+          <div>
+            <span className="block text-[11px] font-medium text-slate-400">Domisili Tempat Tinggal</span>
+            <span className="font-semibold text-[#1D3557] dark:text-slate-200 mt-0.5 block">
+              {snapshot.address}
+            </span>
+          </div>
+        )}
       </div>
     </section>
   );

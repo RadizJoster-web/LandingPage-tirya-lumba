@@ -13,6 +13,10 @@ export const StudentCoachPanel: React.FC<StudentCoachPanelProps> = ({ snapshot }
 
   if (!snapshot.instructorName) return null;
 
+  const hasLicense = Boolean(snapshot.instructorLicense && snapshot.instructorLicense.trim());
+  const hasExperience = Boolean(snapshot.instructorExperience && snapshot.instructorExperience.trim());
+  const hasBio = Boolean(snapshot.instructorBio && snapshot.instructorBio.trim());
+
   return (
     <div className="pt-2 border-t border-gray-100 dark:border-slate-800 space-y-3">
       <div className="flex items-center justify-between">
@@ -47,27 +51,30 @@ export const StudentCoachPanel: React.FC<StudentCoachPanelProps> = ({ snapshot }
                 <h4 className="text-sm font-bold text-[#1D3557] dark:text-slate-100">
                   {snapshot.instructorName}
                 </h4>
-                <Badge variant="azure" size="sm" className="text-[10px] font-semibold py-0.5">
-                  PRSI Verified
-                </Badge>
+                {hasLicense && (
+                  <Badge variant="azure" size="sm" className="text-[10px] font-semibold py-0.5">
+                    {snapshot.instructorLicense}
+                  </Badge>
+                )}
               </div>
-              <p className="text-xs text-slate-500 mt-0.5">
-                {snapshot.instructorLicense || 'Sertifikasi Pelatih Resmi PRSI'}
-              </p>
             </div>
           </div>
 
-          <div className="text-xs text-slate-600 dark:text-slate-300 space-y-1 pt-1 border-t border-slate-200/60 dark:border-slate-700">
-            <p>
-              <strong className="text-slate-700 dark:text-slate-200 font-semibold">Pengalaman: </strong>
-              {snapshot.instructorExperience || 'Pelatih renang berpengalaman melatih teknik renang dasar & prestasi.'}
-            </p>
-            {snapshot.instructorBio && (
-              <p className="italic text-slate-500 dark:text-slate-400">
-                "{snapshot.instructorBio}"
-              </p>
-            )}
-          </div>
+          {(hasExperience || hasBio) && (
+            <div className="text-xs text-slate-600 dark:text-slate-300 space-y-1.5 pt-1 border-t border-slate-200/60 dark:border-slate-700">
+              {hasExperience && (
+                <p>
+                  <strong className="text-slate-700 dark:text-slate-200 font-semibold">Pengalaman: </strong>
+                  {snapshot.instructorExperience}
+                </p>
+              )}
+              {hasBio && (
+                <p className="italic text-slate-500 dark:text-slate-400">
+                  "{snapshot.instructorBio}"
+                </p>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>

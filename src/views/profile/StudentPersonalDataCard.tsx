@@ -35,38 +35,47 @@ export const StudentPersonalDataCard: React.FC<StudentPersonalDataCardProps> = (
             {email}
           </span>
         </div>
-        <div>
-          <span className="block text-[11px] font-medium text-slate-400">Nomor WhatsApp</span>
-          <span className="font-semibold text-[#1D3557] dark:text-slate-200 mt-0.5 block">
-            {snapshot.phone || '–'}
-          </span>
-        </div>
-        <div>
-          <span className="block text-[11px] font-medium text-slate-400">Asal Sekolah / Kantor</span>
-          <span className="font-semibold text-[#1D3557] dark:text-slate-200 mt-0.5 block">
-            {snapshot.schoolOrOffice || '–'}
-          </span>
-        </div>
-        <div>
-          <span className="block text-[11px] font-medium text-slate-400">Ukuran Kaos</span>
-          <span className="font-semibold text-[#1D3557] dark:text-slate-200 mt-0.5 block">
-            {snapshot.tshirtSize || '–'}
-          </span>
-        </div>
-        <div>
-          <span className="block text-[11px] font-medium text-slate-400">Metode Pembayaran</span>
-          <span className="font-semibold text-[#1D3557] dark:text-slate-200 mt-0.5 block">
-            {PAYMENT_LABEL[snapshot.paymentMethod] || snapshot.paymentMethod || '–'}
-          </span>
-        </div>
+        {snapshot.phone && (
+          <div>
+            <span className="block text-[11px] font-medium text-slate-400">Nomor WhatsApp</span>
+            <span className="font-semibold text-[#1D3557] dark:text-slate-200 mt-0.5 block">
+              {snapshot.phone}
+            </span>
+          </div>
+        )}
+        {snapshot.schoolOrOffice && (
+          <div>
+            <span className="block text-[11px] font-medium text-slate-400">Asal Sekolah / Kantor</span>
+            <span className="font-semibold text-[#1D3557] dark:text-slate-200 mt-0.5 block">
+              {snapshot.schoolOrOffice}
+            </span>
+          </div>
+        )}
+        {snapshot.tshirtSize && (
+          <div>
+            <span className="block text-[11px] font-medium text-slate-400">Ukuran Kaos</span>
+            <span className="font-semibold text-[#1D3557] dark:text-slate-200 mt-0.5 block">
+              {snapshot.tshirtSize}
+            </span>
+          </div>
+        )}
+        {snapshot.paymentMethod && (
+          <div>
+            <span className="block text-[11px] font-medium text-slate-400">Metode Pembayaran</span>
+            <span className="font-semibold text-[#1D3557] dark:text-slate-200 mt-0.5 block">
+              {PAYMENT_LABEL[snapshot.paymentMethod] || snapshot.paymentMethod}
+            </span>
+          </div>
+        )}
 
-        {/* Domisili dibuat selebar kartu */}
-        <div className="sm:col-span-2 pt-1 border-t border-gray-100 dark:border-slate-800">
-          <span className="block text-[11px] font-medium text-slate-400">Domisili Tempat Tinggal</span>
-          <span className="font-medium text-slate-600 dark:text-slate-300 mt-0.5 block leading-relaxed">
-            {snapshot.address || '–'}
-          </span>
-        </div>
+        {snapshot.address && (
+          <div className="sm:col-span-2 pt-1 border-t border-gray-100 dark:border-slate-800">
+            <span className="block text-[11px] font-medium text-slate-400">Domisili Tempat Tinggal</span>
+            <span className="font-medium text-slate-600 dark:text-slate-300 mt-0.5 block leading-relaxed">
+              {snapshot.address}
+            </span>
+          </div>
+        )}
       </div>
     </section>
   );

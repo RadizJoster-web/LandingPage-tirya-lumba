@@ -1,6 +1,5 @@
 import React from 'react';
-import Link from 'next/link';
-import { Home, LogOut, MessageCircle } from 'lucide-react';
+import { LogOut, MessageCircle } from 'lucide-react';
 import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
 
@@ -71,18 +70,6 @@ export const ProfileIdentitySidebar: React.FC<ProfileIdentitySidebarProps> = ({
             <span>Hubungi CS via WhatsApp</span>
           </Button>
         </a>
-
-        <Link href="/" className="block w-full">
-          <Button
-            variant="outline"
-            size="sm"
-            isFullRounded={false}
-            className="w-full flex items-center justify-center gap-2 text-xs text-slate-600 border-gray-200 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
-          >
-            <Home className="w-3.5 h-3.5 shrink-0" />
-            <span>Kembali ke Beranda</span>
-          </Button>
-        </Link>
 
         <Button
           variant="ghost"
