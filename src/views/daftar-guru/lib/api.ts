@@ -14,13 +14,11 @@ export async function fetchMasterData(): Promise<{
   const [a, l] = await Promise.all([
     request<Area[]>('/areas', {
       method: 'GET',
-      revalidate: 3600,
-      tags: ['areas'],
+      revalidate: 0,
     }),
     request<Location[]>('/locations', {
       method: 'GET',
-      revalidate: 3600,
-      tags: ['locations'],
+      revalidate: 0,
     }),
   ]);
   return { areas: a.data ?? [], locations: l.data ?? [] };

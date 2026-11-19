@@ -13,18 +13,15 @@ export async function fetchMaster() {
   const [a, l, p] = await Promise.all([
     request<Area[]>('/areas', {
       method: 'GET',
-      revalidate: 3600,
-      tags: ['areas'],
+      revalidate: 0,
     }),
     request<Location[]>('/locations', {
       method: 'GET',
-      revalidate: 3600,
-      tags: ['locations'],
+      revalidate: 0,
     }),
     request<LessonPackage[]>('/packages', {
       method: 'GET',
-      revalidate: 3600,
-      tags: ['packages'],
+      revalidate: 0,
     }),
   ]);
   return {
