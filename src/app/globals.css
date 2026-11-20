@@ -40,6 +40,26 @@
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 90px;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+@supports not (scrollbar-color: auto) {
+  html {
+    scrollbar-width: auto;
+  }
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
 }
 
 body {
@@ -47,10 +67,23 @@ body {
   color: var(--text-dark);
   font-family: var(--font-body), "Inter", sans-serif;
   min-height: 100vh;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading), "Plus Jakarta Sans", sans-serif;
+  text-wrap: balance;
+  letter-spacing: -0.02em;
+}
+
+p, li {
+  text-wrap: pretty;
+}
+
+:where(a, button, input, select, textarea):focus-visible {
+  outline: 2px solid var(--primary-blue);
+  outline-offset: 3px;
 }
 
 /* Fluid micro-interaction keyframes */

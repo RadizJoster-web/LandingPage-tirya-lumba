@@ -43,24 +43,21 @@ export const WhyUsStats: React.FC<WhyUsStatsProps> = ({ stats }) => {
   ];
 
   return (
-    <div className="space-y-12">
-      {/* Bento Grid 4 Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-left">
+    <div className="space-y-10">
+      {/* 4-Column Stat Cards with Clean Typography and Subtle Borders */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 text-left">
         {statItems.map((item) => (
           <div
             key={item.label}
-            className="bg-white rounded-2xl p-6 sm:p-7 shadow-lg shadow-blue-950/5 border border-slate-200/60 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:bg-slate-900 dark:border-slate-800"
+            className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs hover:border-sky-200 hover:shadow-sm transition-all duration-200 dark:bg-slate-900 dark:border-slate-800"
           >
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 block mb-3">
-              Data Resmi
-            </span>
-            <div className="font-heading font-extrabold text-[42px] leading-tight text-[#0077B6] tabular-nums tracking-tight">
+            <div className="font-heading font-extrabold text-3xl sm:text-4xl text-[#0077B6] tabular-nums tracking-tight">
               {item.value}
             </div>
             <h3 className="mt-2 font-heading font-bold text-base text-[#1D3557] dark:text-slate-100">
               {item.label}
             </h3>
-            <p className="mt-1 text-xs text-slate-500 leading-relaxed">
+            <p className="mt-1 text-xs text-slate-500 leading-relaxed dark:text-slate-400">
               {item.subtext}
             </p>
           </div>
@@ -73,7 +70,7 @@ export const WhyUsStats: React.FC<WhyUsStatsProps> = ({ stats }) => {
             variant="primary"
             size="lg"
             isFullRounded={true}
-            className="px-8 shadow-sm hover:shadow-md"
+            className="px-8 py-3.5 text-sm font-semibold shadow-xs hover:shadow-sm active:scale-[0.98] transition-all"
           >
             Daftar Sebagai Murid
           </Button>
