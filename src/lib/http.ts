@@ -48,9 +48,6 @@ export async function request<T>(
     ...(revalidate === 0 ? { cache: 'no-store' as const } : {}),
     headers: {
       Accept: 'application/json',
-      ...(revalidate === 0
-        ? { 'Cache-Control': 'no-cache, no-store, must-revalidate', Pragma: 'no-cache' }
-        : {}),
       ...(isForm || body === undefined
         ? {}
         : { 'Content-Type': 'application/json' }),
