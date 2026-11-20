@@ -7,6 +7,7 @@ import { Area, Location, SessionSlot } from '@/types';
 import { toErrorMessage } from '@/lib/http';
 import { GuruWizardLayout } from './GuruWizardLayout';
 import { GuruFormSteps } from './GuruFormSteps';
+import { CoachClosedNotice } from './CoachClosedNotice';
 import { useGuruForm } from './useGuruForm';
 import { useGuruUpload } from './useGuruUpload';
 import {
@@ -27,6 +28,7 @@ export default function DaftarGuruParent() {
   const [areas, setAreas] = useState<Area[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
   const [sessionMap, setSessionMap] = useState<Record<string, SessionSlot[]>>({});
+  const [isClosed, setIsClosed] = useState(false);
   const form = useGuruForm(locations);
 
   const { isCvUploading, isPhotoUploading, handleCvChange, handlePhotoChange } =
@@ -48,10 +50,11 @@ export default function DaftarGuruParent() {
     let active = true;
     fetchMasterData()
       .then((data) => {
-        if (active) {
-          setAreas(data.areas);
-          setLocations(data.locations);
-        }
+        if (!active) return;
+        setAreas(data.areas);
+        setLocations(data.locations);
+        const open = data.locations.some((l) => l.isCoachRegistrationOpen !== false);
+        if (!open && data.locations.length > 0) setIsClosed(true);
       })
       .catch((err) => {
         if (active) form.setErrorMsg(toErrorMessage(err));
@@ -70,18 +73,11 @@ export default function DaftarGuruParent() {
         const slots = await fetchSessions(locId).catch(() => []);
         return [locId, slots] as const;
       }),
-    )
-      .then((entries) => {
-        if (active) {
-          setSessionMap((prev) => ({
-            ...prev,
-            ...Object.fromEntries(entries),
-          }));
-        }
-      })
-      .catch((err) => {
-        if (active) form.setErrorMsg(toErrorMessage(err));
-      });
+    ).then((entries) => {
+      if (active) {
+        setSessionMap((prev) => ({ ...prev, ...Object.fromEntries(entries) }));
+      }
+    });
     return () => {
       active = false;
     };
@@ -96,9 +92,7 @@ export default function DaftarGuruParent() {
       !form.cvUrl ||
       !form.profilePictureUrl
     ) {
-      form.setErrorMsg(
-        'Pastikan kolam, jadwal, berkas CV, dan foto profil sudah lengkap.',
-      );
+      form.setErrorMsg('Pastikan kolam, jadwal, berkas CV, dan foto profil sudah lengkap.');
       return;
     }
     form.setIsSubmitting(true);
@@ -112,12 +106,17 @@ export default function DaftarGuruParent() {
           scheduleLabels: form.scheduleLabels,
         }),
       );
+      form.clearDraft();
       router.push('/profile?sukses=1');
     } catch (err) {
       form.setErrorMsg(toErrorMessage(err));
       form.setIsSubmitting(false);
     }
   };
+
+  if (isClosed) {
+    return <CoachClosedNotice />;
+  }
 
   return (
     <GuruWizardLayout step={form.step} errorMsg={form.errorMsg}>

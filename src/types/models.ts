@@ -46,6 +46,7 @@ export interface Location {
   category?: string | null;
   mapUrl?: string | null;
   imageUrl?: string | null;
+  isCoachRegistrationOpen?: boolean;
   areaId?: string;
   areaName?: string;
   regularPrice?: number;

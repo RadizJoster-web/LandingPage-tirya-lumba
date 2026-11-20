@@ -51,10 +51,13 @@ export function useMuridSubmit({
 
     form.setIsSubmitting(true);
     try {
+      let finalPhotoUrl = photoUrl;
       if (form.photoFile) {
         const photo = await uploadStudentPhoto(form.photoFile);
+        finalPhotoUrl = photo.url;
         setPhotoUrl(photo.url);
       }
+      form.persistDraft(2, { photoUrl: finalPhotoUrl });
       form.setStep(2);
     } catch (err) {
       form.setErrorMsg(`Gagal mengunggah foto profil 4x6: ${toErrorMessage(err)}`);
@@ -72,6 +75,7 @@ export function useMuridSubmit({
       return;
     }
 
+    form.persistDraft(3, { photoUrl });
     form.setStep(3);
   };
 
@@ -110,6 +114,7 @@ export function useMuridSubmit({
       persistRegistration(createStudentSnapshot(form, payload, res, reported));
       await refreshRegistration();
 
+      form.clearDraft();
       router.push('/profile');
     } catch (err) {
       form.setErrorMsg(`Gagal memproses pendaftaran murid: ${toErrorMessage(err)}`);

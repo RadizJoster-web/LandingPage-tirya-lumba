@@ -5,8 +5,9 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 import { MuridWizardLayout } from './MuridWizardLayout';
 import { MuridFormSteps } from './MuridFormSteps';
-import { useMuridForm } from './useMuridForm';
+import { useMuridForm, MURID_DRAFT_KEY } from './useMuridForm';
 import { useMuridSubmit } from './lib/useMuridSubmit';
+import { loadDraft } from '@/lib/draftStorage';
 
 export default function DaftarMuridParent() {
   const router = useRouter();
@@ -41,6 +42,12 @@ export default function DaftarMuridParent() {
   useEffect(() => {
     if (!authLoading && !user) router.push('/login');
   }, [user, authLoading, router]);
+
+  useEffect(() => {
+    const d = loadDraft<{ photoUrl?: string; paymentProofUrl?: string }>(MURID_DRAFT_KEY);
+    if (d?.photoUrl && !photoUrl) setPhotoUrl(d.photoUrl);
+    if (d?.paymentProofUrl && !paymentProofUrl) setPaymentProofUrl(d.paymentProofUrl);
+  }, []);
 
   useEffect(() => {
     if (studentSnapshot?.profilePictureUrl && !photoUrl) {

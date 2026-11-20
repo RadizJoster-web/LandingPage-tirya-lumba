@@ -45,6 +45,7 @@ export async function request<T>(
     ...init,
     body: isForm ? body : body !== undefined ? JSON.stringify(body) : undefined,
     credentials: isPublicGet ? 'same-origin' : 'include',
+    ...(revalidate === 0 ? { cache: 'no-store' as const } : {}),
     headers: {
       Accept: 'application/json',
       ...(isForm || body === undefined
