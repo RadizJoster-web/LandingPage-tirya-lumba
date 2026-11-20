@@ -1,8 +1,11 @@
 import { ApiResponse } from '@/types';
 import { getToken } from '@/services/session-store';
 
-export const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const rawApiUrl =
+  process.env.NEXT_PUBLIC_API_URL?.trim() || 'http://localhost:5000/api';
+export const API_BASE_URL = rawApiUrl.endsWith('/api')
+  ? rawApiUrl
+  : rawApiUrl.replace(/\/+$/, '') + '/api';
 
 /** Alamat berkas statis (tanpa /api) untuk merender URL dari server. */
 export const API_ORIGIN = API_BASE_URL.replace(/\/api\/?$/, '');
