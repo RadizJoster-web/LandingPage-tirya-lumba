@@ -11,6 +11,7 @@ export interface ModalProps {
   description?: string;
   children: React.ReactNode;
   className?: string;
+  closeOnBackdrop?: boolean;
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -20,6 +21,7 @@ export const Modal: React.FC<ModalProps> = ({
   description,
   children,
   className,
+  closeOnBackdrop = false,
 }) => {
   useEffect(() => {
     if (!isOpen) return;
@@ -37,7 +39,7 @@ export const Modal: React.FC<ModalProps> = ({
       role="dialog"
       aria-modal="true"
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-fade-in"
-      onClick={onClose}
+      onClick={closeOnBackdrop ? onClose : undefined}
     >
       <div
         className={cn(
